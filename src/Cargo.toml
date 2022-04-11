@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "generator",
+    "bench",
+    "command",
+]
