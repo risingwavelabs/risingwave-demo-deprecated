@@ -1,0 +1,4 @@
+[generator]
+    [generator.jsonnonested]
+    total = 100
+    cardinal = [{ field = "query", count = 100 }, {field = "search_hash_id", count = 100}]

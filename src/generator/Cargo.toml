@@ -2,7 +2,18 @@
 name = "generator"
 version = "0.1.0"
 edition = "2021"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rand = "0.8.5"
+rdkafka = { version = "0.28", features = ["cmake-build"] }
+serde = { version = "1", features = ["derive"] }
+serde_derive = "1"
+serde_json = "1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "sync", "macros", "time", "signal", "fs"] }
+toml = "0.5.8"
+anyhow = "1.0.56"
+bytes = { version = "1", features = ["serde"] }
+strum = "0.24"
+strum_macros = "0.24"
+croaring = "0.5.2"
