@@ -1,4 +1,3 @@
-use crate::json::json_generator::RunningState::Process;
 use crate::json::json_template::{
     FloatValue, IntValue, JsonDataType, LongValue, RandomStringValue, Value,
 };
@@ -6,8 +5,6 @@ use rand::Rng;
 use serde_derive::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
 use std::str::FromStr;
 use tokio::sync;
 
@@ -56,23 +53,29 @@ impl JsonGenerator {
         data_tx: sync::mpsc::Sender<String>,
         notify_tx: sync::watch::Sender<RunningState>,
     ) -> anyhow::Result<()> {
-        if let Err(err) = notify_tx.send(Process) {
+        if let Err(err) = notify_tx.send(RunningState::Process) {
             Err(anyhow::Error::from(err))
         } else {
             // TODO: instead of using the State trait
             let mut rule_state: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
             let field_rule_vec = self.rule.cardinal.clone();
-            for _ in 0..self.rule.total {
+            for _ in 0..=self.rule.total {
                 let mut record = self.new_json_object();
                 field_rule_vec.iter().for_each(|field_cardinal| {
                     let field = field_cardinal.field.clone();
                     if rule_state.contains_key(field.as_str()) {
                         let values = rule_state.get(field.as_str()).unwrap();
                         let values_size = values.len() as i32;
-                        if values_size > field_cardinal.count {
+                        if values_size >= field_cardinal.count {
                             let idx = rand::thread_rng().gen_range(0..values_size) as usize;
                             let old_value = values.get(idx).unwrap().clone();
-                            record.insert(field, old_value);
+                            record.insert(field.clone(), old_value);
+                        } else {
+                            let field_value = record.get(field.as_str()).unwrap();
+                            let mut values =
+                                rule_state.get(field.clone().as_str()).unwrap().clone();
+                            values.push(field_value.clone());
+                            rule_state.insert(field.clone(), values);
                         }
                     } else {
                         rule_state.insert(
@@ -82,7 +85,8 @@ impl JsonGenerator {
                     }
                 });
                 let json_string = serde_json::to_string(&record).unwrap();
-                if let Err(_err) = data_tx.send(json_string).await {
+                if let Err(err) = data_tx.send(json_string).await {
+                    println!("send error = {:?}", err);
                     let _send_ignore = notify_tx.send(RunningState::Failure);
                 }
             }
@@ -126,30 +130,10 @@ impl JsonGenerator {
     }
 }
 
-pub fn load_json_template(path: String) -> anyhow::Result<HashMap<String, String>> {
-    let file_rs = File::open(path);
-    match file_rs {
-        Ok(file) => {
-            let reader = BufReader::new(file);
-            let config_json: HashMap<String, String> = serde_json::from_reader(reader).unwrap();
-            Ok(config_json)
-        }
-        Err(err) => Err(anyhow::Error::from(err)),
-    }
-}
-
-pub fn load_generator_config(path: String) -> anyhow::Result<GeneratorRuleConfig> {
-    let config_string = std::fs::read_to_string(path).expect("can't read toml file");
-    let config_rs = toml::from_str(&config_string);
-    match config_rs {
-        Ok(generator) => Ok(generator),
-        Err(err) => Err(anyhow::Error::from(err)),
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::json::json_generator::{load_generator_config, load_json_template, JsonGenerator};
+    use crate::json::json_generator::{GeneratorRuleConfig, JsonGenerator, RunningState};
+    use crate::{load_json_template, load_toml_config};
     use std::path::PathBuf;
 
     fn get_config_path(config_file: &str) -> String {
@@ -160,9 +144,10 @@ mod tests {
     }
 
     #[test]
-    fn get_json_generator_rule() {
+    fn test_load_generator_rule() {
         let rule_config_path = get_config_path("generator.toml");
-        let rule_rs = load_generator_config(rule_config_path);
+        let read_toml_rs = std::fs::read_to_string(rule_config_path).unwrap();
+        let rule_rs = load_toml_config::<GeneratorRuleConfig>(read_toml_rs.as_str());
         assert!(rule_rs.is_ok());
     }
 
@@ -173,18 +158,52 @@ mod tests {
         assert!(json_template_rs.is_ok());
     }
 
-    #[test]
-    fn test_generator() {
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_batch_generate() {
+        let json_generator = new_generate();
+        let (tx, mut rx) = tokio::sync::mpsc::channel(10);
+        let (notify_tx, mut notify_rx) = tokio::sync::watch::channel(RunningState::Process);
+        let wait_join = tokio::task::spawn(async move {
+            loop {
+                tokio::select! {
+                   data = rx.recv() => {
+                      println!("receive data {}", data.unwrap());
+                   },
+                   run_status = notify_rx.changed() => {
+                        if run_status.is_ok() {
+                            if let RunningState::Success = *notify_rx.borrow() {
+                                println!("receive RunningState is Success.");
+                                break;
+                            }
+                        }
+                   }
+                }
+            }
+        });
+        let batch_gen_rs = json_generator.batch_generate(tx, notify_tx).await;
+        assert!(batch_gen_rs.is_ok());
+        let rs = wait_join.await;
+        assert!(rs.is_ok())
+    }
+
+    fn new_generate() -> JsonGenerator {
         let template_file_path = get_config_path("json-nonested.json");
         let json_template = load_json_template(template_file_path).unwrap();
         println!("json_template = {:?}", json_template);
         let rule_config_path = get_config_path("generator.toml");
-        let rule = load_generator_config(rule_config_path).unwrap();
+        let read_toml_rs = std::fs::read_to_string(rule_config_path).unwrap();
+
+        let rule: GeneratorRuleConfig = load_toml_config(read_toml_rs.as_str()).unwrap();
         println!("rule_config = {:?}", rule);
-        let json_generator = JsonGenerator::new(
+        JsonGenerator::new(
             json_template,
             rule.generator.get("jsonnonested").unwrap().clone(),
-        );
+        )
+    }
+
+    #[test]
+    fn test_new_json_object() {
+        let json_generator = new_generate();
         for _ in 0..3 {
             let json_obj = json_generator.new_json_object();
             assert!(!json_obj.is_empty());

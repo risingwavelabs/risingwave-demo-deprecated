@@ -1,0 +1,4 @@
+[connector]
+    [connector.kafka]
+    broker = "127.0.0.1:39092"
+    topic = "test_topic"
