@@ -10,7 +10,7 @@ use tokio::sync;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct GeneratorRuleConfig {
-    generator: HashMap<String, JsonNoNestedRule>,
+    pub generator: HashMap<String, JsonNoNestedRule>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -20,7 +20,6 @@ pub struct JsonNoNestedRule {
 }
 
 #[derive(Debug, Deserialize, Clone)]
-#[allow(dead_code)]
 pub struct FieldCardinal {
     field: String,
     count: i32,
@@ -133,15 +132,7 @@ impl JsonGenerator {
 #[cfg(test)]
 mod tests {
     use crate::json::json_generator::{GeneratorRuleConfig, JsonGenerator, RunningState};
-    use crate::{load_json_template, load_toml_config};
-    use std::path::PathBuf;
-
-    fn get_config_path(config_file: &str) -> String {
-        let current_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        let parent = current_path.parent().unwrap().parent().unwrap();
-        let path_string = parent.as_os_str().to_str().unwrap().to_string();
-        path_string + "/configs/" + config_file
-    }
+    use crate::{get_config_path, load_json_template, load_toml_config};
 
     #[test]
     fn test_load_generator_rule() {

@@ -1,4 +1,3 @@
 #![allow(dead_code)]
-
-mod json_generator;
-mod json_template;
+pub mod json_generator;
+pub mod json_template;
