@@ -58,7 +58,7 @@ impl JsonGenerator {
             // TODO: instead of using the State trait
             let mut rule_state: HashMap<String, Vec<serde_json::Value>> = HashMap::new();
             let field_rule_vec = self.rule.cardinal.clone();
-            for _ in 0..=self.rule.total {
+            for count in 0..=self.rule.total {
                 let mut record = self.new_json_object();
                 field_rule_vec.iter().for_each(|field_cardinal| {
                     let field = field_cardinal.field.clone();
@@ -84,11 +84,20 @@ impl JsonGenerator {
                     }
                 });
                 let json_string = serde_json::to_string(&record).unwrap();
-                if let Err(err) = data_tx.send(json_string).await {
-                    println!("send error = {:?}", err);
-                    let _send_ignore = notify_tx.send(RunningState::Failure);
+                let send_rs = data_tx.send(json_string).await;
+                match send_rs {
+                    Ok(()) => {
+                        if count % 100 == 0 && count > 0 {
+                            println!("generate message success. count = {}", count);
+                        }
+                    }
+                    Err(send_err) => {
+                        println!("send message error = {:?}", send_err);
+                        let _send_ignore = notify_tx.send(RunningState::Failure);
+                    }
                 }
             }
+            println!("all message send complete.");
             let _ignore_send = notify_tx.send(RunningState::Success);
             Ok(())
         }

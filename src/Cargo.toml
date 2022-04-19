@@ -2,5 +2,5 @@
 
 members = [
     "generator",
-    "command",
+    "bench",
 ]

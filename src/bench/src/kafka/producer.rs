@@ -1,4 +1,4 @@
-use data_generator::json::json_generator::{GeneratorRuleConfig, JsonGenerator, JsonNoNestedRule, RunningState};
+use data_generator::json::json_generator::{GeneratorRuleConfig, JsonGenerator, RunningState};
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use std::collections::HashMap;
 use std::time::Duration;
@@ -40,7 +40,7 @@ impl ProducerMessage {
         let (tx, mut rx) = sync::mpsc::channel(DEFAULT_CHANNEL_BUFFER_SIZE);
         let (notify_tx, mut notify_rx) = sync::watch::channel(RunningState::Process);
         let topic_string = self.kafka_props.clone().topic;
-        tokio::task::spawn(async move {
+        let recv_join = tokio::task::spawn(async move {
             let producer: &FutureProducer = &rdkafka::ClientConfig::new()
                 .set(
                     "bootstrap.servers",
@@ -49,54 +49,60 @@ impl ProducerMessage {
                 .set("message.timeout.ms", MESSAGE_TIME_OUT)
                 .create()
                 .expect("can't create kafka producer");
-            println!("kafka producer create success.");
             let mut counter = 0_i32;
             loop {
-                let msg: Option<String> = tokio::select! {
-                   data = rx.recv() => {
-                        Some(data.unwrap())
+                let msg: String = tokio::select! {
+                   msg = rx.recv() => {
+                        if let Some(msg) = msg {
+                            msg
+                        } else {
+                            break
+                        }
                    },
                    run_status = notify_rx.changed() => {
                         if run_status.is_ok() {
-                            if let RunningState::Process = *notify_rx.borrow() {
-                                continue;
-                            } else {
-                                println!("");
-                                None
+                            if let RunningState::Failure = *notify_rx.borrow() {
+                                println!("ProduceMessage receive signal change. {:?}", *notify_rx.borrow());
+                                break;
                             }
-                        } else {
-                            continue;
                         }
+                        continue;
                    }
                 };
-                if let Some(data) = msg {
-                    println!("receive data={}", data.clone());
-                    let deliver_status = producer
-                        .send::<Vec<u8>, _, _>(
-                            FutureRecord::to(topic_string.as_str())
-                                .payload(&data.as_bytes().to_vec()),
-                            Duration::from_secs(0),
-                        )
-                        .await;
-                    if deliver_status.is_err() {
-                        println!(
-                            "send message to kafka error topic={},msg={}",
-                            topic_string, data
-                        );
-                        break;
-                    } else {
-                        if counter % 10 == 0 {
-                            println!("{} {} messages sent successfully", topic_string, counter);
-                        }
-                        counter += 1;
-                    }
-                } else {
+                let deliver_status = producer
+                    .send::<Vec<u8>, _, _>(
+                        FutureRecord::to(topic_string.as_str()).payload(&msg.as_bytes().to_vec()),
+                        Duration::from_secs(0),
+                    )
+                    .await;
+                if deliver_status.is_err() {
+                    println!(
+                        "send message to kafka error topic={},msg={},Err={:?}",
+                        topic_string,
+                        msg,
+                        deliver_status.err().unwrap()
+                    );
                     break;
+                } else {
+                    if counter % 100 == 0 && counter > 0 {
+                        println!("{} {} messages sent successfully", topic_string, counter);
+                    }
+                    counter += 1;
                 }
             }
         });
-        let _msg_gen_rs = self.json_generator.batch_generate(tx, notify_tx).await;
-        Ok(())
+        let msg_gen_rs = self.json_generator.batch_generate(tx, notify_tx).await;
+        if let Err(gen_err) = msg_gen_rs {
+            println!("json generator gen_msg = {:?}", gen_err);
+            Err(gen_err)
+        } else {
+            let join_rs = recv_join.await;
+            if join_rs.is_err() {
+                Err(anyhow::Error::from(join_rs.err().unwrap()))
+            } else {
+                Ok(())
+            }
+        }
     }
 }
 
@@ -129,13 +135,24 @@ pub fn new_generator(conf_path: String) -> JsonGenerator {
     if rule_config_rs.is_err() {
         panic!("can't read file {}", rule_conf_path);
     }
-    let rule_config = rule_config_rs.unwrap().generator.get("jsonnonested").unwrap().clone();
-    JsonGenerator::new(json_template_rs.unwrap(), rule_config)
+    let rule_config = rule_config_rs
+        .unwrap()
+        .generator
+        .get("jsonnonested")
+        .unwrap()
+        .clone();
+    let json_template = json_template_rs.unwrap();
+    println!(
+        "load json_generator rule_config = {:?},json_template={:?}",
+        rule_config, json_template
+    );
+    JsonGenerator::new(json_template, rule_config)
 }
 
 pub fn new_producer_by_config(config_path: String) -> Box<ProducerMessage> {
-    println!("current config path = {:?}", config_path.clone());
+    println!("current config path = {:?}", config_path);
     let kafka_props = load_kafka_props(config_path.clone());
+    println!("load kafka properties = {:?}", kafka_props);
     let json_generator = new_generator(config_path);
     Box::new(ProducerMessage::new_json_producer(
         kafka_props,
@@ -154,8 +171,8 @@ fn read_file(path: String) -> String {
 
 #[cfg(test)]
 mod test {
-    use std::path::PathBuf;
     use crate::new_producer_by_config;
+    use std::path::PathBuf;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn kafka_producer_test() {
@@ -165,6 +182,6 @@ mod test {
         let producer = new_producer_by_config(format!("{}/configs", dev_config_path));
         let producer_static = Box::leak(producer);
         let rs = producer_static.send_message().await;
-        println!("producer sens msg = {:?}", rs);
+        assert!(rs.is_ok())
     }
 }
