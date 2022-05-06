@@ -109,13 +109,8 @@ impl ProducerMessage {
 pub fn load_kafka_props(conf_path: String) -> KafkaProperties {
     let connector_path = format!("{}/{}", conf_path, "connector.toml");
     let connector_file_content = read_file(connector_path.clone());
-    let connector_rs: anyhow::Result<ConnectorConfig> =
-        load_toml_config(connector_file_content.as_str());
-    if connector_rs.is_err() {
-        panic!("can't read file {}", connector_path);
-    }
-    connector_rs
-        .unwrap()
+    load_toml_config::<ConnectorConfig>(connector_file_content.as_str())
+        .expect(format!("can't read file {}", connector_path).as_str())
         .connector
         .get("kafka")
         .unwrap()
@@ -125,23 +120,16 @@ pub fn load_kafka_props(conf_path: String) -> KafkaProperties {
 pub fn new_generator(conf_path: String) -> JsonGenerator {
     let template_conf_path = format!("{}/{}", conf_path, "json-nonested.json");
     let rule_conf_path = format!("{}/{}", conf_path, "generator.toml");
-    let json_template_rs = load_json_template(template_conf_path.clone());
-    if json_template_rs.is_err() {
-        panic!("can't read file {}", template_conf_path);
-    }
+    let json_template = load_json_template(template_conf_path.clone())
+        .expect(format!("can't read file {}", template_conf_path).as_str());
     let rule_file_content = read_file(rule_conf_path.clone());
-    let rule_config_rs: anyhow::Result<GeneratorRuleConfig> =
-        load_toml_config(rule_file_content.as_str());
-    if rule_config_rs.is_err() {
-        panic!("can't read file {}", rule_conf_path);
-    }
-    let rule_config = rule_config_rs
-        .unwrap()
+
+    let rule_config = load_toml_config::<GeneratorRuleConfig>(rule_file_content.as_str())
+        .expect(format!("can't read file {}", rule_conf_path).as_str())
         .generator
         .get("jsonnonested")
         .unwrap()
         .clone();
-    let json_template = json_template_rs.unwrap();
     println!(
         "load json_generator rule_config = {:?},json_template={:?}",
         rule_config, json_template
@@ -161,12 +149,8 @@ pub fn new_producer_by_config(config_path: String) -> Box<ProducerMessage> {
 }
 
 fn read_file(path: String) -> String {
-    let read_rs = std::fs::read_to_string(path.clone());
-    if let Ok(file_content) = read_rs {
-        file_content
-    } else {
-        panic!("can't read file from path {}", path)
-    }
+    std::fs::read_to_string(path.clone())
+        .expect(format!("can't read file from path {}", path).as_str())
 }
 
 #[cfg(test)]
