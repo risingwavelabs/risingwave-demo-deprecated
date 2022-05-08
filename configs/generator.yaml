@@ -1,0 +1,65 @@
+---
+total: 10
+format: json
+
+connector:
+  kafka:
+    broker: 127.0.0.1:29092
+    topic: test_topic
+    timeout_ms: 1000
+
+schema:
+  - field: platform
+    type: enum
+  - field: search_hash_id
+    type: string
+  - field: log_type
+    type: string
+  - field: view_action
+    type: string
+  - field: parent_token
+    type: string
+  - field: parent_id
+    type: string
+  - field: server_timestamp
+    type: timestamp
+  - field: query
+    type: stringzh
+  - field: tab_type
+    type: string
+  - field: content_type
+    type: string
+  - field: content_id
+    type: string
+  - field: publish_timestamp
+    type: timestamp
+  - field: container_index
+    type: int
+  - field: client_id
+    type: string
+  - field: member_id
+    type: long
+  - field: client_timestamp
+    type: timestamp
+  - field: page_elapsed
+    type: long
+  - field: container_type
+    type: string
+  - field: page_level1_id
+    type: string
+  - field: content_token
+    type: string
+  - field: element_type
+    type: string
+  - field: event_type
+    type: string
+  - field: block_text
+    type: string
+  - field: element_text
+    type: string
+  - field: view_url
+    type: string
+  - field: page_name
+    type: string
+  - field: search_source
+    type: string
