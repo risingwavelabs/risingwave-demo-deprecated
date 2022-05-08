@@ -1,4 +1,4 @@
-use crate::json::json_template::{
+use crate::json_template::{
     FloatValue, IntValue, JsonDataType, LongValue, RandomStringValue, Value,
 };
 use rand::Rng;
@@ -140,7 +140,7 @@ impl JsonGenerator {
 
 #[cfg(test)]
 mod tests {
-    use crate::json::json_generator::{GeneratorRuleConfig, JsonGenerator, RunningState};
+    use crate::json_generator::{GeneratorRuleConfig, JsonGenerator, RunningState};
     use crate::{get_config_path, load_json_template, load_toml_config};
 
     #[test]
@@ -191,6 +191,7 @@ mod tests {
         let json_template = load_json_template(template_file_path).unwrap();
         println!("json_template = {:?}", json_template);
         let rule_config_path = get_config_path("generator.toml");
+
         let read_toml_rs = std::fs::read_to_string(rule_config_path).unwrap();
 
         let rule: GeneratorRuleConfig = load_toml_config(read_toml_rs.as_str()).unwrap();
