@@ -35,7 +35,7 @@ impl Generator {
                     DataType::Long => json!(rand_long()),
                     DataType::Int => json!(rand_int()),
                     DataType::Float => json!(rand_float()),
-                    DataType::Timestamp => json!(rand_timestamp()),
+                    DataType::Timestamp => json!(rand_timestamp(&f.timestamp)),
                 };
                 (key.clone(), json_value)
             })

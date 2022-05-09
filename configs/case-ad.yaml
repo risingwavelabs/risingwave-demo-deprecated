@@ -1,0 +1,21 @@
+---
+total: 10
+format: json
+
+connector:
+  kafka:
+    broker: 127.0.0.1:29092
+    topic: test_topic
+    timeout_ms: 1000
+
+schema:
+  user_id:
+    type: long
+  ad_id:
+    type: long
+  click_timestamp:
+    type: timestamp
+  impression_timestamp:
+    type: timestamp
+    timestamp:
+      before_less_than: 1s

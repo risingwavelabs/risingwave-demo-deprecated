@@ -1,7 +1,10 @@
+use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use serde::Deserialize;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime};
+
+use crate::config::TimestampConfig;
 
 // TODO: support for loading from config file.
 const RAN_F64_MAX: f64 = 50000_f64;
@@ -44,11 +47,19 @@ pub fn rand_string() -> String {
         .collect()
 }
 
-pub fn rand_timestamp() -> i64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64
+pub fn rand_timestamp(time_cfg: &Option<TimestampConfig>) -> String {
+    let now = SystemTime::now();
+    let time = match time_cfg {
+        Some(t) => {
+            let before_ms =
+                rand::thread_rng().gen_range(0_u64..t.before_less_than.as_secs() * 1000);
+            now - Duration::from_millis(before_ms)
+        }
+        None => now,
+    };
+    DateTime::<Utc>::from(time)
+        .format("%Y-%m-%d %H:%M:%S%.f")
+        .to_string()
 }
 
 pub fn rand_long() -> i64 {
@@ -61,4 +72,32 @@ pub fn rand_int() -> i32 {
 
 pub fn rand_float() -> f64 {
     rand::thread_rng().gen_range(1_f64..RAN_F64_MAX)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::rand_timestamp;
+    use crate::config::TimestampConfig;
+    use chrono::NaiveDateTime;
+    use std::time::Duration;
+
+    #[test]
+    fn test_timestmap() {
+        assert_eq!(
+            "2022-05-09 13:26:07.396503".len(),
+            rand_timestamp(&None).len()
+        );
+
+        fn parse_timestamp(s: &str) -> NaiveDateTime {
+            NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S%.f").unwrap()
+        }
+
+        let ts1 = parse_timestamp(&rand_timestamp(&Some(TimestampConfig {
+            before_less_than: Duration::from_secs(1),
+        })));
+        let ts2 = parse_timestamp(&rand_timestamp(&None));
+
+        assert!(ts1 < ts2);
+        assert!((ts2 - ts1) <= chrono::Duration::seconds(1));
+    }
 }

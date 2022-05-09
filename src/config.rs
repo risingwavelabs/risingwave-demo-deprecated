@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use serde::Deserialize;
 
@@ -38,14 +38,24 @@ pub struct FieldConfig {
 
     #[serde(rename = "enum", default)]
     pub enum_variants: Vec<String>,
+
+    pub timestamp: Option<TimestampConfig>,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct TimestampConfig {
+    /// The time is (0, `before_less_than`] before now().
+    /// The duration is randomly generated on every record. So the records are not in order by time.
+    #[serde(with = "humantime_serde")]
+    pub before_less_than: Duration,
 }
 
 #[cfg(test)]
 mod tests {
-    use std::vec;
+    use std::{time::Duration, vec};
 
     use crate::{
-        config::{FieldConfig, FormatType},
+        config::{FieldConfig, FormatType, TimestampConfig},
         rand::DataType,
     };
 
@@ -62,8 +72,10 @@ mod tests {
             topic: test_topic
             timeout_ms: 5000
         schema:
-          foo:
-            type: int
+          click_timestamp:
+            type: timestamp
+            timestamp:
+              before_less_than: 1s
           bar:
             type: string
           platform:
@@ -79,17 +91,22 @@ mod tests {
         assert_eq!(
             cfg.schema,
             maplit::hashmap! {
-                "foo".to_string() => FieldConfig {
-                    data_type: DataType::Int,
+                "click_timestamp".to_string() => FieldConfig {
+                    data_type: DataType::Timestamp,
                     enum_variants: vec![],
+                    timestamp: Some(TimestampConfig {
+                        before_less_than: Duration::from_secs(1),
+                    }),
                 },
                 "bar".to_string() => FieldConfig {
                     data_type: DataType::String,
                     enum_variants: vec![],
+                    timestamp: None,
                 },
                 "platform".to_string() => FieldConfig {
                     data_type: DataType::Enum,
                     enum_variants: vec!["ios".to_string(), "android".to_string()],
+                    timestamp: None,
                 }
             }
         );
