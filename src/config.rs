@@ -12,7 +12,7 @@ pub enum FormatType {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
-    pub total: usize,
+    pub total: u64,
     pub format: FormatType,
     pub connector: ConnectorConfig,
     pub schema: HashMap<String, FieldConfig>,

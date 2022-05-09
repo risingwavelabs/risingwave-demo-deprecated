@@ -1,5 +1,7 @@
 pub mod kafka;
 
+use indicatif::{ProgressBar, ProgressIterator, ProgressStyle};
+
 use crate::{
     config::{Config, ConnectorConfig},
     generator::Generator,
@@ -30,20 +32,18 @@ pub async fn run_loop(cfg: Config) {
     let generator = Generator::new(cfg.clone());
     let sink = Sink::new(cfg.clone());
 
-    let mut counter = 0_usize;
-    while counter <= cfg.total {
+    let pb = ProgressBar::new(cfg.total);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({eta})")
+        .progress_chars("#>-"));
+    for _ in (0..cfg.total).progress_with(pb) {
         let msg = generator.generate();
         match sink.send_record(&msg).await {
             Err(e) => {
                 println!("ERROR: failed to send message: {}\n{}", e, &msg);
                 break;
             }
-            Ok(_) => {
-                if counter % 100 == 0 && counter > 0 {
-                    println!("{} messages sent successfully", counter);
-                }
-                counter += 1;
-            }
+            Ok(()) => (),
         }
     }
 }
