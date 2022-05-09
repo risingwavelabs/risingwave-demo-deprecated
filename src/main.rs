@@ -1,7 +1,7 @@
 extern crate core;
 
 use clap::Parser;
-use data_generator::{config::Config, kafka::Producer};
+use workload_generator::{config::Config, kafka::Producer};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
