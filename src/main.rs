@@ -15,8 +15,9 @@ struct CmdArgs {
 async fn main() {
     let args = CmdArgs::parse();
 
-    let file = std::fs::File::open(&args.config).unwrap();
-    let cfg: Config = serde_yaml::from_reader(file).unwrap();
+    let file = std::fs::read_to_string(&args.config).unwrap();
+    let cfg: Config = serde_yaml::from_str(&file)
+        .unwrap_or_else(|e| panic!("Failed to parse config file: {}\n{}", e, file));
     let producer = Producer::new(cfg);
     producer.run().await;
 }

@@ -4,7 +4,6 @@ use serde::Deserialize;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // TODO: support for loading from config file.
-const PLATFORM_ENUM_ARRAY: &[&str] = &["android", "ios"];
 const RAN_F64_MAX: f64 = 50000_f64;
 const RAN_I64_MAX: i64 = 10000000_i64;
 const RAN_I32_MAX: i32 = 40000_i32;
@@ -22,10 +21,10 @@ pub enum DataType {
     Timestamp,
 }
 
-pub fn rand_enum() -> String {
+pub fn rand_enum(variants: &[String]) -> String {
     let rand_seed: usize = rand::thread_rng().gen_range(1..200);
-    let rand_idx = rand_seed % PLATFORM_ENUM_ARRAY.len();
-    PLATFORM_ENUM_ARRAY[rand_idx].to_string()
+    let rand_idx = rand_seed % variants.len();
+    variants[rand_idx].clone()
 }
 
 pub fn rand_string_zh() -> String {

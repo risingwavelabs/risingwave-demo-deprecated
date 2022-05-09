@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 use crate::rand::DataType;
@@ -13,7 +15,7 @@ pub struct Config {
     pub total: usize,
     pub format: FormatType,
     pub connector: ConnectorConfig,
-    pub schema: Vec<FieldConfig>,
+    pub schema: HashMap<String, FieldConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -31,10 +33,11 @@ pub struct KafkaConfig {
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct FieldConfig {
-    pub field: String,
-
     #[serde(rename = "type")]
     pub data_type: DataType,
+
+    #[serde(rename = "enum", default)]
+    pub enum_variants: Vec<String>,
 }
 
 #[cfg(test)]
@@ -54,14 +57,20 @@ mod tests {
         total: 10
         format: json
         connector:
-            kafka:
-                broker: localhost:29092
-                topic: test_topic
+          kafka:
+            broker: localhost:29092
+            topic: test_topic
+            timeout_ms: 5000
         schema:
-            - field: foo
-              type: int
-            - field: bar
-              type: string
+          foo:
+            type: int
+          bar:
+            type: string
+          platform:
+            type: enum
+            enum:
+            - ios
+            - android
         ";
         let cfg: Config = serde_yaml::from_str(s).unwrap();
         assert_eq!(cfg.total, 10);
@@ -69,16 +78,20 @@ mod tests {
 
         assert_eq!(
             cfg.schema,
-            vec![
-                FieldConfig {
-                    field: "foo".to_string(),
+            maplit::hashmap! {
+                "foo".to_string() => FieldConfig {
                     data_type: DataType::Int,
+                    enum_variants: vec![],
                 },
-                FieldConfig {
-                    field: "bar".to_string(),
-                    data_type: DataType::String
+                "bar".to_string() => FieldConfig {
+                    data_type: DataType::String,
+                    enum_variants: vec![],
+                },
+                "platform".to_string() => FieldConfig {
+                    data_type: DataType::Enum,
+                    enum_variants: vec!["ios".to_string(), "android".to_string()],
                 }
-            ]
+            }
         );
     }
 }

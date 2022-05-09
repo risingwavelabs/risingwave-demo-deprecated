@@ -9,57 +9,60 @@ connector:
     timeout_ms: 1000
 
 schema:
-  - field: platform
+  platform:
     type: enum
-  - field: search_hash_id
+    enum:
+      - ios
+      - android
+  search_hash_id:
     type: string
-  - field: log_type
+  log_type:
     type: string
-  - field: view_action
+  view_action:
     type: string
-  - field: parent_token
+  parent_token:
     type: string
-  - field: parent_id
+  parent_id:
     type: string
-  - field: server_timestamp
+  server_timestamp:
     type: timestamp
-  - field: query
+  query:
     type: stringzh
-  - field: tab_type
+  tab_type:
     type: string
-  - field: content_type
+  content_type:
     type: string
-  - field: content_id
+  content_id:
     type: string
-  - field: publish_timestamp
+  publish_timestamp:
     type: timestamp
-  - field: container_index
+  container_index:
     type: int
-  - field: client_id
+  client_id:
     type: string
-  - field: member_id
+  member_id:
     type: long
-  - field: client_timestamp
+  client_timestamp:
     type: timestamp
-  - field: page_elapsed
+  page_elapsed:
     type: long
-  - field: container_type
+  container_type:
     type: string
-  - field: page_level1_id
+  page_level1_id:
     type: string
-  - field: content_token
+  content_token:
     type: string
-  - field: element_type
+  element_type:
     type: string
-  - field: event_type
+  event_type:
     type: string
-  - field: block_text
+  block_text:
     type: string
-  - field: element_text
+  element_text:
     type: string
-  - field: view_url
+  view_url:
     type: string
-  - field: page_name
+  page_name:
     type: string
-  - field: search_source
+  search_source:
     type: string

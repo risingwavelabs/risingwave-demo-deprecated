@@ -7,6 +7,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 clap = { version = "3", features = ["derive"] }
+maplit = "1"
 rand = "0.8"
 rdkafka = { version = "0.28", features = ["cmake-build"] }
 serde = { version = "1", features = ["derive"] }

@@ -27,17 +27,17 @@ impl Generator {
         self.config
             .schema
             .iter()
-            .map(|f| {
+            .map(|(key, f)| {
                 let json_value = match f.data_type.clone() {
                     DataType::StringZh => json!(rand_string_zh()),
                     DataType::String => json!(rand_string()),
-                    DataType::Enum => json!(rand_enum()),
+                    DataType::Enum => json!(rand_enum(&f.enum_variants)),
                     DataType::Long => json!(rand_long()),
                     DataType::Int => json!(rand_int()),
                     DataType::Float => json!(rand_float()),
                     DataType::Timestamp => json!(rand_timestamp()),
                 };
-                (f.field.clone(), json_value)
+                (key.clone(), json_value)
             })
             .collect()
     }
