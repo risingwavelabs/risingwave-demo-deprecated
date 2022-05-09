@@ -1,7 +1,7 @@
 extern crate core;
 
 use clap::Parser;
-use workload_generator::{config::Config, kafka::Producer};
+use workload_generator::{config::Config, sink::run_loop};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -18,6 +18,5 @@ async fn main() {
     let file = std::fs::read_to_string(&args.config).unwrap();
     let cfg: Config = serde_yaml::from_str(&file)
         .unwrap_or_else(|e| panic!("Failed to parse config file: {}\n{}", e, file));
-    let producer = Producer::new(cfg);
-    producer.run().await;
+    run_loop(cfg).await;
 }
