@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime};
 
 use crate::config::TimestampConfig;
@@ -12,7 +12,7 @@ const RAN_I64_MAX: i64 = 10000000_i64;
 const RAN_I32_MAX: i32 = 40000_i32;
 const DEFAULT_RANDOM_LEN: i32 = 6;
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum DataType {
     StringZh,
@@ -51,9 +51,8 @@ pub fn rand_timestamp(time_cfg: &Option<TimestampConfig>) -> String {
     let now = SystemTime::now();
     let time = match time_cfg {
         Some(t) => {
-            let before_ms =
-                rand::thread_rng().gen_range(0_u64..t.before_less_than.as_secs() * 1000);
-            now - Duration::from_millis(before_ms)
+            let delay_ms = rand::thread_rng().gen_range(0_u64..(t.random_delay.as_secs() * 1000));
+            now + Duration::from_millis(delay_ms)
         }
         None => now,
     };
@@ -93,11 +92,11 @@ mod tests {
         }
 
         let ts1 = parse_timestamp(&rand_timestamp(&Some(TimestampConfig {
-            before_less_than: Duration::from_secs(1),
+            random_delay: Duration::from_secs(1),
         })));
         let ts2 = parse_timestamp(&rand_timestamp(&None));
 
-        assert!(ts1 < ts2);
-        assert!((ts2 - ts1) <= chrono::Duration::seconds(1));
+        assert!(ts1 > ts2);
+        assert!((ts1 - ts2) <= chrono::Duration::seconds(1));
     }
 }

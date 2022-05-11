@@ -1,8 +1,9 @@
 use std::{collections::HashMap, time::Duration};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::rand::DataType;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
@@ -10,18 +11,32 @@ pub enum FormatType {
     Json,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Validate)]
 pub struct Config {
     pub total: u64,
     pub format: FormatType,
     pub connector: ConnectorConfig,
+    pub qps: Option<u32>,
+
+    #[validate(custom = "validate_schema")]
     pub schema: HashMap<String, FieldConfig>,
+}
+
+fn validate_schema(schema: &HashMap<String, FieldConfig>) -> Result<(), ValidationError> {
+    for (_, f) in schema.iter() {
+        f.validate().map_err(|e| {
+            println!("ERROR: {}", e);
+            ValidationError::new("schema")
+        })?;
+    }
+    Ok(())
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum ConnectorConfig {
     Kafka(KafkaConfig),
+    Stdout,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -31,7 +46,7 @@ pub struct KafkaConfig {
     pub timeout_ms: u64,
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Validate)]
 pub struct FieldConfig {
     #[serde(rename = "type")]
     pub data_type: DataType,
@@ -40,14 +55,17 @@ pub struct FieldConfig {
     pub enum_variants: Vec<String>,
 
     pub timestamp: Option<TimestampConfig>,
+
+    /// The number of distinct values to generate.
+    pub cardinality: Option<usize>,
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Validate)]
 pub struct TimestampConfig {
-    /// The time is (0, `before_less_than`] before now().
-    /// The duration is randomly generated on every record. So the records are not in order by time.
+    /// A randomized delay within the range of (0, `random_delay`].
+    /// If it's set, this field will not be guaranteed to ordered.
     #[serde(with = "humantime_serde")]
-    pub before_less_than: Duration,
+    pub random_delay: Duration,
 }
 
 #[cfg(test)]
@@ -75,9 +93,10 @@ mod tests {
           click_timestamp:
             type: timestamp
             timestamp:
-              before_less_than: 1s
+              random_delay: 1s
           bar:
             type: string
+            cardinality: 100
           platform:
             type: enum
             enum:
@@ -95,18 +114,21 @@ mod tests {
                     data_type: DataType::Timestamp,
                     enum_variants: vec![],
                     timestamp: Some(TimestampConfig {
-                        before_less_than: Duration::from_secs(1),
+                        random_delay: Duration::from_secs(1),
                     }),
+                    cardinality: None,
                 },
                 "bar".to_string() => FieldConfig {
                     data_type: DataType::String,
                     enum_variants: vec![],
                     timestamp: None,
+                    cardinality: Some(100),
                 },
                 "platform".to_string() => FieldConfig {
                     data_type: DataType::Enum,
                     enum_variants: vec!["ios".to_string(), "android".to_string()],
                     timestamp: None,
+                    cardinality: None,
                 }
             }
         );

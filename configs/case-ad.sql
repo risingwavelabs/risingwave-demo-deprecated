@@ -1,5 +1,5 @@
 -- impression_timestamp: The time when the ad was shown.
--- click_timestamp: The time when the ad was clicked by the user.
+-- click_timestamp: The time when the ad was clicked.
 create source ad_source (
     user_id bigint,
     ad_id bigint,
