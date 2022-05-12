@@ -1,21 +1,20 @@
 ---
 total: 1000000
 format: json
-qps: 1
+qps: 10
 
 connector:
-  # kafka:
-  #   broker: 127.0.0.1:29092
-  #   topic: test_topic
-  #   timeout_ms: 1000
-  stdout
+  kafka:
+    broker: 127.0.0.1:29092
+    topic: test_topic
+    timeout_ms: 10000
 
 schema:
   user_id:
     type: long
   ad_id:
     type: long
-    cardinality: 1000
+    cardinality: 10
   click_timestamp:
     type: timestamp
     timestamp:

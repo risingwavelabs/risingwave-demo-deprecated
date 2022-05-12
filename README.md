@@ -4,6 +4,8 @@ This is a tool that populates fake streaming data to a sink, for example, a Kafk
 The data is generated according to the schema configuration:
 
 ```yml
+# The throughput per second.
+qps: 10
 # The total lines of records.
 total: 1000000
 # The data format. We currently only support JSON.
