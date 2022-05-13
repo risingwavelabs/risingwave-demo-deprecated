@@ -72,6 +72,11 @@ pub fn rand_float(cfg: Option<FloatConfig>) -> f64 {
     rand::thread_rng().gen_range(cfg.start..cfg.stop)
 }
 
+pub fn rand_name() -> String {
+    let mut rng = rand::thread_rng();
+    petname::Petnames::default().generate(&mut rng, 2, " ")
+}
+
 #[cfg(test)]
 mod tests {
     use super::rand_timestamp;

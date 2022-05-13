@@ -10,18 +10,12 @@ connector:
     timeout_ms: 10000
 
 schema:
-  client_id:
-    type: long
-    range: [1, 1000]
   user_id:
-    type: long
-    range: [1, 1000]
+    long:
+      start: 1
+      stop: 1000
   ad_id:
-    type: long
-    range: [1, 10]
-  user_name:
-    type: name
-  click_timestamp:
-    type: timestamp
-    timestamp:
-      random_delay: 1s
+    long:
+      start: 1
+      stop: 1000
+  impression_timestamp: timestamp

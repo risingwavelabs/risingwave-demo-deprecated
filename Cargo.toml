@@ -12,6 +12,7 @@ governor = "0.4"
 humantime-serde = "1"
 indicatif = "0.16"
 maplit = "1"
+petname = "1"
 rand = "0.8"
 rdkafka = { version = "0.28", features = ["cmake-build"] }
 serde = { version = "1", features = ["derive"] }

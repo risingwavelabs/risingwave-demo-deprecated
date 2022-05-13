@@ -44,6 +44,7 @@ pub struct KafkaConfig {
 pub enum DataType {
     StringZh,
     String,
+    Name,
     Enum(Vec<String>),
     Long(Option<LongConfig>),
     Int(Option<IntConfig>),

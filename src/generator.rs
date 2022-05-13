@@ -38,6 +38,7 @@ impl Generator {
             DataType::Int(cfg) => json!(rand_int(cfg)),
             DataType::Float(cfg) => json!(rand_float(cfg)),
             DataType::Timestamp(cfg) => json!(rand_timestamp(&cfg)),
+            DataType::Name => json!(rand_name()),
         }
     }
 }
