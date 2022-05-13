@@ -1,28 +1,15 @@
 use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
-use serde::{Deserialize, Serialize};
 use std::time::{Duration, SystemTime};
 
-use crate::config::TimestampConfig;
+use crate::config::{FloatConfig, IntConfig, LongConfig, TimestampConfig};
 
 // TODO: support for loading from config file.
 const RAN_F64_MAX: f64 = 50000_f64;
 const RAN_I64_MAX: i64 = 10000000_i64;
 const RAN_I32_MAX: i32 = 40000_i32;
 const DEFAULT_RANDOM_LEN: i32 = 6;
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-pub enum DataType {
-    StringZh,
-    String,
-    Enum,
-    Long,
-    Int,
-    Float,
-    Timestamp,
-}
 
 pub fn rand_enum(variants: &[String]) -> String {
     let rand_seed: usize = rand::thread_rng().gen_range(1..200);
@@ -61,16 +48,28 @@ pub fn rand_timestamp(time_cfg: &Option<TimestampConfig>) -> String {
         .to_string()
 }
 
-pub fn rand_long() -> i64 {
-    rand::thread_rng().gen_range(1_i64..RAN_I64_MAX)
+pub fn rand_long(cfg: Option<LongConfig>) -> i64 {
+    let cfg = cfg.unwrap_or(LongConfig {
+        start: 1_i64,
+        stop: RAN_I64_MAX,
+    });
+    rand::thread_rng().gen_range(cfg.start..cfg.stop)
 }
 
-pub fn rand_int() -> i32 {
-    rand::thread_rng().gen_range(1_i32..RAN_I32_MAX)
+pub fn rand_int(cfg: Option<IntConfig>) -> i32 {
+    let cfg = cfg.unwrap_or(IntConfig {
+        start: 1_i32,
+        stop: RAN_I32_MAX,
+    });
+    rand::thread_rng().gen_range(cfg.start..cfg.stop)
 }
 
-pub fn rand_float() -> f64 {
-    rand::thread_rng().gen_range(1_f64..RAN_F64_MAX)
+pub fn rand_float(cfg: Option<FloatConfig>) -> f64 {
+    let cfg = cfg.unwrap_or(FloatConfig {
+        start: 1_f64,
+        stop: RAN_F64_MAX,
+    });
+    rand::thread_rng().gen_range(cfg.start..cfg.stop)
 }
 
 #[cfg(test)]

@@ -1,35 +1,15 @@
-use crate::config::{Config, FieldConfig, FormatType};
-use rand::Rng;
+use crate::config::{Config, DataType, FormatType};
 use serde_json::json;
 use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Generator {
     config: Config,
-
-    gen_json_values: HashMap<String, Vec<serde_json::Value>>,
 }
 
 impl Generator {
     pub fn new(config: Config) -> Self {
-        let gen_json_values = match &config.format {
-            FormatType::Json => config
-                .schema
-                .iter()
-                .map(|(key, f)| {
-                    let values = if let Some(card) = f.cardinality.as_ref() {
-                        (0..*card).map(|_| Self::new_json_field(f)).collect()
-                    } else {
-                        vec![]
-                    };
-                    (key.clone(), values)
-                })
-                .collect(),
-        };
-        Self {
-            gen_json_values,
-            config,
-        }
+        Self { config }
     }
 
     pub fn generate(&self) -> String {
@@ -43,28 +23,21 @@ impl Generator {
             .config
             .schema
             .iter()
-            .map(|(key, f)| {
-                if f.cardinality.is_some() {
-                    let values = self.gen_json_values.get(key).unwrap();
-                    let idx = rand::thread_rng().gen_range(0..values.len());
-                    return (key.clone(), values[idx].clone());
-                }
-                (key.clone(), Self::new_json_field(f))
-            })
+            .map(|(key, d)| (key.clone(), Self::new_json_field(d.clone())))
             .collect();
         serde_json::to_string(&record).unwrap()
     }
 
-    fn new_json_field(f: &FieldConfig) -> serde_json::Value {
+    fn new_json_field(data_type: DataType) -> serde_json::Value {
         use crate::rand::*;
-        match f.data_type.clone() {
+        match data_type {
             DataType::StringZh => json!(rand_string_zh()),
             DataType::String => json!(rand_string()),
-            DataType::Enum => json!(rand_enum(&f.enum_variants)),
-            DataType::Long => json!(rand_long()),
-            DataType::Int => json!(rand_int()),
-            DataType::Float => json!(rand_float()),
-            DataType::Timestamp => json!(rand_timestamp(&f.timestamp)),
+            DataType::Enum(variants) => json!(rand_enum(&variants)),
+            DataType::Long(cfg) => json!(rand_long(cfg)),
+            DataType::Int(cfg) => json!(rand_int(cfg)),
+            DataType::Float(cfg) => json!(rand_float(cfg)),
+            DataType::Timestamp(cfg) => json!(rand_timestamp(&cfg)),
         }
     }
 }

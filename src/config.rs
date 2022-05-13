@@ -2,7 +2,6 @@ use std::{collections::HashMap, time::Duration};
 
 use serde::{Deserialize, Serialize};
 
-use crate::rand::DataType;
 use validator::{Validate, ValidationError};
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
@@ -19,16 +18,10 @@ pub struct Config {
     pub qps: Option<u32>,
 
     #[validate(custom = "validate_schema")]
-    pub schema: HashMap<String, FieldConfig>,
+    pub schema: HashMap<String, DataType>,
 }
 
-fn validate_schema(schema: &HashMap<String, FieldConfig>) -> Result<(), ValidationError> {
-    for (_, f) in schema.iter() {
-        f.validate().map_err(|e| {
-            println!("ERROR: {}", e);
-            ValidationError::new("schema")
-        })?;
-    }
+fn validate_schema(_schema: &HashMap<String, DataType>) -> Result<(), ValidationError> {
     Ok(())
 }
 
@@ -46,18 +39,34 @@ pub struct KafkaConfig {
     pub timeout_ms: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Validate)]
-pub struct FieldConfig {
-    #[serde(rename = "type")]
-    pub data_type: DataType,
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum DataType {
+    StringZh,
+    String,
+    Enum(Vec<String>),
+    Long(Option<LongConfig>),
+    Int(Option<IntConfig>),
+    Float(Option<FloatConfig>),
+    Timestamp(Option<TimestampConfig>),
+}
 
-    #[serde(rename = "enum", default)]
-    pub enum_variants: Vec<String>,
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Validate)]
+pub struct LongConfig {
+    pub start: i64,
+    pub stop: i64,
+}
 
-    pub timestamp: Option<TimestampConfig>,
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Validate)]
+pub struct IntConfig {
+    pub start: i32,
+    pub stop: i32,
+}
 
-    /// The number of distinct values to generate.
-    pub cardinality: Option<usize>,
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Validate)]
+pub struct FloatConfig {
+    pub start: f64,
+    pub stop: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Validate)]
@@ -72,10 +81,7 @@ pub struct TimestampConfig {
 mod tests {
     use std::{time::Duration, vec};
 
-    use crate::{
-        config::{FieldConfig, FormatType, TimestampConfig},
-        rand::DataType,
-    };
+    use crate::config::{DataType, FormatType, IntConfig, TimestampConfig};
 
     use super::Config;
 
@@ -91,14 +97,14 @@ mod tests {
             timeout_ms: 5000
         schema:
           click_timestamp:
-            type: timestamp
             timestamp:
               random_delay: 1s
-          bar:
-            type: string
-            cardinality: 100
+          bar: string
+          foo: 
+            int:
+              start: 1
+              stop: 10
           platform:
-            type: enum
             enum:
             - ios
             - android
@@ -110,26 +116,17 @@ mod tests {
         assert_eq!(
             cfg.schema,
             maplit::hashmap! {
-                "click_timestamp".to_string() => FieldConfig {
-                    data_type: DataType::Timestamp,
-                    enum_variants: vec![],
-                    timestamp: Some(TimestampConfig {
-                        random_delay: Duration::from_secs(1),
-                    }),
-                    cardinality: None,
-                },
-                "bar".to_string() => FieldConfig {
-                    data_type: DataType::String,
-                    enum_variants: vec![],
-                    timestamp: None,
-                    cardinality: Some(100),
-                },
-                "platform".to_string() => FieldConfig {
-                    data_type: DataType::Enum,
-                    enum_variants: vec!["ios".to_string(), "android".to_string()],
-                    timestamp: None,
-                    cardinality: None,
-                }
+                "click_timestamp".to_string() => DataType::Timestamp(Some(TimestampConfig {
+                        random_delay:  Duration::from_secs(1),
+                })),
+                "bar".to_string() =>  DataType::String,
+                "foo".to_string() => DataType::Int(Some(IntConfig {
+                    start: 1,
+                    stop: 10,
+                })),
+                "platform".to_string() => DataType::Enum(
+                    vec!["ios".to_string(), "android".to_string()]
+                ),
             }
         );
     }

@@ -22,15 +22,14 @@ connector:
 # The schema configuration.
 schema:
   user_id:
-    type: long
-    cardinality: 10
-  start_time:
-    type: timestamp
+    long:
+      start: 1
+      stop: 10
+  start_time: timestamp
   end_time:
-    type: timestamp
-    delay: 1s
+    timestamp:
+      random_delay: 1s
   platform:
-    type: enum
     enum:
     - ios
     - android
@@ -49,6 +48,3 @@ We have supported multiple data types so far, including:
     - If `random_delay` is set, it will added with a random value within `[0, random_delay]`.
 - `enum`: The value will be randomized through a predefined set of variants.
     - The variants must be provided in the `enum` section.
-
-Except for enum, every type can be configured with a `cardinality` which is the number of distinct values.
-In some use cases, we may want to limit the value space of a field, for example, we may want to count the sales of each item in the market. If the item is completely random, the transactions on every item could be always 1.

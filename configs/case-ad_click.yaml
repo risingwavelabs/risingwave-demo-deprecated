@@ -1,0 +1,20 @@
+---
+total: 1000000
+format: json
+qps: 10
+
+connector:
+  kafka:
+    broker: 127.0.0.1:29092
+    topic: ad_click
+    timeout_ms: 10000
+
+schema:
+  user_id:
+    long:
+      range: [1, 1000]
+  ad_id:
+    long:
+      range: [1, 10]
+  impression_timestamp:
+    timestamp:

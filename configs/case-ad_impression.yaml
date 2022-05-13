@@ -6,18 +6,22 @@ qps: 10
 connector:
   kafka:
     broker: 127.0.0.1:29092
-    topic: test_topic
+    topic: ad_impression
     timeout_ms: 10000
 
 schema:
+  client_id:
+    type: long
+    range: [1, 1000]
   user_id:
     type: long
+    range: [1, 1000]
   ad_id:
     type: long
-    cardinality: 10
+    range: [1, 10]
+  user_name:
+    type: name
   click_timestamp:
     type: timestamp
     timestamp:
       random_delay: 1s
-  impression_timestamp:
-    type: timestamp
