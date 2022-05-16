@@ -1,0 +1,17 @@
+name: Docker Build for Workload Generator
+
+on:
+  # For manually triggering workflow
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - "docker/**"
+
+jobs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.who-to-greet }}
