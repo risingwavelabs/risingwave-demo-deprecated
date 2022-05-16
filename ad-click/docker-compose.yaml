@@ -158,7 +158,8 @@ services:
     environment: {}
     container_name: redpanda
   workload-generator:
-    image: "ghcr.io/singularity-data/risingwave:latest"
+    image: "ghcr.io/singularity-data/workload-generator:latest"
+    depends_on: [redpanda]
     command:
       - --config
       - /ad-click/ad_clicks.yaml
