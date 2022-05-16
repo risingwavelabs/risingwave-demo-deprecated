@@ -6,7 +6,7 @@ qps: 10
 connector:
   kafka:
     broker: 127.0.0.1:29092
-    topic: ad_click
+    topic: ad_clicks
     timeout_ms: 10000
 
 schema:
@@ -21,4 +21,5 @@ schema:
   click_timestamp:
     timestamp:
       random_delay: 1s
-  impression_timestamp: timestamp
+  impression_timestamp:
+    timestamp:
