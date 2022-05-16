@@ -17,17 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-
-      - name: Build workload-generator
-        run: |
-          cd workload-generator
-          cargo build --release
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
