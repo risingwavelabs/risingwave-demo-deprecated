@@ -33,7 +33,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.10.0
         with:
-          context: ./workload-generator
+          context: .
           push: true
           tags: |
             ghcr.io/singularity-data/workload-generator

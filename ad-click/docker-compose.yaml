@@ -157,6 +157,12 @@ services:
     volumes: []
     environment: {}
     container_name: redpanda
+  workload-generator:
+    image: "ghcr.io/singularity-data/risingwave:latest"
+    command:
+      - --config
+      - /ad-click/ad_clicks.yaml
+
 volumes:
   minio-0:
     external: false
