@@ -1,5 +1,11 @@
 use crate::config::KafkaConfig;
-use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::{
+    admin::{AdminClient, AdminOptions, NewTopic, TopicReplication},
+    client::DefaultClientContext,
+    config::FromClientConfig,
+    producer::{FutureProducer, FutureRecord},
+    ClientConfig,
+};
 use std::time::Duration;
 
 pub struct KafkaSink {
@@ -8,8 +14,9 @@ pub struct KafkaSink {
 }
 
 impl KafkaSink {
-    pub fn new(cfg: KafkaConfig) -> Self {
+    pub async fn new(cfg: KafkaConfig) -> Self {
         let producer = Self::rdkafka_producer(&cfg);
+        Self::create_topic(&cfg).await;
         Self { cfg, producer }
     }
 
@@ -24,12 +31,33 @@ impl KafkaSink {
             .map(|_| ())
     }
 
-    fn rdkafka_producer(cfg: &KafkaConfig) -> FutureProducer {
+    fn rdkafka_config(cfg: &KafkaConfig) -> ClientConfig {
         rdkafka::ClientConfig::new()
             .set("bootstrap.servers", cfg.broker.as_str())
             .set("message.timeout.ms", cfg.timeout_ms.to_string())
-            .set_log_level(rdkafka::config::RDKafkaLogLevel::Error)
+            .set_log_level(rdkafka::config::RDKafkaLogLevel::Info)
+            .clone()
+    }
+
+    fn rdkafka_producer(cfg: &KafkaConfig) -> FutureProducer {
+        Self::rdkafka_config(cfg)
             .create()
-            .expect("can't create kafka producer")
+            .expect("failed to create kafka producer")
+    }
+
+    async fn create_topic(cfg: &KafkaConfig) {
+        let admin = AdminClient::<DefaultClientContext>::from_config(&Self::rdkafka_config(cfg))
+            .expect("failed to create kafka admin client");
+        admin
+            .create_topics(
+                &[NewTopic::new(
+                    cfg.topic.as_str(),
+                    1,
+                    TopicReplication::Fixed(1),
+                )],
+                &AdminOptions::default(),
+            )
+            .await
+            .unwrap_or_else(|_| panic!("failed to create topic: {}", cfg.topic));
     }
 }

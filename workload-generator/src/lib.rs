@@ -12,7 +12,7 @@ pub mod sink;
 /// Loop until all total records are sent or a failure occurs.
 pub async fn run_loop(cfg: Config) {
     let generator = Generator::new(cfg.clone());
-    let sink = Sink::new(cfg.clone());
+    let sink = Sink::new(cfg.clone()).await;
 
     let pb = ProgressBar::new(cfg.total);
     pb.set_style(

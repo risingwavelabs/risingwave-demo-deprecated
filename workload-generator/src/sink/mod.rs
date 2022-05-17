@@ -8,10 +8,10 @@ pub enum Sink {
 }
 
 impl Sink {
-    pub fn new(cfg: Config) -> Self {
+    pub async fn new(cfg: Config) -> Self {
         match &cfg.connector {
             ConnectorConfig::Kafka(kafka_cfg) => {
-                Self::Kafka(kafka::KafkaSink::new(kafka_cfg.clone()))
+                Self::Kafka(kafka::KafkaSink::new(kafka_cfg.clone()).await)
             }
             ConnectorConfig::Stdout => Self::Stdout,
         }
