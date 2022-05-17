@@ -5,7 +5,7 @@ qps: 2
 
 connector:
   kafka:
-    broker: 127.0.0.1:29092
+    broker: redpanda:9092
     topic: ad_clicks
     timeout_ms: 10000
 
