@@ -28,6 +28,7 @@ impl KafkaSink {
         rdkafka::ClientConfig::new()
             .set("bootstrap.servers", cfg.broker.as_str())
             .set("message.timeout.ms", cfg.timeout_ms.to_string())
+            .set_log_level(rdkafka::config::RDKafkaLogLevel::Error)
             .create()
             .expect("can't create kafka producer")
     }

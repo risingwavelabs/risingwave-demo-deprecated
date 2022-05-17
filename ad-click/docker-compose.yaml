@@ -146,13 +146,11 @@ services:
       - "--node-id"
       - "0"
       - "--kafka-addr"
-      - "PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092"
+      - "0.0.0.0:9092"
       - "--advertise-kafka-addr"
-      - "PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092"
-    expose:
-      - "9092"
+      - "redpanda:9092"
     ports:
-      - "9092:9092"
+      - 9092:9092
     depends_on: []
     volumes: []
     environment: {}
@@ -161,8 +159,13 @@ services:
     image: "ghcr.io/singularity-data/workload-generator:latest"
     depends_on: [redpanda]
     command:
-      - --config
-      - /ad-click/ad_clicks.yaml
+      - /bin/sh
+      - -c
+      - /workload_generator --config /ad_clicks.yaml
+    restart: always
+    volumes:
+      - "./ad_clicks.yaml:/ad_clicks.yaml"
+    container_name: workload-generator
 
 volumes:
   minio-0:

@@ -14,6 +14,8 @@ struct CmdArgs {
 
 #[tokio::main]
 async fn main() {
+    env_logger::builder().init();
+
     let args = CmdArgs::parse();
 
     let file = std::fs::read_to_string(&args.config).unwrap();
