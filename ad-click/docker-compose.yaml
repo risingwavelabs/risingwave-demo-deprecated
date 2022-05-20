@@ -16,8 +16,8 @@ services:
       - "--meta-address"
       - "http://meta-node-0:5690"
     expose:
-      - "6660"
-      - "1260"
+      - 6660
+      - 1260
     ports: []
     depends_on:
       - meta-node-0
@@ -42,8 +42,8 @@ services:
       - "--meta-address"
       - "http://meta-node-0:5690"
     expose:
-      - "5688"
-      - "1222"
+      - 5688
+      - 1222
     ports: []
     depends_on:
       - meta-node-0
@@ -60,9 +60,9 @@ services:
       - "--meta-addr"
       - "http://meta-node-0:5690"
     expose:
-      - "4566"
+      - 4566
     ports:
-      - "4566:4566"
+      - 4566:4566
     depends_on:
       - meta-node-0
     volumes: []
@@ -81,9 +81,9 @@ services:
       - "--backend"
       - mem
     expose:
-      - "5690"
-      - "1250"
-      - "5691"
+      - 5690
+      - 1250
+      - 5691
     ports: []
     depends_on: []
     volumes: []
@@ -99,11 +99,11 @@ services:
       - "0.0.0.0:9400"
       - /data
     expose:
-      - "9301"
-      - "9400"
+      - 9301
+      - 9400
     ports:
-      - "9301:9301"
-      - "9400:9400"
+      - 9301:9301
+      - 9400:9400
     depends_on: []
     volumes:
       - "minio-0:/data"
@@ -123,9 +123,9 @@ services:
       - "--web.console.templates=/usr/share/prometheus/consoles"
       - "--web.listen-address=0.0.0.0:9500"
     expose:
-      - "9500"
+      - 9500
     ports:
-      - "9500:9500"
+      - 9500:9500
     depends_on: []
     volumes:
       - "prometheus-0:/prometheus"
@@ -136,19 +136,13 @@ services:
   redpanda:
     image: "docker.vectorized.io/vectorized/redpanda:latest"
     command:
-      - redpanda
-      - start
-      - "--smp"
-      - "1"
-      - "--reserve-memory"
-      - 0M
-      - "--overprovisioned"
-      - "--node-id"
-      - "0"
-      - "--kafka-addr"
-      - "0.0.0.0:9092"
-      - "--advertise-kafka-addr"
-      - "redpanda:9092"
+      - redpanda start
+      - --smp 1
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr 0.0.0.0:9092
+      - --advertise-kafka-addr redpanda:9092
     ports:
       - 9092:9092
     depends_on: []
