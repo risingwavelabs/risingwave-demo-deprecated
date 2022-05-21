@@ -1,0 +1,11 @@
+---
+total: 1000000
+format: json
+qps: 2
+
+connectors:
+  ad_clicks:
+    kafka:
+      broker: redpanda:9092
+      topic: ad_clicks
+      timeout_ms: 10000

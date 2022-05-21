@@ -1338,6 +1338,7 @@ dependencies = [
  "governor",
  "humantime-serde",
  "indicatif",
+ "itertools",
  "log",
  "maplit",
  "petname",
