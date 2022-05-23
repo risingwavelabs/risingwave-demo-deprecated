@@ -5,11 +5,10 @@ qps: 2
 
 connectors:
   ad_click:
-    connector:
-      kafka:
-        broker: redpanda:9092
-        topic: ad_click
-        timeout_ms: 10000
+    kafka:
+      broker: redpanda:9092
+      topic: ad_click
+      timeout_ms: 10000
   ad_impression:
     kafka:
       broker: redpanda:9092

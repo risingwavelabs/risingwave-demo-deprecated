@@ -9,10 +9,11 @@ use std::{collections::HashMap, time::Duration};
 
 /*
 ad_click => (
-    ad_id bigint,
+    bid_id bigint,
     click_timestamp timestamp,
 )
 ad_impression => (
+    bid_id bigint,
     ad_id bigint,
     impression_timestamp timestamp
 )
@@ -60,10 +61,12 @@ impl AdCtrGen {
 
 impl Generator for AdCtrGen {
     fn generate_record(&mut self) -> HashMap<String, String> {
+        let bid_id = rand_long(100000, i64::MAX);
         let ad_id = rand_long(1, 10);
 
         let mut v = hashmap! {
             "ad_impression".to_string() => self.fmt_impression(AdImpression {
+                bid_id,
                 ad_id,
                 impression_timestamp: rand_timestamp(None),
             })
@@ -72,7 +75,7 @@ impl Generator for AdCtrGen {
             v.insert(
                 "ad_click".to_string(),
                 self.fmt_click(AdClick {
-                    ad_id,
+                    bid_id,
                     click_timestamp: rand_timestamp(Some(Duration::from_secs(1))),
                 }),
             );
@@ -83,12 +86,13 @@ impl Generator for AdCtrGen {
 
 #[derive(Serialize)]
 struct AdClick {
-    ad_id: i64,
+    bid_id: i64,
     click_timestamp: String,
 }
 
 #[derive(Serialize)]
 struct AdImpression {
+    bid_id: i64,
     ad_id: i64,
     impression_timestamp: String,
 }
