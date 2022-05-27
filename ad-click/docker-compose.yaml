@@ -155,7 +155,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - /workload_generator --config /config.yaml
+      - /workload_generator --config /config.yaml ad-click
     restart: always
     volumes:
       - "./config.yaml:/config.yaml"

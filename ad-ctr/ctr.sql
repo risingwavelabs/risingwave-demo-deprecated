@@ -1,44 +1,85 @@
-create source ad_click (
-    ad_id bigint,
-    click_timestamp timestamp
-) with (
-    'connector' = 'kafka',
-    'kafka.topic' = 'ad_click',
-    'kafka.brokers' = 'redpanda:9092',
-    'kafka.scan.startup.mode' = 'earliest'
-) row format json;
-
-create source ad_impression (
-    bid_id bigint,
-    ad_id bigint,
-    impression_timestamp timestamp
-) with (
+CREATE SOURCE ad_impression (
+    bid_id BIGINT,
+    ad_id BIGINT,
+    impression_timestamp TIMESTAMP
+) WITH (
     'connector' = 'kafka',
     'kafka.topic' = 'ad_impression',
     'kafka.brokers' = 'redpanda:9092',
     'kafka.scan.startup.mode' = 'earliest'
-) row format json;
+) ROW FORMAT JSON;
 
-create materialized view ad_ctr as
-select
-    t1.ad_id as ad_id,
-    t1.clicks_count :: numeric * 100 / t2.impressions_count as ctr
-from
+CREATE SOURCE ad_click (
+    bid_id BIGINT,
+    click_timestamp TIMESTAMP
+) WITH (
+    'connector' = 'kafka',
+    'kafka.topic' = 'ad_click',
+    'kafka.brokers' = 'redpanda:9092',
+    'kafka.scan.startup.mode' = 'earliest'
+) ROW FORMAT JSON;
+
+CREATE MATERIALIZED VIEW ad_ctr AS
+SELECT
+    ad_clicks.ad_id AS ad_id,
+    ad_clicks.clicks_count :: NUMERIC / ad_impressions.impressions_count AS ctr
+FROM
     (
-        select
-            ad_id,
-            count(*) as clicks_count
-        from
-            ad_click
-        group by
-            ad_id
-    ) as t1
-    join (
-        select
-            ad_id,
-            count(*) as impressions_count
-        from
+        SELECT
+            ad_impression.ad_id AS ad_id,
+            COUNT(*) AS impressions_count
+        FROM
             ad_impression
-        group by
+        GROUP BY
             ad_id
-    ) as t2 on t1.ad_id = t2.ad_id;
+    ) AS ad_impressions
+    JOIN (
+        SELECT
+            ai.ad_id AS ad_id,
+            COUNT(*) AS clicks_count
+        FROM
+            ad_click AS ac
+            LEFT JOIN ad_impression AS ai ON ac.bid_id = ai.bid_id
+        GROUP BY
+            ai.ad_id
+    ) AS ad_clicks ON ad_impressions.ad_id = ad_clicks.ad_id;
+
+CREATE MATERIALIZED VIEW ad_ctr_5min AS
+SELECT
+    ac.ad_id AS ad_id,
+    ac.clicks_count :: NUMERIC / ai.impressions_count AS ctr,
+    ai.window_end AS window_end
+FROM
+    (
+        SELECT
+            ad_id,
+            COUNT(*) AS impressions_count,
+            window_end
+        FROM
+            TUMBLE(
+                ad_impression,
+                impression_timestamp,
+                INTERVAL '5' MINUTE
+            )
+        GROUP BY
+            ad_id,
+            window_end
+    ) AS ai
+    JOIN (
+        SELECT
+            ai.ad_id AS ad_id,
+            COUNT(*) AS clicks_count,
+            ai.window_end AS window_end
+        FROM
+            TUMBLE(ad_click, click_timestamp, INTERVAL '5' MINUTE) AS ac
+            INNER JOIN TUMBLE(
+                ad_impression,
+                impression_timestamp,
+                INTERVAL '5' MINUTE
+            ) AS ai ON ai.bid_id = ac.bid_id
+            AND ai.window_end = ac.window_end
+        GROUP BY
+            ai.ad_id,
+            ai.window_end
+    ) AS ac ON ai.ad_id = ac.ad_id
+    AND ai.window_end = ac.window_end;
