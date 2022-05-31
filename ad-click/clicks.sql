@@ -8,7 +8,7 @@ create source ad_source (
 ) with (
     'connector' = 'kafka',
     'kafka.topic' = 'ad_clicks',
-    'kafka.brokers' = 'redpanda:9092',
+    'kafka.brokers' = 'message_queue:9092',
     'kafka.scan.startup.mode' = 'earliest'
 ) row format json;
 
