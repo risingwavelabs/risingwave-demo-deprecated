@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/singularity-data/risingwave:latest"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220601"
     command:
       - compactor-node
       - "--host"
@@ -27,7 +27,7 @@ services:
     container_name: compactor-0
     pull_policy: always
   compute-node-0:
-    image: "ghcr.io/singularity-data/risingwave:latest"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220601"
     command:
       - compute-node
       - "--host"
@@ -54,7 +54,7 @@ services:
     container_name: compute-node-0
     pull_policy: always
   frontend-node-0:
-    image: "ghcr.io/singularity-data/risingwave:latest"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220601"
     command:
       - frontend-node
       - "--host"
@@ -72,7 +72,7 @@ services:
     container_name: frontend-node-0
     pull_policy: always
   meta-node-0:
-    image: "ghcr.io/singularity-data/risingwave:latest"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220601"
     command:
       - meta-node
       - "--host"
