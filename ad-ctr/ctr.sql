@@ -35,7 +35,7 @@ FROM
     ) AS ad_impressions
     JOIN (
         SELECT
-            ai.ad_id AS ad_id,
+            ai.ad_id,
             COUNT(*) AS clicks_count
         FROM
             ad_click AS ac
@@ -67,7 +67,7 @@ FROM
     ) AS ai
     JOIN (
         SELECT
-            ai.ad_id AS ad_id,
+            ai.ad_id,
             COUNT(*) AS clicks_count,
             ai.window_end AS window_end
         FROM
