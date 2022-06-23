@@ -33,8 +33,10 @@ func (r *clickEvent) toKafka() (topic string, data []byte) {
 func loadAdClick(ctx context.Context, sink iSink) error {
 	const layout = "2006-01-02 15:04:05.07"
 
-	if err := createRequiredTopics([]string{topicAdClicks}); err != nil {
-		return err
+	if _, ok := sink.(*kafkaSink); ok {
+		if err := createRequiredTopics([]string{topicAdClicks}); err != nil {
+			return err
+		}
 	}
 	count := int64(0)
 	initTime := time.Now()

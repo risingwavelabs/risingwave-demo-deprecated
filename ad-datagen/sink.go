@@ -58,12 +58,26 @@ func newKafkaConfig() *sarama.Config {
 	return config
 }
 
-func openKafkaSink() (*kafkaSink, error) {
+func openKafkaSink(ctx context.Context) (*kafkaSink, error) {
 	client, err := sarama.NewAsyncProducer(strings.Split(brokers, ","), newKafkaConfig())
 	if err != nil {
 		return nil, fmt.Errorf("NewAsyncProducer failed: %v", err)
 	}
-	return &kafkaSink{client: client}, nil
+	p := &kafkaSink{client: client}
+	go func() {
+		p.consumeSuccesses(ctx)
+	}()
+	return p, nil
+}
+
+func (p *kafkaSink) consumeSuccesses(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-p.client.Successes():
+		}
+	}
 }
 
 func createRequiredTopics(keys []string) error {
@@ -77,7 +91,7 @@ func createRequiredTopics(keys []string) error {
 	}
 	if len(topics) != 0 {
 		var topicNames []string
-		for k, _ := range topics {
+		for k := range topics {
 			topicNames = append(topicNames, k)
 		}
 		log.Printf("Existing topics: %s", topicNames)
@@ -105,7 +119,8 @@ func createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama
 }
 
 func (p *kafkaSink) close() error {
-	return p.client.Close()
+	p.client.AsyncClose()
+	return nil
 }
 
 func (p *kafkaSink) writeRecord(ctx context.Context, record sinkRecord) error {
@@ -117,6 +132,8 @@ func (p *kafkaSink) writeRecord(ctx context.Context, record sinkRecord) error {
 	select {
 	case <-ctx.Done():
 	case p.client.Input() <- msg:
+	case err := <-p.client.Errors():
+		log.Printf("failed to produce message: %s", err)
 	}
 	return nil
 }
@@ -127,7 +144,7 @@ func loadGen(ctx context.Context) error {
 	if sink == "postgres" {
 		sinkImpl, err = openPostgresSink()
 	} else if sink == "kafka" {
-		sinkImpl, err = openKafkaSink()
+		sinkImpl, err = openKafkaSink(ctx)
 	} else {
 		return fmt.Errorf("invalid sink type: %s", sink)
 	}
