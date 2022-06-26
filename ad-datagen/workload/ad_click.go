@@ -19,10 +19,11 @@ type clickEvent struct {
 }
 
 const topicAdClicks = "ad_clicks"
+const tableAdClicks = "ad_source"
 
 func (r *clickEvent) ToPostgresSql() string {
 	return fmt.Sprintf("INSERT INTO %s (user_id, ad_id, click_timestamp, impression_timestamp) values ('%d', '%d', '%s', '%s')",
-		"ad_source", r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
+		"", r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
 }
 
 func (r *clickEvent) ToKafka() (topic string, data []byte) {

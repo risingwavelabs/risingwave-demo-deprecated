@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/Shopify/sarama v1.34.1
+	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/lib/pq v1.10.6
 	github.com/urfave/cli v1.22.9
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
