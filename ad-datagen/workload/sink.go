@@ -1,4 +1,4 @@
-package main
+package workload
 
 import (
 	"context"
@@ -11,39 +11,52 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-type sinkRecord interface {
-	toPostgresSql() string
-	toKafka() (topic string, data []byte)
+type GeneratorConfig struct {
+	DbHost      string
+	Database    string
+	DbPort      int
+	DbUser      string
+	PrintInsert bool
+	Mode        string
+	Sink        string
+	Qps         int
+	Brokers     string
 }
 
-type iSink interface {
-	writeRecord(ctx context.Context, record sinkRecord) error
-	close() error
+type SinkRecord interface {
+	ToPostgresSql() string
+	ToKafka() (topic string, data []byte)
 }
 
-type postgresSink struct {
+type Sink interface {
+	WriteRecord(ctx context.Context, record SinkRecord) error
+	Close() error
+}
+
+type PostgresSink struct {
 	db *sql.DB
 }
 
-func openPostgresSink() (*postgresSink, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("postgresql://%s:@%s:%d/%s?sslmode=disable", dbUser, dbHost, dbPort, database))
+func OpenPostgresSink(cfg GeneratorConfig) (*PostgresSink, error) {
+	db, err := sql.Open("postgres", fmt.Sprintf("postgresql://%s:@%s:%d/%s?sslmode=disable",
+		cfg.DbUser, cfg.DbHost, cfg.DbPort, cfg.Database))
 	if err != nil {
 		return nil, err
 	}
-	return &postgresSink{db}, nil
+	return &PostgresSink{db}, nil
 }
 
-func (p *postgresSink) close() error {
+func (p *PostgresSink) Close() error {
 	return p.db.Close()
 }
 
-func (p *postgresSink) writeRecord(ctx context.Context, record sinkRecord) error {
-	query := record.toPostgresSql()
+func (p *PostgresSink) WriteRecord(ctx context.Context, record SinkRecord) error {
+	query := record.ToPostgresSql()
 	_, err := p.db.ExecContext(ctx, query)
 	return err
 }
 
-type kafkaSink struct {
+type KafkaSink struct {
 	client sarama.AsyncProducer
 }
 
@@ -58,19 +71,19 @@ func newKafkaConfig() *sarama.Config {
 	return config
 }
 
-func openKafkaSink(ctx context.Context) (*kafkaSink, error) {
-	client, err := sarama.NewAsyncProducer(strings.Split(brokers, ","), newKafkaConfig())
+func OpenKafkaSink(ctx context.Context, cfg GeneratorConfig) (*KafkaSink, error) {
+	client, err := sarama.NewAsyncProducer(strings.Split(cfg.Brokers, ","), newKafkaConfig())
 	if err != nil {
 		return nil, fmt.Errorf("NewAsyncProducer failed: %v", err)
 	}
-	p := &kafkaSink{client: client}
+	p := &KafkaSink{client: client}
 	go func() {
 		p.consumeSuccesses(ctx)
 	}()
 	return p, nil
 }
 
-func (p *kafkaSink) consumeSuccesses(ctx context.Context) {
+func (p *KafkaSink) consumeSuccesses(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -80,7 +93,7 @@ func (p *kafkaSink) consumeSuccesses(ctx context.Context) {
 	}
 }
 
-func createRequiredTopics(keys []string) error {
+func createRequiredTopics(brokers string, keys []string) error {
 	admin, err := sarama.NewClusterAdmin(strings.Split(brokers, ","), newKafkaConfig())
 	if err != nil {
 		return err
@@ -118,13 +131,13 @@ func createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama
 	}, false)
 }
 
-func (p *kafkaSink) close() error {
+func (p *KafkaSink) Close() error {
 	p.client.AsyncClose()
 	return nil
 }
 
-func (p *kafkaSink) writeRecord(ctx context.Context, record sinkRecord) error {
-	topic, data := record.toKafka()
+func (p *KafkaSink) WriteRecord(ctx context.Context, record SinkRecord) error {
+	topic, data := record.ToKafka()
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
 	msg.Key = sarama.StringEncoder(topic)
@@ -138,29 +151,29 @@ func (p *kafkaSink) writeRecord(ctx context.Context, record sinkRecord) error {
 	return nil
 }
 
-func loadGen(ctx context.Context) error {
-	sinkImpl := iSink(nil)
+func LoadGen(ctx context.Context, cfg GeneratorConfig) error {
+	sinkImpl := Sink(nil)
 	err := error(nil)
-	if sink == "postgres" {
-		sinkImpl, err = openPostgresSink()
-	} else if sink == "kafka" {
-		sinkImpl, err = openKafkaSink(ctx)
+	if cfg.Sink == "postgres" {
+		sinkImpl, err = OpenPostgresSink(cfg)
+	} else if cfg.Sink == "kafka" {
+		sinkImpl, err = OpenKafkaSink(ctx, cfg)
 	} else {
-		return fmt.Errorf("invalid sink type: %s", sink)
+		return fmt.Errorf("invalid sink type: %s", cfg.Sink)
 	}
 	if err != nil {
 		return err
 	}
 	defer func() {
-		if err = sinkImpl.close(); err != nil {
+		if err = sinkImpl.Close(); err != nil {
 			log.Print(err)
 		}
 	}()
-	if mode == "ad-click" {
-		return loadAdClick(ctx, sinkImpl)
-	} else if mode == "ad-ctr" {
+	if cfg.Mode == "ad-click" {
+		return LoadAdClick(ctx, cfg, sinkImpl)
+	} else if cfg.Mode == "ad-ctr" {
 		return nil // TODO
 	} else {
-		return fmt.Errorf("invalid mode: %s", mode)
+		return fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
 }

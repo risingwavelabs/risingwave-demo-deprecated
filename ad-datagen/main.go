@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ad-datagen/workload"
 	"context"
 	"log"
 	"os"
@@ -10,6 +11,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/urfave/cli"
 )
+
+var cfg workload.GeneratorConfig = workload.GeneratorConfig{}
 
 func runCommand() error {
 	terminateCh := make(chan os.Signal, 1)
@@ -21,22 +24,11 @@ func runCommand() error {
 		log.Println("Cancelled")
 		cancel()
 	}()
-	return loadGen(ctx)
+	return workload.LoadGen(ctx, cfg)
 }
 
-var (
-	dbHost      string
-	database    string
-	dbPort      int
-	dbUser      string
-	printInsert bool
-	mode        string
-	sink        string
-	qps         int
-	brokers     string
-)
-
 func main() {
+
 	app := &cli.App{
 		Commands: []cli.Command{
 			{
@@ -47,32 +39,32 @@ func main() {
 						Usage:       "The host address of the PostgreSQL server",
 						Required:    false,
 						Value:       "localhost",
-						Destination: &dbHost,
+						Destination: &cfg.DbHost,
 					},
 					cli.StringFlag{
 						Name:        "db",
 						Usage:       "The database where the target table is located",
 						Required:    false,
 						Value:       "dev",
-						Destination: &database,
+						Destination: &cfg.Database,
 					},
 					cli.IntFlag{
 						Name:        "port",
 						Usage:       "The port of the PostgreSQL server",
 						Required:    false,
 						Value:       4566,
-						Destination: &dbPort,
+						Destination: &cfg.DbPort,
 					},
 					cli.StringFlag{
 						Name:        "user",
 						Usage:       "The user to Postgres",
 						Required:    false,
 						Value:       "root",
-						Destination: &dbUser,
+						Destination: &cfg.DbUser,
 					},
 				},
 				Action: func(c *cli.Context) error {
-					sink = "postgres"
+					cfg.Sink = "postgres"
 					return runCommand()
 				},
 			},
@@ -83,11 +75,11 @@ func main() {
 						Name:        "brokers",
 						Usage:       "Kafka bootstrap brokers to connect to, as a comma separated list",
 						Required:    true,
-						Destination: &brokers,
+						Destination: &cfg.Brokers,
 					},
 				},
 				Action: func(c *cli.Context) error {
-					sink = "kafka"
+					cfg.Sink = "kafka"
 					return runCommand()
 				},
 				HelpName: "ad-datagen postgres",
@@ -98,20 +90,20 @@ func main() {
 				Name:        "print",
 				Usage:       "Whether to print the content every event",
 				Required:    false,
-				Destination: &printInsert,
+				Destination: &cfg.PrintInsert,
 			},
 			cli.IntFlag{
 				Name:        "qps",
 				Usage:       "Number of messages to send per second",
 				Required:    false,
 				Value:       1,
-				Destination: &qps,
+				Destination: &cfg.Qps,
 			},
 			cli.StringFlag{
 				Name:        "mode",
 				Usage:       "ad-click or ad-ctr",
 				Required:    true,
-				Destination: &mode,
+				Destination: &cfg.Mode,
 			},
 		},
 	}
