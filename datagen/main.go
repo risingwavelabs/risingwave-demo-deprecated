@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ad-datagen/workload"
 	"context"
+	"datagen/workload"
 	"log"
 	"os"
 	"os/signal"
@@ -82,7 +82,7 @@ func main() {
 					cfg.Sink = "kafka"
 					return runCommand()
 				},
-				HelpName: "ad-datagen postgres",
+				HelpName: "datagen postgres",
 			},
 		},
 		Flags: []cli.Flag{

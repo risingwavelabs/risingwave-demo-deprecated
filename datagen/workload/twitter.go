@@ -35,8 +35,16 @@ const topicTwitterEvents = "twitter"
 const tableTwitterEvents = "twitter"
 
 func (r *twitterEvent) ToPostgresSql() string {
-	return fmt.Sprintf("INSERT INTO %s (user_id, ad_id, click_timestamp, impression_timestamp) values ('%d', '%d', '%s', '%s')",
-		tableTwitterEvents, r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
+	return fmt.Sprintf("INSERT INTO %s (data, author) values (%s, %s);",
+		tableTwitterEvents, r.Data.objectString(), r.Author.objectString())
+}
+
+func (r *twitterUser) objectString() string {
+	return fmt.Sprintf("('%s', '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Name, r.UserName)
+}
+
+func (r *tweetData) objectString() string {
+	return fmt.Sprintf("('%s', '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Text, r.Lang)
 }
 
 func (r *twitterEvent) ToKafka() (topic string, data []byte) {
@@ -63,7 +71,7 @@ func newTwitterGen() *twitterGen {
 			users[id] = &twitterUser{
 				CreatedAt: faker.DateRange(startTime, endTime).Format("2020-02-12T17:09:56.000Z"),
 				Id:        id,
-				Name:      fmt.Sprintf("%s ", faker.Name(), faker.Adverb()),
+				Name:      fmt.Sprintf("%s %s", faker.Name(), faker.Adverb()),
 				UserName:  faker.Username(),
 			}
 		}
@@ -91,8 +99,6 @@ func (t *twitterGen) generate() twitterEvent {
 }
 
 func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, sink Sink) error {
-	const layout = "2006-01-02 15:04:05.07"
-
 	if _, ok := sink.(*KafkaSink); ok {
 		if err := createRequiredTopics(cfg.Brokers, []string{topicTwitterEvents}); err != nil {
 			return err

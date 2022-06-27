@@ -1,4 +1,4 @@
-module ad-datagen
+module datagen
 
 go 1.18
 
