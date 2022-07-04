@@ -69,7 +69,7 @@ func newTwitterGen() *twitterGen {
 			endTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", endYear))
 			startTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", startYear))
 			users[id] = &twitterUser{
-				CreatedAt: faker.DateRange(startTime, endTime).Format("2020-02-12T17:09:56.000Z"),
+				CreatedAt: faker.DateRange(startTime, endTime).Format("2006-01-02 15:04:05.07"),
 				Id:        id,
 				Name:      fmt.Sprintf("%s %s", faker.Name(), faker.Adverb()),
 				UserName:  faker.Username(),
@@ -90,9 +90,19 @@ func (t *twitterGen) generate() twitterEvent {
 	id := t.faker.DigitN(19)
 	author := t.users[rand.Intn(len(t.users))]
 
+	wordsCnt := t.faker.IntRange(10, 20)
+	hashTagsCnt := t.faker.IntRange(0, 2)
+	hashTags := ""
+	for i := 0; i < hashTagsCnt; i++ {
+		hashTags += fmt.Sprintf("#%s ", t.faker.BuzzWord())
+	}
+	sentence := fmt.Sprintf("%s%s", hashTags, t.faker.Sentence(wordsCnt))
 	return twitterEvent{
 		Data: tweetData{
-			Id: id,
+			Id:        id,
+			CreatedAt: time.Now().Format("2006-01-02 15:04:05.07"),
+			Text:      sentence,
+			Lang:      "English",
 		},
 		Author: *author,
 	}

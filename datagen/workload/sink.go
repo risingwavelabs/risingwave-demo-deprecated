@@ -56,6 +56,9 @@ func (p *PostgresSink) Close() error {
 func (p *PostgresSink) WriteRecord(ctx context.Context, record SinkRecord) error {
 	query := record.ToPostgresSql()
 	_, err := p.db.ExecContext(ctx, query)
+	if err != nil {
+		err = fmt.Errorf("failed to execute query '%s': %s", query, err)
+	}
 	return err
 }
 
