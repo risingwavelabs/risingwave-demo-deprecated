@@ -6,11 +6,11 @@ qps: 2
 connectors:
   ad_click:
     kafka:
-      broker: message_queue:9092
+      broker: message_queue:29092
       topic: ad_click
-      timeout_ms: 10000
+      timeout_ms: 5000
   ad_impression:
     kafka:
-      broker: message_queue:9092
+      broker: message_queue:29092
       topic: ad_impression
-      timeout_ms: 10000
+      timeout_ms: 5000
