@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
   push:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build_docker_image:
@@ -36,3 +36,11 @@ jobs:
           push: true
           tags: |
             ghcr.io/singularity-data/workload-generator
+
+      - name: Build and push
+        uses: docker/build-push-action@v2.10.0
+        with:
+          context: ./datagen
+          push: true
+          tags: |
+            ghcr.io/singularity-data/demo-datagen:${{github.ref_name}}
