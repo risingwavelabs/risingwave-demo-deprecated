@@ -313,15 +313,13 @@ services:
       timeout: 5s
       retries: 5
   datagen:
-    image: "datagen:latest"
+    image: ghcr.io/singularity-data/demo-datagen:v1.0.0
     depends_on: [message_queue]
     command:
       - /bin/sh
       - -c
       - /datagen --mode ad-click --qps 2 kafka --brokers message_queue:29092
     restart: always
-    volumes:
-      - "./config.yaml:/config.yaml"
     container_name: datagen
 volumes:
   etcd-0:
