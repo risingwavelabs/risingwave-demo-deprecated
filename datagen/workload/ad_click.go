@@ -2,6 +2,7 @@ package workload
 
 import (
 	"context"
+	"datagen/workload/sink"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -31,11 +32,11 @@ func (r *clickEvent) ToKafka() (topic string, data []byte) {
 	return topicAdClicks, data
 }
 
-func LoadAdClick(ctx context.Context, cfg GeneratorConfig, sink Sink) error {
+func LoadAdClick(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
 	const layout = "2006-01-02 15:04:05.07"
 
-	if _, ok := sink.(*KafkaSink); ok {
-		if err := createRequiredTopics(cfg.Brokers, []string{topicAdClicks}); err != nil {
+	if _, ok := snk.(*sink.KafkaSink); ok {
+		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicAdClicks}); err != nil {
 			return err
 		}
 	}
@@ -51,7 +52,7 @@ func LoadAdClick(ctx context.Context, cfg GeneratorConfig, sink Sink) error {
 			ClickTimestamp:      now.Add(time.Duration(rand.Intn(1000)) * time.Millisecond).Format(layout),
 			ImpressionTimestamp: now.Format(layout),
 		}
-		if err := sink.WriteRecord(ctx, &record); err != nil {
+		if err := snk.WriteRecord(ctx, &record); err != nil {
 			return err
 		}
 		_ = rl.Wait(ctx)

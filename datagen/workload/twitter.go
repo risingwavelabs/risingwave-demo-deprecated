@@ -2,6 +2,7 @@ package workload
 
 import (
 	"context"
+	"datagen/workload/sink"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -108,9 +109,9 @@ func (t *twitterGen) generate() twitterEvent {
 	}
 }
 
-func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, sink Sink) error {
-	if _, ok := sink.(*KafkaSink); ok {
-		if err := createRequiredTopics(cfg.Brokers, []string{topicTwitterEvents}); err != nil {
+func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
+	if _, ok := snk.(*sink.KafkaSink); ok {
+		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicTwitterEvents}); err != nil {
 			return err
 		}
 	}
@@ -122,7 +123,7 @@ func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, sink Sink) erro
 	rl := rate.NewLimiter(rate.Limit(cfg.Qps), 0) // per second
 	for {
 		record := gen.generate()
-		if err := sink.WriteRecord(ctx, &record); err != nil {
+		if err := snk.WriteRecord(ctx, &record); err != nil {
 			return err
 		}
 		_ = rl.Wait(ctx)
