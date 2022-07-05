@@ -120,7 +120,7 @@ func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) 
 	count := int64(0)
 	initTime := time.Now()
 	prevTime := time.Now()
-	rl := rate.NewLimiter(rate.Limit(cfg.Qps), 0) // per second
+	rl := rate.NewLimiter(rate.Every(time.Second), cfg.Qps) // per second
 	for {
 		record := gen.generate()
 		if err := snk.WriteRecord(ctx, &record); err != nil {

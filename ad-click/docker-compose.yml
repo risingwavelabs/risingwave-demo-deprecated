@@ -312,17 +312,17 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
-  workload-generator:
-    image: "ghcr.io/singularity-data/workload-generator:latest"
+  datagen:
+    image: "datagen:latest"
     depends_on: [message_queue]
     command:
       - /bin/sh
       - -c
-      - /workload_generator --config /config.yaml ad-click
+      - /datagen --mode ad-click --qps 2 kafka --brokers message_queue:29092
     restart: always
     volumes:
       - "./config.yaml:/config.yaml"
-    container_name: workload-generator
+    container_name: datagen
 volumes:
   etcd-0:
     external: false

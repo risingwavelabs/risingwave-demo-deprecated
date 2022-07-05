@@ -318,7 +318,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - /datagen --mode ad-ctr --qps 2 kafka --brokers message_queue:29092
+      - /datagen --mode twitter --qps 10000000 kafka --brokers message_queue:29092
     restart: always
     volumes:
       - "./config.yaml:/config.yaml"

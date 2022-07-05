@@ -101,7 +101,7 @@ func LoadAdCtr(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
 	count := int64(0)
 	initTime := time.Now()
 	prevTime := time.Now()
-	rl := rate.NewLimiter(rate.Limit(cfg.Qps), 0) // per second
+	rl := rate.NewLimiter(rate.Every(time.Second), cfg.Qps) // per second
 	for {
 		records := gen.generate()
 		for _, record := range records {
