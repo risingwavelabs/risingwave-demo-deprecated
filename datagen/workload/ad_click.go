@@ -33,8 +33,6 @@ func (r *clickEvent) ToKafka() (topic string, data []byte) {
 }
 
 func LoadAdClick(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
-	const layout = "2006-01-02 15:04:05.07"
-
 	if _, ok := snk.(*sink.KafkaSink); ok {
 		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicAdClicks}); err != nil {
 			return err
@@ -49,8 +47,8 @@ func LoadAdClick(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error 
 		record := clickEvent{
 			UserId:              rand.Int63n(100000),
 			AdId:                rand.Int63n(10),
-			ClickTimestamp:      now.Add(time.Duration(rand.Intn(1000)) * time.Millisecond).Format(layout),
-			ImpressionTimestamp: now.Format(layout),
+			ClickTimestamp:      now.Add(time.Duration(rand.Intn(1000)) * time.Millisecond).Format(rwTimestampLayout),
+			ImpressionTimestamp: now.Format(rwTimestampLayout),
 		}
 		if err := snk.WriteRecord(ctx, &record); err != nil {
 			return err

@@ -70,7 +70,7 @@ func newTwitterGen() *twitterGen {
 			endTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", endYear))
 			startTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", startYear))
 			users[id] = &twitterUser{
-				CreatedAt: faker.DateRange(startTime, endTime).Format("2006-01-02 15:04:05.07"),
+				CreatedAt: faker.DateRange(startTime, endTime).Format(rwTimestampLayout),
 				Id:        id,
 				Name:      fmt.Sprintf("%s %s", faker.Name(), faker.Adverb()),
 				UserName:  faker.Username(),

@@ -31,6 +31,8 @@ func LoadGen(ctx context.Context, cfg GeneratorConfig) error {
 		})
 	} else if cfg.Sink == "kafka" {
 		sinkImpl, err = sink.OpenKafkaSink(ctx, cfg.Brokers)
+	} else if cfg.Sink == "pulsar" {
+		sinkImpl, err = sink.OpenPulsarSink(ctx, cfg.Brokers)
 	} else {
 		return fmt.Errorf("invalid sink type: %s", cfg.Sink)
 	}
@@ -52,3 +54,5 @@ func LoadGen(ctx context.Context, cfg GeneratorConfig) error {
 		return fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
 }
+
+const rwTimestampLayout = "2006-01-02 15:04:05.07"

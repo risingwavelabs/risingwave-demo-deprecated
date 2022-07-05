@@ -5,10 +5,11 @@ import (
 )
 
 type SinkRecord interface {
-	// Convert the event to an INSERT INTO command to a Postgres table.
+	// Convert the event to an INSERT INTO command.
 	ToPostgresSql() string
 
-	// Convert the event to a Kakfa message to a specific topic.
+	// Convert the event to a Kakfa message in JSON format.
+	// This interface will also be used for Pulsar.
 	ToKafka() (topic string, data []byte)
 }
 

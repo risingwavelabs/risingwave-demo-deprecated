@@ -82,7 +82,23 @@ func main() {
 					cfg.Sink = "kafka"
 					return runCommand()
 				},
-				HelpName: "datagen postgres",
+				HelpName: "datagen kafka",
+			},
+			{
+				Name: "pulsar",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:        "brokers",
+						Usage:       "Pulsar brokers to connect to, as a comma separated list",
+						Required:    true,
+						Destination: &cfg.Brokers,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					cfg.Sink = "pulsar"
+					return runCommand()
+				},
+				HelpName: "datagen pulsar",
 			},
 		},
 		Flags: []cli.Flag{
