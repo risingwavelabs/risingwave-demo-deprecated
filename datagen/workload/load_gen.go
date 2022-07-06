@@ -47,7 +47,7 @@ func LoadGen(ctx context.Context, cfg GeneratorConfig) error {
 	if cfg.Mode == "ad-click" {
 		return LoadAdClick(ctx, cfg, sinkImpl)
 	} else if cfg.Mode == "ad-ctr" {
-		return nil // TODO
+		return LoadAdCtr(ctx, cfg, sinkImpl)
 	} else if cfg.Mode == "twitter" {
 		return LoadTwitterEvents(ctx, cfg, sinkImpl)
 	} else {
