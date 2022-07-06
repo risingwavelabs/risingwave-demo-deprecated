@@ -41,11 +41,11 @@ func (r *twitterEvent) ToPostgresSql() string {
 }
 
 func (r *twitterUser) objectString() string {
-	return fmt.Sprintf("('%s', '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Name, r.UserName)
+	return fmt.Sprintf("('%s'::TIMESTAMP, '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Name, r.UserName)
 }
 
 func (r *tweetData) objectString() string {
-	return fmt.Sprintf("('%s', '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Text, r.Lang)
+	return fmt.Sprintf("('%s'::TIMESTAMP, '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Text, r.Lang)
 }
 
 func (r *twitterEvent) ToKafka() (topic string, data []byte) {

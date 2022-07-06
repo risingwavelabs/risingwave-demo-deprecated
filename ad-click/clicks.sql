@@ -12,6 +12,14 @@ create source ad_source (
     'kafka.scan.startup.mode' = 'earliest'
 ) row format json;
 
+-- Create a table and directly feed data via INSERT INTO.
+create table ad_source (
+    user_id bigint,
+    ad_id bigint,
+    click_timestamp timestamp,
+    impression_timestamp timestamp
+);
+
 -- The number of clicks on the ad within one minute after the ad was shown.
 create materialized view m_click_statistic as
 select
