@@ -25,7 +25,7 @@ services:
       - meta-node-0
       - minio-0
     volumes:
-      - "./risingwave.toml:/risingwave.toml"
+      - "../risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: compactor-0
@@ -64,7 +64,7 @@ services:
       - meta-node-0
       - minio-0
     volumes:
-      - "./risingwave.toml:/risingwave.toml"
+      - "../risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: compute-node-0
@@ -157,10 +157,10 @@ services:
     depends_on: []
     volumes:
       - "grafana-0:/var/lib/grafana"
-      - "./grafana.ini:/etc/grafana/grafana.ini"
-      - "./grafana-risedev-datasource.yml:/etc/grafana/provisioning/datasources/grafana-risedev-datasource.yml"
-      - "./grafana-risedev-dashboard.yml:/etc/grafana/provisioning/dashboards/grafana-risedev-dashboard.yml"
-      - "./risingwave-dashboard.json:/risingwave-dashboard.json"
+      - "../grafana.ini:/etc/grafana/grafana.ini"
+      - "../grafana-risedev-datasource.yml:/etc/grafana/provisioning/datasources/grafana-risedev-datasource.yml"
+      - "../grafana-risedev-dashboard.yml:/etc/grafana/provisioning/dashboards/grafana-risedev-dashboard.yml"
+      - "../risingwave-dashboard.json:/risingwave-dashboard.json"
     environment: {}
     container_name: grafana-0
     healthcheck:
@@ -197,7 +197,7 @@ services:
     ports: []
     depends_on: []
     volumes:
-      - "./risingwave.toml:/risingwave.toml"
+      - "../risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: meta-node-0
@@ -261,7 +261,7 @@ services:
     depends_on: []
     volumes:
       - "prometheus-0:/prometheus"
-      - "./prometheus.yaml:/etc/prometheus/prometheus.yml"
+      - "../prometheus.yaml:/etc/prometheus/prometheus.yml"
     environment: {}
     container_name: prometheus-0
     healthcheck:
