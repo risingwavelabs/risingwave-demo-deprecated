@@ -7,5 +7,6 @@ Here is a gallery of demos that present how to use RisingWave alongwith the ecos
 
 ## Workload Generator
 
-This repo also hosts a tool named "Workload Generator" that helps feed the example stream to RisingWave.
-Please checkout the [docs](./workload-generator/README.md) for the usage.
+This repo also hosts a tool named "datagen" that helps feed the example stream to RisingWave.
+It's written in Golang. To use this tool, you can compile './datagen' from source or use the
+docker image `ghcr.io/singularity-data/demo-datagen:v1.0.0`.
