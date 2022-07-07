@@ -92,7 +92,7 @@ func (g *adCtrGen) generate() []sink.SinkRecord {
 
 func LoadAdCtr(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
 	if _, ok := snk.(*sink.KafkaSink); ok {
-		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicAdClicks}); err != nil {
+		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{"ad_click", "ad_impression"}); err != nil {
 			return err
 		}
 	}

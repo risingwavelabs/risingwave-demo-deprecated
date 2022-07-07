@@ -32,12 +32,9 @@ type twitterUser struct {
 	UserName  string `json:"username"`
 }
 
-const topicTwitterEvents = "twitter"
-const tableTwitterEvents = "twitter"
-
 func (r *twitterEvent) ToPostgresSql() string {
 	return fmt.Sprintf("INSERT INTO %s (data, author) values (%s, %s);",
-		tableTwitterEvents, r.Data.objectString(), r.Author.objectString())
+		"twitter", r.Data.objectString(), r.Author.objectString())
 }
 
 func (r *twitterUser) objectString() string {
@@ -50,7 +47,7 @@ func (r *tweetData) objectString() string {
 
 func (r *twitterEvent) ToKafka() (topic string, data []byte) {
 	data, _ = json.Marshal(r)
-	return topicTwitterEvents, data
+	return "twitter", data
 }
 
 type twitterGen struct {
@@ -111,7 +108,7 @@ func (t *twitterGen) generate() twitterEvent {
 
 func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
 	if _, ok := snk.(*sink.KafkaSink); ok {
-		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicTwitterEvents}); err != nil {
+		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{"twitter"}); err != nil {
 			return err
 		}
 	}

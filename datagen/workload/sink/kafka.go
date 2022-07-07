@@ -22,6 +22,8 @@ func newKafkaConfig() *sarama.Config {
 	config := sarama.NewConfig()
 	config.Version = version
 	config.Net.DialTimeout = 3 * time.Second
+	config.Admin.Timeout = 5 * time.Second
+	config.Producer.Timeout = 5 * time.Second
 	return config
 }
 

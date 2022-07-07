@@ -19,22 +19,19 @@ type clickEvent struct {
 	ImpressionTimestamp string `json:"impression_timestamp"`
 }
 
-const topicAdClicks = "ad_clicks"
-const tableAdClicks = "ad_source"
-
 func (r *clickEvent) ToPostgresSql() string {
 	return fmt.Sprintf("INSERT INTO %s (user_id, ad_id, click_timestamp, impression_timestamp) values ('%d', '%d', '%s', '%s')",
-		tableAdClicks, r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
+		"ad_source", r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
 }
 
 func (r *clickEvent) ToKafka() (topic string, data []byte) {
 	data, _ = json.Marshal(r)
-	return topicAdClicks, data
+	return "ad_clicks", data
 }
 
 func LoadAdClick(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
 	if _, ok := snk.(*sink.KafkaSink); ok {
-		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{topicAdClicks}); err != nil {
+		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{"ad_clicks"}); err != nil {
 			return err
 		}
 	}
