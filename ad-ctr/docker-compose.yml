@@ -313,7 +313,7 @@ services:
       timeout: 5s
       retries: 5
   datagen:
-    image: ghcr.io/singularity-data/demo-datagen:v1.0.0
+    image: ghcr.io/singularity-data/demo-datagen:v1.0.1
     depends_on: [message_queue]
     command:
       - /bin/sh
