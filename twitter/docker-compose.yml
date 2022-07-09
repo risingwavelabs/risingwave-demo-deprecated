@@ -283,7 +283,7 @@ services:
     container_name: message_queue
     stop_grace_period: 2s
   datagen:
-    image: ghcr.io/singularity-data/demo-datagen:main
+    image: ghcr.io/singularity-data/demo-datagen:v1.0.1
     depends_on: [message_queue]
     command:
       - /bin/sh

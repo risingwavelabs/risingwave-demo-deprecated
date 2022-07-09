@@ -1,16 +1,15 @@
-package workload
+package ad_ctr
 
 import (
 	"context"
-	"datagen/workload/sink"
+	"datagen/gen"
+	"datagen/sink"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"golang.org/x/time/rate"
 )
 
 type adImpressionEvent struct {
@@ -49,7 +48,7 @@ type adCtrGen struct {
 	ctr   map[int64]float64
 }
 
-func newAdCtrGen() *adCtrGen {
+func NewAdCtrGen() gen.LoadGenerator {
 	return &adCtrGen{
 		ctr:   make(map[int64]float64),
 		faker: gofakeit.New(0),
@@ -77,48 +76,32 @@ func (g *adCtrGen) generate() []sink.SinkRecord {
 		&adImpressionEvent{
 			BidId:               bidId,
 			AdId:                adId,
-			ImpressionTimestamp: time.Now().Format(rwTimestampLayout),
+			ImpressionTimestamp: time.Now().Format(gen.RwTimestampLayout),
 		},
 	}
 	if g.hasClick(adId) {
 		randomDelay := time.Duration(g.faker.IntRange(1, 10) * int(time.Second))
 		events = append(events, &adClickEvent{
 			BidId:          bidId,
-			ClickTimestamp: time.Now().Add(randomDelay).Format(rwTimestampLayout),
+			ClickTimestamp: time.Now().Add(randomDelay).Format(gen.RwTimestampLayout),
 		})
 	}
 	return events
 }
 
-func LoadAdCtr(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
-	if _, ok := snk.(*sink.KafkaSink); ok {
-		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{"ad_click", "ad_impression"}); err != nil {
-			return err
-		}
-	}
+func (g *adCtrGen) KafkaTopics() []string {
+	return []string{"ad_impression", "ad_click"}
+}
 
-	gen := newAdCtrGen()
-	count := int64(0)
-	initTime := time.Now()
-	prevTime := time.Now()
-	rl := rate.NewLimiter(rate.Every(time.Second), cfg.Qps) // per second
+func (g *adCtrGen) Load(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) {
 	for {
-		records := gen.generate()
+		records := g.generate()
 		for _, record := range records {
-			if err := snk.WriteRecord(ctx, record); err != nil {
-				return err
+			select {
+			case outCh <- record:
+			case <-ctx.Done():
+				return
 			}
-			_ = rl.Wait(ctx)
-			count++
-		}
-		select {
-		case <-ctx.Done():
-			return nil
-		default:
-		}
-		if time.Since(prevTime) >= 10*time.Second {
-			log.Printf("Sent %d records in total (Elasped: %s)", count, time.Since(initTime).String())
-			prevTime = time.Now()
 		}
 	}
 }

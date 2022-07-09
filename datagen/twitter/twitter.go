@@ -1,16 +1,15 @@
-package workload
+package twitter
 
 import (
 	"context"
-	"datagen/workload/sink"
+	"datagen/gen"
+	"datagen/sink"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"golang.org/x/time/rate"
 )
 
 type tweetData struct {
@@ -56,7 +55,7 @@ type twitterGen struct {
 	users []*twitterUser
 }
 
-func newTwitterGen() *twitterGen {
+func NewTwitterGen() gen.LoadGenerator {
 	faker := gofakeit.New(0)
 	users := make(map[string]*twitterUser)
 	for len(users) < 100000 {
@@ -68,7 +67,7 @@ func newTwitterGen() *twitterGen {
 			endTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", endYear))
 			startTime, _ := time.Parse("2006-01-01", fmt.Sprintf("%d-01-01", startYear))
 			users[id] = &twitterUser{
-				CreatedAt: faker.DateRange(startTime, endTime).Format(rwTimestampLayout),
+				CreatedAt: faker.DateRange(startTime, endTime).Format(gen.RwTimestampLayout),
 				Id:        id,
 				Name:      fmt.Sprintf("%s %s", faker.Name(), faker.Adverb()),
 				UserName:  faker.Username(),
@@ -108,33 +107,17 @@ func (t *twitterGen) generate() twitterEvent {
 	}
 }
 
-func LoadTwitterEvents(ctx context.Context, cfg GeneratorConfig, snk sink.Sink) error {
-	if _, ok := snk.(*sink.KafkaSink); ok {
-		if err := sink.CreateRequiredTopics(cfg.Brokers, []string{"twitter"}); err != nil {
-			return err
-		}
-	}
+func (t *twitterGen) KafkaTopics() []string {
+	return []string{"twitter"}
+}
 
-	gen := newTwitterGen()
-	count := int64(0)
-	initTime := time.Now()
-	prevTime := time.Now()
-	rl := rate.NewLimiter(rate.Every(time.Second), cfg.Qps) // per second
+func (t *twitterGen) Load(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) {
 	for {
-		record := gen.generate()
-		if err := snk.WriteRecord(ctx, &record); err != nil {
-			return err
-		}
-		_ = rl.Wait(ctx)
+		record := t.generate()
 		select {
 		case <-ctx.Done():
-			return nil
-		default:
-		}
-		count++
-		if time.Since(prevTime) >= 10*time.Second {
-			log.Printf("Sent %d records in total (Elasped: %s)", count, time.Since(initTime).String())
-			prevTime = time.Now()
+			return
+		case outCh <- &record:
 		}
 	}
 }

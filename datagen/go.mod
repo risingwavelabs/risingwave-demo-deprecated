@@ -7,14 +7,16 @@ require (
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/lib/pq v1.10.6
+	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/urfave/cli v1.22.9
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+	go.uber.org/ratelimit v0.2.0
 )
 
 require (
 	github.com/99designs/keyring v1.1.6 // indirect
 	github.com/AthenZ/athenz v1.10.39 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
+	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
 	github.com/apache/pulsar-client-go/oauth2 v0.0.0-20220120090717-25e59572242e // indirect
 	github.com/ardielle/ardielle-go v1.5.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

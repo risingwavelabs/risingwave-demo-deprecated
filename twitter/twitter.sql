@@ -55,7 +55,7 @@ CREATE TABLE twitter (
 
 CREATE MATERIALIZED VIEW influencer_tweets AS
 SELECT
-    (data).text
+    (author).id as author_id, (data).text as tweet
 FROM
     twitter
 WHERE

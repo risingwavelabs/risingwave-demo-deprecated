@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"datagen/workload"
+	"datagen/gen"
 	"log"
 	"os"
 	"os/signal"
@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var cfg workload.GeneratorConfig = workload.GeneratorConfig{}
+var cfg gen.GeneratorConfig = gen.GeneratorConfig{}
 
 func runCommand() error {
 	terminateCh := make(chan os.Signal, 1)
@@ -24,7 +24,7 @@ func runCommand() error {
 		log.Println("Cancelled")
 		cancel()
 	}()
-	return workload.LoadGen(ctx, cfg)
+	return generateLoad(ctx, cfg)
 }
 
 func main() {
