@@ -1,3 +1,6 @@
+--
+-- The Pulsar source version
+--
 CREATE SOURCE twitter (
     data STRUCT < created_at TIMESTAMP,
     id VARCHAR,
@@ -7,7 +10,27 @@ CREATE SOURCE twitter (
     id VARCHAR,
     name VARCHAR,
     username VARCHAR,
-    followers INT >,
+    followers INT >
+) WITH (
+    'connector' = 'pulsar',
+    'pulsar.topic' = 'twitter',
+    'pulsar.admin.url' = 'http://message_queue:8080',
+    'pulsar.service.url' = 'pulsar://message_queue:6650'
+) ROW FORMAT JSON;
+
+--
+-- The Kafka source version
+--
+CREATE SOURCE twitter (
+    data STRUCT < created_at TIMESTAMP,
+    id VARCHAR,
+    text VARCHAR,
+    lang VARCHAR >,
+    author STRUCT < created_at TIMESTAMP,
+    id VARCHAR,
+    name VARCHAR,
+    username VARCHAR,
+    followers INT >
 ) WITH (
     'connector' = 'kafka',
     'kafka.topic' = 'twitter',
@@ -27,7 +50,7 @@ CREATE TABLE twitter (
     id VARCHAR,
     name VARCHAR,
     username VARCHAR,
-    followers INT >,
+    followers INT >
 );
 
 CREATE MATERIALIZED VIEW influencer_tweets AS
@@ -57,7 +80,7 @@ GROUP BY
     hashtag;
 
 --
--- Postgres
+-- The Postgres version. The two user-defined types correspond with the struct types in RisingWave.
 --
 CREATE TYPE twitter_user AS (
     created_at TIMESTAMP,
