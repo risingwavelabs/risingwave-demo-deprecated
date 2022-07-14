@@ -30,6 +30,7 @@ type twitterUser struct {
 	Id        string `json:"id"`
 	Name      string `json:"name"`
 	UserName  string `json:"username"`
+	Followers int    `json:"followers"`
 }
 
 func (r *twitterEvent) ToPostgresSql() string {
@@ -71,6 +72,7 @@ func newTwitterGen() *twitterGen {
 				Id:        id,
 				Name:      fmt.Sprintf("%s %s", faker.Name(), faker.Adverb()),
 				UserName:  faker.Username(),
+				Followers: gofakeit.IntRange(1, 100000),
 			}
 		}
 	}
@@ -100,7 +102,7 @@ func (t *twitterGen) generate() twitterEvent {
 			Id:        id,
 			CreatedAt: time.Now().Format("2006-01-02 15:04:05.07"),
 			Text:      sentence,
-			Lang:      "English",
+			Lang:      gofakeit.Language(),
 		},
 		Author: *author,
 	}
