@@ -274,33 +274,23 @@ services:
       timeout: 5s
       retries: 5
   message_queue:
-    image: "docker.vectorized.io/vectorized/redpanda:latest"
+    image: "apachepulsar/pulsar:2.9.1"
     command:
-      - redpanda
-      - start
-      - "--smp"
-      - "4"
-      - "--reserve-memory"
-      - 0M
-      - "--memory"
-      - 4G
-      - "--overprovisioned"
-      - "--node-id"
-      - "0"
-      - "--check=false"
-      - "--kafka-addr"
-      - "PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092"
-      - "--advertise-kafka-addr"
-      - "PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092"
+      - bin/pulsar
+      - standalone
     expose:
-      - "29092"
-      - "9092"
+      - "6650"
     ports:
-      - "9092:9092"
-      - "9644:9644"
+      - "6650:6650"
+      - "8080:8080"
     depends_on: []
     volumes:
-      - "message_queue:/var/lib/redpanda/data"
+      - type: bind
+        source: pulsardata
+        target: /pulsar/data
+      - type: bind
+        source: pulsarconf
+        target: /pulsar/conf
     environment: {}
     container_name: message_queue
     healthcheck:
@@ -308,7 +298,7 @@ services:
         - CMD
         - printf
         - ""
-        - /dev/tcp/127.0.0.1/9092
+        - /dev/tcp/127.0.0.1/6650
       interval: 1s
       timeout: 5s
       retries: 5
@@ -318,7 +308,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - /datagen --mode twitter --qps 2 kafka --brokers message_queue:29092
+      - /datagen --mode twitter --qps 2 pulsar --brokers message_queue:6650
     restart: always
     container_name: datagen
 volumes:
