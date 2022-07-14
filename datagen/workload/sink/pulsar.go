@@ -3,6 +3,7 @@ package sink
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/apache/pulsar-client-go/pulsar"
 )
@@ -14,7 +15,8 @@ type PulsarSink struct {
 
 func OpenPulsarSink(ctx context.Context, brokers string) (*PulsarSink, error) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: fmt.Sprintf("pulsar://%s", brokers),
+		URL:              fmt.Sprintf("pulsar://%s", brokers),
+		OperationTimeout: 5 * time.Second,
 	})
 	if err != nil {
 		return nil, err
@@ -31,10 +33,11 @@ func (p *PulsarSink) Close() error {
 }
 
 func (p *PulsarSink) WriteRecord(ctx context.Context, record SinkRecord) error {
+	var err error
 	topic, data := record.ToKafka()
 	producer, ok := p.producers[topic]
 	if !ok {
-		producer, err := p.client.CreateProducer(pulsar.ProducerOptions{
+		producer, err = p.client.CreateProducer(pulsar.ProducerOptions{
 			Topic: topic,
 		})
 		if err != nil {
@@ -42,7 +45,7 @@ func (p *PulsarSink) WriteRecord(ctx context.Context, record SinkRecord) error {
 		}
 		p.producers[topic] = producer
 	}
-	_, err := producer.Send(ctx, &pulsar.ProducerMessage{
+	_, err = producer.Send(ctx, &pulsar.ProducerMessage{
 		Payload: data,
 	})
 	return err
