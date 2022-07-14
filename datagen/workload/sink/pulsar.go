@@ -3,7 +3,6 @@ package sink
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/apache/pulsar-client-go/pulsar"
 )
@@ -15,8 +14,7 @@ type PulsarSink struct {
 
 func OpenPulsarSink(ctx context.Context, brokers string) (*PulsarSink, error) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL:              fmt.Sprintf("pulsar://%s", brokers),
-		OperationTimeout: 5 * time.Second,
+		URL: fmt.Sprintf("pulsar://%s", brokers),
 	})
 	if err != nil {
 		return nil, err
