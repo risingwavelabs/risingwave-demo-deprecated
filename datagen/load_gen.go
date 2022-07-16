@@ -50,7 +50,7 @@ func spawnGen(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.Si
 	if err != nil {
 		return err
 	}
-	go gen.Load(ctx, cfg, outCh)
+	go gen.Load(ctx, outCh)
 	return nil
 }
 

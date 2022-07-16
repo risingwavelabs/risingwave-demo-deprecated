@@ -20,7 +20,7 @@ type GeneratorConfig struct {
 type LoadGenerator interface {
 	KafkaTopics() []string
 
-	Load(ctx context.Context, cfg GeneratorConfig, outCh chan<- sink.SinkRecord)
+	Load(ctx context.Context, outCh chan<- sink.SinkRecord)
 }
 
 const RwTimestampLayout = "2006-01-02 15:04:05.07"

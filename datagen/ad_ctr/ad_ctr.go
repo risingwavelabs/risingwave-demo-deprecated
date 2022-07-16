@@ -93,7 +93,7 @@ func (g *adCtrGen) KafkaTopics() []string {
 	return []string{"ad_impression", "ad_click"}
 }
 
-func (g *adCtrGen) Load(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) {
+func (g *adCtrGen) Load(ctx context.Context, outCh chan<- sink.SinkRecord) {
 	for {
 		records := g.generate()
 		for _, record := range records {

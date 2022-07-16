@@ -38,7 +38,7 @@ func (g *adClickGen) KafkaTopics() []string {
 	return []string{"ad_clicks"}
 }
 
-func (g *adClickGen) Load(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) {
+func (g *adClickGen) Load(ctx context.Context, outCh chan<- sink.SinkRecord) {
 	for {
 		now := time.Now()
 		record := &clickEvent{

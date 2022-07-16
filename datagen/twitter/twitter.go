@@ -111,7 +111,7 @@ func (t *twitterGen) KafkaTopics() []string {
 	return []string{"twitter"}
 }
 
-func (t *twitterGen) Load(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) {
+func (t *twitterGen) Load(ctx context.Context, outCh chan<- sink.SinkRecord) {
 	for {
 		record := t.generate()
 		select {
