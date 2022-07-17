@@ -7,9 +7,9 @@ require (
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/lib/pq v1.10.6
-	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/urfave/cli v1.22.9
 	go.uber.org/ratelimit v0.2.0
+	gonum.org/v1/gonum v0.11.0
 )
 
 require (
@@ -64,6 +64,7 @@ require (
 	github.com/stretchr/testify v1.7.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
