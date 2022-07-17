@@ -6,15 +6,21 @@ import (
 )
 
 type GeneratorConfig struct {
-	DbHost      string
-	Database    string
-	DbPort      int
-	DbUser      string
+	// The postgres configurations.
+	DbHost   string
+	Database string
+	DbPort   int
+	DbUser   string
+	// Whether to print the content of every event.
 	PrintInsert bool
-	Mode        string
-	Sink        string
-	Qps         int
-	Brokers     string
+	// The datagen mode, e.g. "ad-ctr".
+	Mode string
+	// The sink type.
+	Sink string
+	// The throttled requests-per-second.
+	Qps int
+	// Empty if the sink is a database.
+	Brokers string
 }
 
 type LoadGenerator interface {

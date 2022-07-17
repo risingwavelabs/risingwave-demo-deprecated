@@ -5,6 +5,7 @@ import (
 	"datagen/ad_click"
 	"datagen/ad_ctr"
 	"datagen/cdn_metrics"
+	"datagen/clickstream"
 	"datagen/gen"
 	"datagen/sink"
 	"datagen/twitter"
@@ -42,6 +43,8 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return twitter.NewTwitterGen(), nil
 	} else if cfg.Mode == "cdn-metrics" {
 		return cdn_metrics.NewCdnMetricsGen(), nil
+	} else if cfg.Mode == "clickstream" {
+		return clickstream.NewClickStreamGen(), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
@@ -82,6 +85,11 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 		select {
 		case <-ctx.Done():
 			return nil
+		case <-time.NewTicker(time.Second).C:
+			if time.Since(prevTime) >= 10*time.Second {
+				log.Printf("Sent %d records in total (Elasped: %s)", count, time.Since(initTime).String())
+				prevTime = time.Now()
+			}
 		case record := <-outCh:
 			// Consume records from the channel and send to sink.
 			if err := sinkImpl.WriteRecord(ctx, record); err != nil {
@@ -89,7 +97,6 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 			}
 			_ = rl.Take()
 			count++
-		case <-time.NewTicker(time.Second).C:
 			if time.Since(prevTime) >= 10*time.Second {
 				log.Printf("Sent %d records in total (Elasped: %s)", count, time.Since(initTime).String())
 				prevTime = time.Now()

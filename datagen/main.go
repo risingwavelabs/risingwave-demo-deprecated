@@ -104,7 +104,7 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{
 				Name:        "print",
-				Usage:       "Whether to print the content every event",
+				Usage:       "Whether to print the content of every event",
 				Required:    false,
 				Destination: &cfg.PrintInsert,
 			},
