@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/singularity-data/risingwave:v0.1.10"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220715"
     command:
       - compactor-node
       - "--host"
@@ -39,7 +39,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/singularity-data/risingwave:v0.1.10"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220715"
     command:
       - compute-node
       - "--host"
@@ -121,7 +121,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/singularity-data/risingwave:v0.1.10"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220715"
     command:
       - frontend-node
       - "--host"
@@ -173,7 +173,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/singularity-data/risingwave:v0.1.10"
+    image: "ghcr.io/singularity-data/risingwave:nightly-20220715"
     command:
       - meta-node
       - "--listen-addr"
@@ -283,7 +283,7 @@ services:
     container_name: message_queue
     stop_grace_period: 2s
   datagen:
-    image: ghcr.io/singularity-data/demo-datagen:v1.0.1
+    image: ghcr.io/singularity-data/demo-datagen:v1.0.2
     depends_on: [message_queue]
     command:
       - /bin/sh
