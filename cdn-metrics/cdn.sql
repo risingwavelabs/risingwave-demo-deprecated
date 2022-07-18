@@ -4,8 +4,8 @@ CREATE SOURCE nics_metrics (
     aggregation VARCHAR,
     nic_name VARCHAR,
     report_time TIMESTAMP,
-    bandwidth VARCHAR,
-    metric_value NUMERIC
+    bandwidth DOUBLE PRECISION,
+    metric_value DOUBLE PRECISION
 ) WITH (
     'connector' = 'kafka',
     'kafka.topic' = 'nics_metrics',
@@ -17,7 +17,7 @@ CREATE SOURCE tcp_metrics (
     device_id VARCHAR,
     metric_name VARCHAR,
     report_time TIMESTAMP,
-    metric_value NUMERIC
+    metric_value DOUBLE PRECISION
 ) WITH (
     'connector' = 'kafka',
     'kafka.topic' = 'nics_metrics',
