@@ -1,7 +1,8 @@
-package sink
+package pulsar
 
 import (
 	"context"
+	"datagen/sink"
 	"fmt"
 
 	"github.com/apache/pulsar-client-go/pulsar"
@@ -30,7 +31,7 @@ func (p *PulsarSink) Close() error {
 	return nil
 }
 
-func (p *PulsarSink) WriteRecord(ctx context.Context, record SinkRecord) error {
+func (p *PulsarSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
 	var err error
 	topic, data := record.ToKafka()
 	producer, ok := p.producers[topic]

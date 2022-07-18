@@ -1,7 +1,8 @@
-package sink
+package kafka
 
 import (
 	"context"
+	"datagen/sink"
 	"fmt"
 	"log"
 	"strings"
@@ -92,7 +93,7 @@ func (p *KafkaSink) Close() error {
 	return nil
 }
 
-func (p *KafkaSink) WriteRecord(ctx context.Context, record SinkRecord) error {
+func (p *KafkaSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
 	topic, data := record.ToKafka()
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
