@@ -6,6 +6,7 @@ import (
 	"datagen/ad_ctr"
 	"datagen/cdn_metrics"
 	"datagen/clickstream"
+	"datagen/ecommerce"
 	"datagen/gen"
 	"datagen/sink"
 	"datagen/sink/kafka"
@@ -48,6 +49,8 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return cdn_metrics.NewCdnMetricsGen(), nil
 	} else if cfg.Mode == "clickstream" {
 		return clickstream.NewClickStreamGen(), nil
+	} else if cfg.Mode == "ecommerce" {
+		return ecommerce.NewEcommerceGen(), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
@@ -94,6 +97,9 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 				prevTime = time.Now()
 			}
 		case record := <-outCh:
+			if cfg.PrintInsert {
+				fmt.Println(record.ToPostgresSql())
+			}
 			// Consume records from the channel and send to sink.
 			if err := sinkImpl.WriteRecord(ctx, record); err != nil {
 				return err
