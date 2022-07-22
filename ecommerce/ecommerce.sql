@@ -56,5 +56,5 @@ FROM
         WHERE
             event_type = 'parcel_shipped'
     ) t2 ON t1.order_id = t2.order_id
-where
-    t2.event_timestamp - t1.event_timestamp > interval '7 days';
+WHERE
+    t2.event_timestamp - t1.event_timestamp > INTERVAL '7 days';
