@@ -3,14 +3,18 @@ package gen
 import (
 	"context"
 	"datagen/sink"
+	"datagen/sink/kafka"
+	"datagen/sink/kinesis"
+	"datagen/sink/postgres"
+	"datagen/sink/pulsar"
 )
 
 type GeneratorConfig struct {
-	// The postgres configurations.
-	DbHost   string
-	Database string
-	DbPort   int
-	DbUser   string
+	Postgres postgres.PostgresConfig
+	Kafka    kafka.KafkaConfig
+	Pulsar   pulsar.PulsarConfig
+	Kinesis  kinesis.KinesisConfig
+
 	// Whether to print the content of every event.
 	PrintInsert bool
 	// The datagen mode, e.g. "ad-ctr".
@@ -19,8 +23,6 @@ type GeneratorConfig struct {
 	Sink string
 	// The throttled requests-per-second.
 	Qps int
-	// Empty if the sink is a database.
-	Brokers string
 }
 
 type LoadGenerator interface {

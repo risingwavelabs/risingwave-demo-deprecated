@@ -11,6 +11,7 @@ import (
 	"datagen/gen"
 	"datagen/sink"
 	"datagen/sink/kafka"
+	"datagen/sink/kinesis"
 	"datagen/sink/postgres"
 	"datagen/sink/pulsar"
 	"datagen/twitter"
@@ -23,16 +24,13 @@ import (
 
 func createSink(ctx context.Context, cfg gen.GeneratorConfig) (sink.Sink, error) {
 	if cfg.Sink == "postgres" {
-		return postgres.OpenPostgresSink(postgres.PostgresConfig{
-			DbHost:   cfg.DbHost,
-			DbPort:   cfg.DbPort,
-			DbUser:   cfg.DbUser,
-			Database: cfg.Database,
-		})
+		return postgres.OpenPostgresSink(cfg.Postgres)
 	} else if cfg.Sink == "kafka" {
-		return kafka.OpenKafkaSink(ctx, cfg.Brokers)
+		return kafka.OpenKafkaSink(ctx, cfg.Kafka)
 	} else if cfg.Sink == "pulsar" {
-		return pulsar.OpenPulsarSink(ctx, cfg.Brokers)
+		return pulsar.OpenPulsarSink(ctx, cfg.Pulsar)
+	} else if cfg.Sink == "kinesis" {
+		return kinesis.OpenKinesisSink(cfg.Kinesis)
 	} else {
 		return nil, fmt.Errorf("invalid sink type: %s", cfg.Sink)
 	}

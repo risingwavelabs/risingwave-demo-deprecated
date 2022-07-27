@@ -11,6 +11,10 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+type KafkaConfig struct {
+	Brokers string
+}
+
 type KafkaSink struct {
 	admin   sarama.ClusterAdmin
 	brokers string
@@ -30,8 +34,11 @@ func newKafkaConfig() *sarama.Config {
 	return config
 }
 
-func OpenKafkaSink(ctx context.Context, brokers string) (*KafkaSink, error) {
-	admin, err := sarama.NewClusterAdmin(strings.Split(brokers, ","), newKafkaConfig())
+func OpenKafkaSink(ctx context.Context, cfg KafkaConfig) (*KafkaSink, error) {
+	admin, err := sarama.NewClusterAdmin(strings.Split(cfg.Brokers, ","), newKafkaConfig())
+	if err != nil {
+		return nil, err
+	}
 	topics, err := admin.ListTopics()
 	if err != nil {
 		return nil, err
@@ -41,13 +48,13 @@ func OpenKafkaSink(ctx context.Context, brokers string) (*KafkaSink, error) {
 		topicNames = append(topicNames, k)
 	}
 	log.Printf("Existing topics: %s", topicNames)
-	client, err := sarama.NewAsyncProducer(strings.Split(brokers, ","), newKafkaConfig())
+	client, err := sarama.NewAsyncProducer(strings.Split(cfg.Brokers, ","), newKafkaConfig())
 	if err != nil {
 		return nil, fmt.Errorf("NewAsyncProducer failed: %v", err)
 	}
 	p := &KafkaSink{
 		admin:   admin,
-		brokers: brokers,
+		brokers: cfg.Brokers,
 		client:  client,
 	}
 	go func() {
