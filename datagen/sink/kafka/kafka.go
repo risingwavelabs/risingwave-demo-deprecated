@@ -71,13 +71,6 @@ func CreateRequiredTopics(admin sarama.ClusterAdmin, keys []string) error {
 	if err != nil {
 		return err
 	}
-	if len(topics) != 0 {
-		var topicNames []string
-		for k := range topics {
-			topicNames = append(topicNames, k)
-		}
-		log.Printf("Existing topics: %s", topicNames)
-	}
 	for _, t := range keys {
 		if err := createTopic(admin, t, topics); err != nil {
 			return err
