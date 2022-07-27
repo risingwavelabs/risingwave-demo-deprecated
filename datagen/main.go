@@ -117,7 +117,7 @@ func main() {
 			},
 			cli.StringFlag{
 				Name:        "mode",
-				Usage:       "ad-click or ad-ctr",
+				Usage:       "ad-click or ad-ctr or twitter or cdn-metrics or clickstream or ecommerce or delivery",
 				Required:    true,
 				Destination: &cfg.Mode,
 			},
