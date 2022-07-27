@@ -26,6 +26,10 @@ func OpenPulsarSink(ctx context.Context, brokers string) (*PulsarSink, error) {
 	}, nil
 }
 
+func (p *PulsarSink) Prepare(topics []string) error {
+	return nil
+}
+
 func (p *PulsarSink) Close() error {
 	p.client.Close()
 	return nil

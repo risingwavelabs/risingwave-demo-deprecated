@@ -14,6 +14,8 @@ type SinkRecord interface {
 }
 
 type Sink interface {
+	Prepare(topics []string) error
+
 	WriteRecord(ctx context.Context, record SinkRecord) error
 
 	Close() error

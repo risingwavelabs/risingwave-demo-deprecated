@@ -6,6 +6,7 @@ import (
 	"datagen/ad_ctr"
 	"datagen/cdn_metrics"
 	"datagen/clickstream"
+	"datagen/delivery"
 	"datagen/ecommerce"
 	"datagen/gen"
 	"datagen/sink"
@@ -51,19 +52,21 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return clickstream.NewClickStreamGen(), nil
 	} else if cfg.Mode == "ecommerce" {
 		return ecommerce.NewEcommerceGen(), nil
+	} else if cfg.Mode == "delivery" {
+		return delivery.NewOrderEventGen(cfg), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
 }
 
 // spawnGen spawns one or more goroutines to generate data and send it to outCh.
-func spawnGen(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) error {
+func spawnGen(ctx context.Context, cfg gen.GeneratorConfig, outCh chan<- sink.SinkRecord) (gen.LoadGenerator, error) {
 	gen, err := newGen(cfg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	go gen.Load(ctx, outCh)
-	return nil
+	return gen, nil
 }
 
 // generateLoad generates data and sends it to the given sink.
@@ -79,7 +82,13 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 	}()
 
 	outCh := make(chan sink.SinkRecord, 1000)
-	if err := spawnGen(ctx, cfg, outCh); err != nil {
+	gen, err := spawnGen(ctx, cfg, outCh)
+	if err != nil {
+		return err
+	}
+
+	err = sinkImpl.Prepare(gen.KafkaTopics())
+	if err != nil {
 		return err
 	}
 
