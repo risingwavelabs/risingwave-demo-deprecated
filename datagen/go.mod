@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/Shopify/sarama v1.34.1
 	github.com/apache/pulsar-client-go v0.8.1
+	github.com/aws/aws-sdk-go v1.32.6
 	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/lib/pq v1.10.6
 	github.com/urfave/cli v1.22.9
@@ -42,6 +43,7 @@ require (
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
+	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d // indirect
 	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/linkedin/goavro/v2 v2.9.8 // indirect

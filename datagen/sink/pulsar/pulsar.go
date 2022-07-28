@@ -8,14 +8,18 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 )
 
+type PulsarConfig struct {
+	Brokers string
+}
+
 type PulsarSink struct {
 	client    pulsar.Client
 	producers map[string]pulsar.Producer
 }
 
-func OpenPulsarSink(ctx context.Context, brokers string) (*PulsarSink, error) {
+func OpenPulsarSink(ctx context.Context, cfg PulsarConfig) (*PulsarSink, error) {
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: fmt.Sprintf("pulsar://%s", brokers),
+		URL: fmt.Sprintf("pulsar://%s", cfg.Brokers),
 	})
 	if err != nil {
 		return nil, err
