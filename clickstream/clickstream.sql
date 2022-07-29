@@ -7,10 +7,10 @@ CREATE SOURCE user_behaviors (
     parent_target_type VARCHAR,
     parent_target_id VARCHAR
 ) WITH (
-    'connector' = 'kafka',
-    'kafka.topic' = 'user_behaviors',
-    'kafka.brokers' = 'message_queue:29092',
-    'kafka.scan.startup.mode' = 'earliest'
+    connector = 'kafka',
+    kafka.topic = 'user_behaviors',
+    kafka.brokers = 'message_queue:29092',
+    kafka.scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 CREATE TABLE user_behaviors (
