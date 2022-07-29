@@ -27,6 +27,10 @@ func OpenPostgresSink(cfg PostgresConfig) (*PostgresSink, error) {
 	return &PostgresSink{db}, nil
 }
 
+func (p *PostgresSink) Prepare(topics []string) error {
+	return nil
+}
+
 func (p *PostgresSink) Close() error {
 	return p.db.Close()
 }

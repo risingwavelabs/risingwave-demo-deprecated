@@ -11,8 +11,14 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+type KafkaConfig struct {
+	Brokers string
+}
+
 type KafkaSink struct {
-	client sarama.AsyncProducer
+	admin   sarama.ClusterAdmin
+	brokers string
+	client  sarama.AsyncProducer
 }
 
 func newKafkaConfig() *sarama.Config {
@@ -28,12 +34,29 @@ func newKafkaConfig() *sarama.Config {
 	return config
 }
 
-func OpenKafkaSink(ctx context.Context, brokers string) (*KafkaSink, error) {
-	client, err := sarama.NewAsyncProducer(strings.Split(brokers, ","), newKafkaConfig())
+func OpenKafkaSink(ctx context.Context, cfg KafkaConfig) (*KafkaSink, error) {
+	admin, err := sarama.NewClusterAdmin(strings.Split(cfg.Brokers, ","), newKafkaConfig())
+	if err != nil {
+		return nil, err
+	}
+	topics, err := admin.ListTopics()
+	if err != nil {
+		return nil, err
+	}
+	var topicNames []string
+	for k := range topics {
+		topicNames = append(topicNames, k)
+	}
+	log.Printf("Existing topics: %s", topicNames)
+	client, err := sarama.NewAsyncProducer(strings.Split(cfg.Brokers, ","), newKafkaConfig())
 	if err != nil {
 		return nil, fmt.Errorf("NewAsyncProducer failed: %v", err)
 	}
-	p := &KafkaSink{client: client}
+	p := &KafkaSink{
+		admin:   admin,
+		brokers: cfg.Brokers,
+		client:  client,
+	}
 	go func() {
 		p.consumeSuccesses(ctx)
 	}()
@@ -50,21 +73,10 @@ func (p *KafkaSink) consumeSuccesses(ctx context.Context) {
 	}
 }
 
-func CreateRequiredTopics(brokers string, keys []string) error {
-	admin, err := sarama.NewClusterAdmin(strings.Split(brokers, ","), newKafkaConfig())
-	if err != nil {
-		return err
-	}
+func CreateRequiredTopics(admin sarama.ClusterAdmin, keys []string) error {
 	topics, err := admin.ListTopics()
 	if err != nil {
 		return err
-	}
-	if len(topics) != 0 {
-		var topicNames []string
-		for k := range topics {
-			topicNames = append(topicNames, k)
-		}
-		log.Printf("Existing topics: %s", topicNames)
 	}
 	for _, t := range keys {
 		if err := createTopic(admin, t, topics); err != nil {
@@ -86,6 +98,10 @@ func createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama
 		NumPartitions:     16,
 		ReplicationFactor: 1,
 	}, false)
+}
+
+func (p *KafkaSink) Prepare(topics []string) error {
+	return CreateRequiredTopics(p.admin, topics)
 }
 
 func (p *KafkaSink) Close() error {
