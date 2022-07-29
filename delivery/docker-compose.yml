@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/singularity-data/risingwave:v0.1.10"
+    image: "ghcr.io/singularity-data/risingwave:v0.1.11"
     command:
       - compactor-node
       - "--host"
