@@ -253,7 +253,7 @@ services:
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
       - "--web.listen-address=0.0.0.0:9500"
-      - "--storage.tsdb.retention.time=30d"
+      - "--storage.tsdb.retention.time=5m"
     expose:
       - "9500"
     ports:
@@ -313,7 +313,7 @@ services:
       timeout: 5s
       retries: 5
   prometheus-kafka-adaptor:
-    image: "telefonica/prometheus-kafka-adapter:1.8.0"
+    image: "ghcr.io/singularity-data/risingwave/prometheus-kafka-adapter:1.0.0"
     expose:
       - "9501"
     ports:
@@ -324,7 +324,7 @@ services:
       - PORT=9501
       - GIN_MODE=release
       - LOG_LEVEL=info
-      - SERIALIZATION_FORMAT=JSON
+      - SERIALIZATION_FORMAT=json
     container_name: prometheus-kafka-adaptor
     depends_on:
       - prometheus-0
