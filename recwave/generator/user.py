@@ -1,20 +1,20 @@
 import uuid
+from collections.abc import Iterable
 from pprint import pprint
 import numpy as np
-from preference import Preferences
+from preference import ItemProperties, UserProperties
 from routines import generate_routine_dict
 
 
 def new_user():
-    id = str(uuid.uuid1())
+    id = np.random.randint(1, 1000_000_000)
 
     activeness = np.exp(np.random.lognormal(mean=1))
     routines = generate_routine_dict(activeness)
     distrib = dict(userid=id, activeness=activeness, routines=routines)
 
-    for tag, val in zip(Preferences.tags, np.exp(
-        np.random.lognormal(mean=1, sigma=0.5, size=len(Preferences.tags)))):
-        distrib[tag] = val
+    for tag, gen in UserProperties.generators.items():
+        distrib[tag] = float(gen())
     return distrib
 
 

@@ -1,0 +1,37 @@
+syntax = "proto3";
+package model;
+
+//get_recommendation:
+//    request: userid String
+//    response: list[itemid String] (MVP: mock response)
+//
+//
+//interact:
+//    request: userid String, itemid String, action ActionType
+//    response: timestamp (MVP: log output --> Step I: Kafka to RW)
+
+service Model {
+  rpc GetRating(GetRatingRequest) returns (GetRatingResponse) {}
+  rpc Recall(RecallRequest) returns (RecallResponse) {}
+}
+
+message RecallRequest {
+  string userid = 1;
+}
+
+message RecallResponse {
+  string userid = 1;
+  repeated string itemid = 2;
+}
+
+message GetRatingRequest {
+  string userid = 1;
+  string itemid = 2;
+  repeated double feature_values = 3;
+}
+
+message GetRatingResponse {
+  string userid = 1;
+  string itemid = 2;
+  float rating = 3;
+}

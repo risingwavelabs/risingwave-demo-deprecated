@@ -10,17 +10,23 @@ use tonic::transport::Channel;
 use crate::recommender::recommender_client::RecommenderClient;
 use crate::recommender::{ActionType, GetRecommendationRequest, ReportActionRequest};
 
+///    "address_lat": partial(np.random.uniform, low=-180, high=180),
+//     "address_long": partial(np.random.uniform, low=-180, high=180),
+//     "age_approx": partial(np.random.randint, low=18, high=100),
+//     "gender": partial(np.random.choice, [0, 1]),
+//     "occupation": partial(np.random.randint, low=0, high=25),
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
     pub(crate) userid: String,
-    pub(crate) activeness: f64,
+    pub(crate) address_lat: f64,
+    address_long: f64,
+    pub (crate) activeness: f64,
     #[serde(skip)]
     pub(crate) context: UserContext,
-    ratings: f64,
-    brand: f64,
-    type_: f64,
-    freshness: f64
+    age_approx: f64,
+    gender: f64,
+    occupation: f64
 }
 
 #[derive(Serialize, Deserialize)]
@@ -109,10 +115,12 @@ impl User{
         })
     }
 
-    pub async fn mock_get_recommendations<'a>(&'a self, client: &mut RecommenderClient<Channel>) -> Vec<String> {
+    pub async fn mock_get_recommendations(&self, client: &mut RecommenderClient<Channel>) -> Vec<String> {
         let response = client.get_recommendation(GetRecommendationRequest{
             userid: self.userid.clone()
-        }).await.unwrap();
+        })
+            .await
+            .unwrap();
 
         response.into_inner().itemid
     }

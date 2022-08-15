@@ -23,7 +23,7 @@ use crate::recommender::recommender_client::RecommenderClient;
 
 fn get_delay_mills(delay_val: f64) -> u64 {
     let turbulence = rand::thread_rng().gen_range((delay_val * 0.6) as f64, (delay_val * 1.1) as f64) as f64;
-    (turbulence * 1000.0) as u64
+    (turbulence * 10000.0) as u64
 }
 
 pub async fn main_loop() {
@@ -42,6 +42,7 @@ pub async fn main_loop() {
         let items = items.clone();
         let handle = tokio::spawn(async move {
             loop {
+                sleep(Duration::from_millis(get_delay_mills(1.0 / user.activeness)));
                 let history = user.mock_act(client_mutex.lock().await.deref_mut(), &items)
                     .await
                     .unwrap();
@@ -49,7 +50,6 @@ pub async fn main_loop() {
 
                 let recommendations = user.mock_get_recommendations(client_mutex.lock().await.deref_mut())
                     .await;
-                sleep(Duration::from_millis(get_delay_mills(1.0 / user.activeness)));
             }
         });
         threads.push(handle);
