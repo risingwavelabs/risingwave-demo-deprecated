@@ -39,28 +39,28 @@ func main() {
 						Usage:       "The host address of the PostgreSQL server",
 						Required:    false,
 						Value:       "localhost",
-						Destination: &cfg.DbHost,
+						Destination: &cfg.Postgres.DbHost,
 					},
 					cli.StringFlag{
 						Name:        "db",
 						Usage:       "The database where the target table is located",
 						Required:    false,
 						Value:       "dev",
-						Destination: &cfg.Database,
+						Destination: &cfg.Postgres.Database,
 					},
 					cli.IntFlag{
 						Name:        "port",
 						Usage:       "The port of the PostgreSQL server",
 						Required:    false,
 						Value:       4566,
-						Destination: &cfg.DbPort,
+						Destination: &cfg.Postgres.DbPort,
 					},
 					cli.StringFlag{
 						Name:        "user",
 						Usage:       "The user to Postgres",
 						Required:    false,
 						Value:       "root",
-						Destination: &cfg.DbUser,
+						Destination: &cfg.Postgres.DbUser,
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -75,7 +75,7 @@ func main() {
 						Name:        "brokers",
 						Usage:       "Kafka bootstrap brokers to connect to, as a comma separated list",
 						Required:    true,
-						Destination: &cfg.Brokers,
+						Destination: &cfg.Kafka.Brokers,
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -91,7 +91,7 @@ func main() {
 						Name:        "brokers",
 						Usage:       "Pulsar brokers to connect to, as a comma separated list",
 						Required:    true,
-						Destination: &cfg.Brokers,
+						Destination: &cfg.Pulsar.Brokers,
 					},
 				},
 				Action: func(c *cli.Context) error {
@@ -99,6 +99,28 @@ func main() {
 					return runCommand()
 				},
 				HelpName: "datagen pulsar",
+			},
+			{
+				Name: "kinesis",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:        "region",
+						Usage:       "The region where the Kinesis stream resides",
+						Required:    true,
+						Destination: &cfg.Kinesis.Region,
+					},
+					cli.StringFlag{
+						Name:        "name",
+						Usage:       "The Kinesis stream name",
+						Required:    true,
+						Destination: &cfg.Kinesis.StreamName,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					cfg.Sink = "kinesis"
+					return runCommand()
+				},
+				HelpName: "datagen kinesis",
 			},
 		},
 		Flags: []cli.Flag{
@@ -117,7 +139,7 @@ func main() {
 			},
 			cli.StringFlag{
 				Name:        "mode",
-				Usage:       "ad-click or ad-ctr",
+				Usage:       "ad-click or ad-ctr or twitter or cdn-metrics or clickstream or ecommerce or delivery",
 				Required:    true,
 				Destination: &cfg.Mode,
 			},

@@ -4,10 +4,10 @@ CREATE SOURCE order_events (
     item_price DOUBLE PRECISION,
     event_timestamp TIMESTAMP
 ) WITH (
-    'connector' = 'kafka',
-    'kafka.topic' = 'nics_metrics',
-    'kafka.brokers' = 'message_queue:29092',
-    'kafka.scan.startup.mode' = 'earliest'
+    connector = 'kafka',
+    kafka.topic = 'nics_metrics',
+    kafka.brokers = 'message_queue:29092',
+    kafka.scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 CREATE TABLE order_events (
@@ -56,5 +56,5 @@ FROM
         WHERE
             event_type = 'parcel_shipped'
     ) t2 ON t1.order_id = t2.order_id
-where
-    t2.event_timestamp - t1.event_timestamp > interval '7 days';
+WHERE
+    t2.event_timestamp - t1.event_timestamp > INTERVAL '7 days';

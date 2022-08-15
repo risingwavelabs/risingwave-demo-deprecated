@@ -12,10 +12,10 @@ CREATE SOURCE twitter (
     username VARCHAR,
     followers INT >
 ) WITH (
-    'connector' = 'pulsar',
-    'pulsar.topic' = 'twitter',
-    'pulsar.admin.url' = 'http://message_queue:8080',
-    'pulsar.service.url' = 'pulsar://message_queue:6650'
+    connector = 'pulsar',
+    pulsar.topic = 'twitter',
+    pulsar.admin.url = 'http://message_queue:8080',
+    pulsar.service.url = 'pulsar://message_queue:6650'
 ) ROW FORMAT JSON;
 
 --
@@ -32,10 +32,10 @@ CREATE SOURCE twitter (
     username VARCHAR,
     followers INT >
 ) WITH (
-    'connector' = 'kafka',
-    'kafka.topic' = 'twitter',
-    'kafka.brokers' = 'message_queue:29092',
-    'kafka.scan.startup.mode' = 'earliest'
+    connector = 'kafka',
+    kafka.topic = 'twitter',
+    kafka.brokers = 'message_queue:29092',
+    kafka.scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 --

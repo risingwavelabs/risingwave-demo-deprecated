@@ -6,10 +6,10 @@ create source ad_source (
     click_timestamp timestamp,
     impression_timestamp timestamp
 ) with (
-    'connector' = 'kafka',
-    'kafka.topic' = 'ad_clicks',
-    'kafka.brokers' = 'message_queue:29092',
-    'kafka.scan.startup.mode' = 'earliest'
+    connector = 'kafka',
+    kafka.topic = 'ad_clicks',
+    kafka.brokers = 'message_queue:29092',
+    kafka.scan.startup.mode = 'earliest'
 ) row format json;
 
 -- Create a table and directly feed data via INSERT INTO.
