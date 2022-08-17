@@ -30,7 +30,8 @@ SELECT
     tcp.device_id AS device_id,
     tcp.window_end AS window_end,
     tcp.metric_name AS metric_name,
-    tcp.metric_value AS metric_value
+    tcp.metric_value AS metric_value,
+    nic.avg_util as tcp_avg_bandwidth_util
 FROM
     (
         SELECT
@@ -42,7 +43,7 @@ FROM
             TUMBLE(
                 tcp_metrics,
                 report_time,
-                INTERVAL '3' MINUTE
+                INTERVAL '1' MINUTE
             )
         GROUP BY
             device_id,
@@ -53,12 +54,12 @@ FROM
         SELECT
             device_id,
             window_end,
-            AVG((metric_value * 8 / 10) / bandwidth) AS avg_util
+            AVG((metric_value) / bandwidth) * 100 AS avg_util
         FROM
             TUMBLE(
                 nics_metrics,
                 report_time,
-                INTERVAL '3' MINUTE
+                INTERVAL '1' MINUTE
             )
         WHERE
             metric_name = 'tx_bytes'
@@ -69,7 +70,7 @@ FROM
     ) AS nic ON tcp.device_id = nic.device_id
     AND tcp.window_end = nic.window_end
 WHERE
-    avg_util >= 50;
+    avg_util >= 40;
 
 CREATE MATERIALIZED VIEW retrans_incidents AS
 SELECT

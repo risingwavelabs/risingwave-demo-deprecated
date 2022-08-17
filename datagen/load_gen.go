@@ -45,7 +45,7 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 	} else if cfg.Mode == "twitter" {
 		return twitter.NewTwitterGen(), nil
 	} else if cfg.Mode == "cdn-metrics" {
-		return cdn_metrics.NewCdnMetricsGen(), nil
+		return cdn_metrics.NewCdnMetricsGen(cfg), nil
 	} else if cfg.Mode == "clickstream" {
 		return clickstream.NewClickStreamGen(), nil
 	} else if cfg.Mode == "ecommerce" {

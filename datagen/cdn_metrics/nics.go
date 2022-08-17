@@ -10,8 +10,11 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+)
 
-	"gonum.org/v1/gonum/stat/distuv"
+const (
+	// bandwidth in bytes.
+	maxBandwidth = float64(10 * 1024 * 1024 * 1024 / 8) // 10Gb
 )
 
 type nicsMetric struct {
@@ -40,15 +43,14 @@ func (r *nicsMetric) ToKafka() (topic string, data []byte) {
 // Each device has a nics monitor.
 type deviceNicsMonitor struct {
 	deviceId string
-	// Bandwidth in bytes.
-	Bandwidth int64
+	randDist gen.RandDist
 }
 
-func newDeviceNicsMonitor(id int) deviceNicsMonitor {
+func newDeviceNicsMonitor(id int, cfg gen.GeneratorConfig) deviceNicsMonitor {
 	hash := md5.Sum([]byte(strconv.Itoa(id)))
 	return deviceNicsMonitor{
-		deviceId:  hex.EncodeToString(hash[:]),
-		Bandwidth: 10 * 1024 * 1024 * 1024 / 8, // 10Gb
+		deviceId: hex.EncodeToString(hash[:]),
+		randDist: gen.NewRandDist(cfg),
 	}
 }
 
@@ -64,7 +66,7 @@ func (m *deviceNicsMonitor) emulate(ctx context.Context, outCh chan<- sink.SinkR
 		}
 		select {
 		case <-ctx.Done():
-		case <-time.NewTicker(60 * time.Second).C:
+		case <-time.NewTicker(10 * time.Second).C:
 		}
 	}
 }
@@ -73,12 +75,10 @@ func (impl *deviceNicsMonitor) generate() []*nicsMetric {
 	curTime := time.Now()
 	var metrics []*nicsMetric
 	for nicId := 0; nicId < 4; nicId++ {
-		txBytesAvg := distuv.Poisson{
-			Lambda: float64(impl.Bandwidth) / 100,
-		}.Rand()
-		txBytesPeak := distuv.Poisson{
-			Lambda: 1.3,
-		}.Rand() * txBytesAvg
+		// Median value is 480MB/s.
+		txBytesAvg := impl.randDist.Rand(maxBandwidth / 4 * 3)
+		// Peak value must be larger than average but lower than maxBandwidth.
+		txBytesPeak := (impl.randDist.Rand(0.3) + 1) * txBytesAvg
 		metrics = append(metrics,
 			impl.newMetrics(nicId, "tx_bytes", "avg", curTime, int64(txBytesAvg)),
 			impl.newMetrics(nicId, "tx_bytes", "peak", curTime, int64(txBytesPeak)),
@@ -100,7 +100,7 @@ func (impl *deviceNicsMonitor) newMetrics(
 		Aggregation: aggregation,
 		NicName:     "eth" + strconv.Itoa(NicId),
 		ReportTime:  reportTime.Format(gen.RwTimestampLayout),
-		Bandwidth:   float64(impl.Bandwidth),
+		Bandwidth:   maxBandwidth,
 		Value:       float64(value),
 	}
 }
