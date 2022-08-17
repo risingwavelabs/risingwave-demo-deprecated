@@ -35,7 +35,7 @@ FROM
 select
     *
 from
-    metrics
+    prometheus
 where
     name = 'object_store_read_bytes';
 
