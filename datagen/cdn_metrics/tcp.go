@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-
-	"gonum.org/v1/gonum/stat/distuv"
 )
 
 type tcpMetric struct {
@@ -34,12 +32,14 @@ func (r *tcpMetric) ToKafka() (topic string, data []byte) {
 // Each device has a TCP monitor.
 type deviceTcpMonitor struct {
 	deviceId string
+	randDist gen.RandDist
 }
 
-func newDeviceTcpMonitor(id int) deviceTcpMonitor {
+func newDeviceTcpMonitor(id int, cfg gen.GeneratorConfig) deviceTcpMonitor {
 	hash := md5.Sum([]byte(strconv.Itoa(id)))
 	return deviceTcpMonitor{
 		deviceId: hex.EncodeToString(hash[:]),
+		randDist: gen.NewRandDist(cfg),
 	}
 }
 
@@ -49,14 +49,14 @@ func (m *deviceTcpMonitor) emulate(ctx context.Context, outCh chan<- sink.SinkRe
 		for _, metric := range metrics {
 			select {
 			case <-ctx.Done():
-			case outCh <- metric:
 				return
+			case outCh <- metric:
 			}
 		}
 		// Produce tcp metrics every 60s.
 		select {
 		case <-ctx.Done():
-		case <-time.NewTicker(60 * time.Second).C:
+		case <-time.NewTicker(10 * time.Second).C:
 		}
 	}
 }
@@ -64,15 +64,9 @@ func (m *deviceTcpMonitor) emulate(ctx context.Context, outCh chan<- sink.SinkRe
 func (m *deviceTcpMonitor) generate() []*tcpMetric {
 	curTime := time.Now()
 
-	retransRate := distuv.Poisson{
-		Lambda: 0.3,
-	}.Rand()
-	srtt := distuv.Poisson{
-		Lambda: 700,
-	}.Rand()
-	downloadSpeed := distuv.Poisson{
-		Lambda: 1000,
-	}.Rand()
+	retransRate := m.randDist.Rand(0.6)
+	srtt := m.randDist.Rand(1400)
+	downloadSpeed := m.randDist.Rand(2000)
 
 	return []*tcpMetric{
 		m.newMetrics("retrans_rate", curTime, retransRate),

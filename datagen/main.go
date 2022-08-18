@@ -143,6 +143,12 @@ func main() {
 				Required:    true,
 				Destination: &cfg.Mode,
 			},
+			cli.BoolFlag{
+				Name:        "heavytail",
+				Usage:       "Whether the tail probability is high. If true We will use uniform distribution for randomizing values.",
+				Required:    false,
+				Destination: &cfg.HeavyTail,
+			},
 		},
 	}
 	err := app.Run(os.Args)
