@@ -1,4 +1,5 @@
 import json
+import os
 from concurrent import futures
 import ast
 import numpy as np
@@ -7,6 +8,7 @@ from model_pb2_grpc import *
 import psycopg
 import sql
 import model_pb2_grpc
+from psycopg import sql as pgsql
 from model_pb2 import RecallRequest, RecallResponse, GetRatingResponse
 
 """
@@ -21,7 +23,8 @@ python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. model.proto
 class RecwaveModelService(ModelServicer):
     def __init__(self):
         super(RecwaveModelService, self).__init__()
-        with open('../generator/items.json') as items_json, open('../generator/users.json') as users_json:
+        generator_path = os.environ.get("GENERATOR_PATH", "../generator")
+        with open(os.path.join(generator_path, 'items.json')) as items_json, open(os.path.join(generator_path, 'users.json')) as users_json:
             items = json.load(items_json)
             users = json.load(users_json)
             items_dict = {i['itemid']: i for i in items}
@@ -32,25 +35,29 @@ class RecwaveModelService(ModelServicer):
 
 
     def GetRating(self, request, context):
-        def GetRating(self, request, context):
-            userid, itemid, feature_iter = request.userid, request.itemid, request.feature_values
-            with self.conn.cursor() as cur:
-                cur.execute(sql.GET_MOST_INTERACTED, (userid, ))
-                result = cur.fetchall()[0]
-                userid, result_tuple = result[0], result[1]
-                count, return_userid = ast.literal_eval(result_tuple)
+        userid, itemid, feature_iter = request.userid, request.itemid, request.feature_values
+        with self.conn.cursor() as cur:
+            cur.execute(sql.GET_MOST_INTERACTED % userid)
+            result = cur.fetchall()
+            if len(result) == 0:
+                context.set_code(grpc.StatusCode.OK)
+                return GetRatingResponse(userid=userid, itemid=itemid, rating=0)
+            userid, result_tuple = result[0], result[1]
+            window_start, count, return_userid = ast.literal_eval(result_tuple)
 
-            # the similarity between the most interacted item and the current one
-            score = 1 / (np.linalg.norm(self.items[itemid].values(), self.items[return_userid].values()) + 0.01)
-            return GetRatingResponse(userid=userid, itemid=itemid, score=score)
+        # the similarity between the most interacted item and the current one
+        score = 1 / (np.linalg.norm(self.items[itemid].values(), self.items[return_userid].values()) + 0.01)
+        return GetRatingResponse(userid=userid, itemid=itemid, score=score)
+
 
     def Recall(self, request, context):
         userid = request.userid
         print(f"Recall request from {userid}")
         try:
             with self.conn.cursor() as cur:
-                cur.execute(sql.RECALL_SQL, (userid,))
+                cur.execute(sql.RECALL_SQL % userid)
                 results = cur.fetchall()
+                print(results)
                 if len(results) < 20:
                     # randomly pick 20 items
                     context.set_code(grpc.StatusCode.OK)
@@ -85,10 +92,17 @@ class RecwaveModelService(ModelServicer):
 
 
 if __name__ == '__main__':
-    conn = psycopg.connect("dbname=dev user=root host=127.0.0.1 port=4566")
-    with conn.cursor() as cur:
-        cur.execute("select max((2,3));")
-        results = cur.fetchall()
+    for i in range(1):
+        print("making the", i, "th connection")
 
+        conn = psycopg.connect("dbname=dev user=root host=127.0.0.1 port=4566")
+        with conn.cursor() as cur:
+            # the following code will panic
+            # because placeholder is completely not supported
+            # even varchar parsed to TypeOid 0, which isn't even defined
+            cur.execute("select (2, %s);", ("2333333",))
+            # cur.execute("select (2, $1);")
+            results = cur.fetchall()
+        print(results)
 
-
+        conn.close()

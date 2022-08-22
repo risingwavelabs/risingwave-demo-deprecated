@@ -27,7 +27,7 @@ fn get_delay_mills(delay_val: f64) -> u64 {
 }
 
 pub async fn main_loop() {
-    let (users, items) = entities::generate_user_metadata().unwrap();
+    let (users, items) = entities::parse_user_metadata().unwrap();
     let items = Arc::new(items);
 
     let mut client = Arc::new(Mutex::new(

@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
@@ -127,7 +127,7 @@ impl User{
 }
 
 
-pub(crate) fn read_users_json(path: &Path) -> Result<Vec<User>, Box<dyn Error>> {
+pub(crate) fn read_users_json(path: PathBuf) -> Result<Vec<User>, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let users: Vec<User> = serde_json::from_reader(reader)?;
@@ -135,23 +135,26 @@ pub(crate) fn read_users_json(path: &Path) -> Result<Vec<User>, Box<dyn Error>> 
 }
 
 
-pub(crate) fn read_items_json(path: &Path) -> Result<Vec<Item>, Box<dyn Error>> {
+pub(crate) fn read_items_json(path: PathBuf) -> Result<Vec<Item>, Box<dyn Error>> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let items: Vec<Item> = serde_json::from_reader(reader)?;
     Ok(items)
 }
 
-pub fn generate_user_metadata() -> Result<(Vec<User>, Vec<Item>), ()> {
-    Command::new("python3")
-        .arg("../generator")
-        .arg("--num-users=150")
-        .arg("--num-items=20")
-        .arg("--dump-users=../generator/users.json")
-        .arg("--dump-items=../generator/items.json")
-        .output()
-        .expect("failed to execute process");
-    let users = read_users_json(Path::new("../generator/users.json")).unwrap();
-    let items = read_items_json(Path::new("../generator/items.json")).unwrap();
+pub fn parse_user_metadata() -> Result<(Vec<User>, Vec<Item>), ()> {
+    let generator_path = std::env::var("GENERATOR_PATH")
+        .unwrap_or("../generator".to_string());
+
+    let users = read_users_json(
+        Path::new(&*generator_path)
+                .join("users.json")
+    ).unwrap();
+
+    let items = read_items_json(
+        Path::new(&*generator_path)
+            .join("items.json")
+    ).unwrap();
+
     return Ok((users, items));
 }

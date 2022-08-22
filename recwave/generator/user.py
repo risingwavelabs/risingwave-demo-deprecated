@@ -7,7 +7,7 @@ from routines import generate_routine_dict
 
 
 def new_user():
-    id = np.random.randint(1, 1000_000_000)
+    id = str(np.random.randint(1, 1000_000_000))
 
     activeness = np.exp(np.random.lognormal(mean=1))
     routines = generate_routine_dict(activeness)

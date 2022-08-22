@@ -24,9 +24,12 @@ impl Recommender for Recwave {
     async fn get_recommendation(&self, request: Request<GetRecommendationRequest>)
                                 -> Result<Response<GetRecommendationResponse>, Status> {
         let userid = request.into_inner().userid;
+        println!("Recwave::get_recommendation: userid={}", userid);
         let recalled_items = self.recall(userid.clone()).await?;
+        println!("Recwave::get_recommendation: recalled_items={:?}", recalled_items);
         let sorted_items = self.sort(userid, recalled_items, 20)
             .await?;
+        println!("Recwave::get_recommendation: sorted_items={:?}", sorted_items);
         Ok(Response::new(GetRecommendationResponse {
             itemid: sorted_items,
         }))
@@ -50,11 +53,11 @@ impl Recommender for Recwave {
 impl Recwave{
     fn mock_report_action(&self, message: &ReportActionRequest) -> Result<Response<ReportActionResponse>, Status> {
         let duration = SystemTime::now().duration_since(UNIX_EPOCH);
+        // todo: format duration to SQL acceptable timestamp before SQLization
         // println!("received action from user `{}` on item `{}`", &message.userid, &message.itemid);
         match duration {
             Ok(dur) => {
                 let timestamp = dur.as_micros();
-                println!("timestamp: {}", timestamp);
                 let json = Self::create_sink_json(message, timestamp as u64);
                 println!("timestamp: {}, payload: {}", timestamp, json.clone());
                 self.kafka.send("0".to_string(), json);

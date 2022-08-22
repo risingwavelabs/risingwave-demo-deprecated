@@ -5,7 +5,7 @@ from pprint import pprint
 
 
 def new_item():
-    id = np.random.randint(1, 1000_000_000)
+    id = str(np.random.randint(1, 1000_000_000))
 
     # activeness marks how frequent the user interact with merchandises
     popularity = np.exp(np.random.lognormal(mean=1))

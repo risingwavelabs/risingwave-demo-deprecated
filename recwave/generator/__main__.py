@@ -4,7 +4,7 @@ import user
 import item
 
 @click.command()
-@click.option('--num-users', default=200, help='Number of users to be generated')
+@click.option('--num-users', default=10, help='Number of users to be generated')
 @click.option('--num-items', default=20, help='Number of items to be generated')
 @click.option('--dump-users', default='./users.json', help="The location to dump the `user` json file")
 @click.option('--dump-items', default='./items.json', help="The location to dump the `item` json file")
