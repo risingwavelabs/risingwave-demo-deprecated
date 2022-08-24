@@ -2,7 +2,7 @@ create source if not exists actionhistory (
     userid int,
     itemid int,
     action int,
-    timestamp_ int,
+    timestamp_ timestamp,
 ) with (
     connector='kafka',
     kafka.topic='recwave',
@@ -32,12 +32,22 @@ create table if not exists item (
   -- and more ...
 );
 
-create materialized view user_history_mv as
-    select * from actionhistory;
+create materialized view recenthistory as
+ select distinct userid, itemid, timestamp_ from actionhistory where action=1 order by timestamp_ desc limit 5000;
+
+create materialized view user_interacted_item_window as
+    select userid, itemid, count(itemid) as count, window_start
+    from (
+        select * from tumble(actionhistory, timestamp_, interval '5 minutes')
+    ) recent
+    group by userid, itemid, window_start;
+
 
 create materialized view user_most_interacted_item as
-with counts as (select userid, itemid, count(itemid) as count
-    from actionhistory
-    group by userid, itemid
-    order by userid, count desc)
-select userid, max((count, itemid)) as maxcount_item from counts group by userid;
+    with counts as (select userid, itemid, count(itemid) as count, window_start
+    from (
+        select * from tumble(actionhistory, timestamp_, interval '5 minutes')
+    ) recent
+    group by userid, itemid, window_start
+    )
+select userid, max((window_start, count, itemid)) as maxcount_item from counts group by userid;

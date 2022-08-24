@@ -1,25 +1,27 @@
+#!/bin/bash
+
+# To enter the designated build environment
+# run ```
+# docker build -t recwave .
+# docker run -it -v $(pwd):/recwave recwave
+#
+
 main() {
-  echo "Checking kafka and zookeeper"
-
-  which kafka-server-start &> /dev/null || apt install kafka
-  which python3 &> /dev/null || apt install python3 python3-pip
-  pip3 install -r recommender/model/requirements.txt
-
-  echo "cluster started"
+  check_build_deps
   create_kafka_config
   create_zookeeper_config
+  $HOME/.cargo/bin/rustup default nightly
+  $HOME/.cargo/bin/cargo build --manifest-path $WORK_DIR/recommender/Cargo.toml --release
+  $HOME/.cargo/bin/cargo build --manifest-path $WORK_DIR/simulator/Cargo.toml --release
+  cp $WORK_DIR/recommender/target/release/recommender $WORK_DIR/recwave-recommender
+  cp $WORK_DIR/simulator/target/release/simulator $WORK_DIR/recwave-simulator
+}
 
-  # start kafka and zookeeper
-  zookeeper-server-start ~/kafka/config/zookeeper.properties &
-  kafka-server-start ~/kafka/config/server.properties &
-  sleep 1
-
-  # create kafka topic
-  kafka-topics --create --topic recwave --partitions 1 --replication-factor 1
-
-  # build
-  cargo build --manifest-path=./recommender/Cargo.toml --release  || exit 1
-  cargo build --manifest-path=./simulator/Cargo.toml --release || exit 1
+check_build_deps() {
+    which cargo || ls $HOME/.cargo/bin/cargo || {
+        echo "cargo is not installed. installing Cargo"
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+    }
 }
 
 create_zookeeper_config() {
@@ -34,6 +36,7 @@ create_zookeeper_config() {
         admin.enableServer=false
         # admin.serverPort=8080" > ./zookeeper.properties
 }
+
 create_kafka_config() {
   echo "# The id of the broker. This must be set to a unique integer for each broker.
   broker.id=0

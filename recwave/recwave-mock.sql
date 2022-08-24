@@ -1,43 +1,60 @@
 -- the user history table
 create table actionhistory (
-  id integer primary key,
   userid integer,
   itemid integer,
   action integer,
-  timestamp_ integer
+  timestamp_ timestamp
 );
 
 
-insert into actionhistory values
-    (1, 1, 1, 0, 123456789),
-    (2, 1, 1, 1, 123456790),
-    (3, 1, 2, 0, 123456791),
-    (4, 1, 2, 0, 123456792),
-    (5, 1, 2, 1, 123456793),
-    (6, 2, 1, 0, 123456794),
-    (7, 2, 1, 0, 123456795),
-    (8, 2, 2, 0, 123456796),
-    (9, 2, 2, 0, 123456797),
-    (10,2, 2, 0, 123456798),
-    (11,2, 2, 1, 123456799),
-    (12,2, 2, 1, 123456800);
+create table if not exists user (
+  id integer,
+  address_lat numeric,
+  address_long numeric,  -- datatype `point` not implemented
+  age_approx integer,
+  gender integer,
+  occupation numeric,
+  -- and more ...
+);
 
 
--- recent most viewed items
+create table if not exists item (
+  id integer,
+  category integer,
+  brand integer,
+  freshness numeric,
+  popularity numeric,
+  price numeric,
+  rating numeric
+  -- and more ...
+);
+
+
+create materialized view recent_history as select *
+    from tumble(actionhistory, timestamp_, INTERVAL '30 seconds')
+    order by window_end limit 20;
+
 
 create materialized view user_most_interacted_item as
-select max(userid), max(itemid), max(count) as max_count from
- (select userid, itemid, count(itemid) as count
- from actionhistory where timestamp_ > max(timestamp_) - 86400000
-    group by itemid, userid) max_counts
-group by userid, itemid;
+    with counts as (select userid, itemid, count(itemid) as count, window_start
+    from (
+        select * from tumble(actionhistory, timestamp_, interval '5 minutes')
+    ) recent
+    group by userid, itemid
+    )
+select userid, max((window_start, count, itemid)) as maxcount_item from counts group by userid;
 
 
--- recent most interacted user for each item
-create materialized view item_most_accessed_user as
-select max(itemid), max(userid), max(count) as max_count from
- (select userid, itemid, count(itemid) over (partition by itemid) as count
- from actionhistory where timestamp_ > max(timestamp_) - 86400000
-    group by itemid, userid) max_counts
-group by itemid;
-
+insert into actionhistory values
+    (1, 1, 0, '2016-02-01 00:00:01'),
+    (1, 1, 1, '2016-02-01 00:00:02'),
+    (1, 2, 0, '2016-02-01 00:00:03'),
+    (1, 2, 0, '2016-02-01 00:00:04'),
+    (1, 2, 1, '2016-02-01 00:00:05'),
+    (2, 1, 0, '2016-02-01 00:00:06'),
+    (2, 1, 0, '2016-02-01 00:00:07'),
+    (2, 2, 0, '2016-02-01 00:00:08'),
+    (2, 2, 0, '2016-02-01 00:00:09'),
+    (2, 2, 0, '2016-02-01 00:00:10'),
+    (2, 2, 1, '2016-02-01 00:00:11'),
+    (2, 2, 1, '2016-02-01 00:00:12');
