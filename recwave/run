@@ -1,0 +1,59 @@
+#!/bin/bash
+
+
+set -ex
+
+echo "starting zookeeper"
+/usr/local/kafka/bin/zookeeper-server-start.sh zookeeper.properties > /dev/null 2>&1 &
+sleep 5
+lsof -i:2181  > /dev/null || {
+  echo "failed to start zookeeper"
+  exit 1
+}
+echo "zookeeper started. starting kafka"
+/usr/local/kafka/bin/kafka-server-start.sh kafka.properties > /dev/null 2>&1 &
+sleep 5
+lsof -i:9092 > /dev/null || {
+  echo "kafka start failed"
+  exit 1
+}
+/usr/local/kafka/bin/kafka-topics.sh --create --topic recwave --partitions 1 --replication-factor 1 --bootstrap-server=127.0.0.1:9092 \
+  --if-not-exists  > /dev/null 2>&1 || {
+  echo "kafka topic creation failed"
+  exit 1
+}
+sleep 3
+
+/risingwave/bin/risingwave playground > /dev/null &
+sleep 5
+psql -U root -h 127.0.0.1 -p 4566 -d dev -a -f recwave-start.sql || {
+  echo "failed to initialize db for recwave"
+  exit 1
+}
+sleep 2
+
+
+export GENERATOR_PATH=/opt/recwave/generator
+
+python3 generator --num-users=15 \
+  --num-items=20 \
+  --dump-users="$GENERATOR_PATH/users.json" \
+  --dump-items="$GENERATOR_PATH/items.json"
+
+python3 recommender/model &
+MODEL_PID=$!
+./recwave-recommender &
+RECOMMENDER_PID=$!
+sleep 2
+./recwave-simulator &
+SIMULATOR_PID=$!
+
+trap 'kill $SIMULATOR_PID; kill $RECOMMENDER_PID; kill $MODEL_PID' SIGINT
+wait $SIMULATOR_PID
+echo "Simulator finished"
+wait $RECOMMENDER_PID
+echo "Recommender finished"
+wait $MODEL_PID
+echo "Model finished"
+
+

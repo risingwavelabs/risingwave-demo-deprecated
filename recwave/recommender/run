@@ -1,0 +1,18 @@
+#!/bin/bash
+risedev d
+psql -U root -h 127.0.0.1 -p 4566 -d dev -a -f ../recwave-start.sql
+sleep 2
+
+python3 model &
+MODEL_PID=$!
+sleep 2
+
+cargo run &
+RECOMMENDER_PID=$!
+
+trap 'kill $MODEL_PID $RECOMMENDER_PID' SIGINT
+
+wait $MODEL_PID
+echo "Model finished"
+wait $RECOMMENDER_PID
+echo "Recommender finished"

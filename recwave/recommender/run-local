@@ -1,0 +1,27 @@
+#!/bin/bash
+set -ex
+risedev d
+psql -U root -h 127.0.0.1 -p 4566 -d dev -a -f ../recwave-start.sql
+sleep 2
+
+/usr/local/kafka/bin/kafka-server-start.sh ./server.properties &
+sleep 1
+/usr/local/kafka/bin/kafka-topics.sh --create --topic recwave --partitions 1 --replication-factor 1 --bootstrap-server=127.0.0.1:9092
+
+python3 ../generator --num-users=15 \
+  --num-items=20 \
+  --dump-users="$(pwd)/users.json" \
+  --dump-items="$(pwd)/items.json"
+
+python3 model &
+MODEL_PID=$!
+sleep 2
+
+./target/release/recommender &
+RECOMMENDER_PID=$!
+
+trap 'kill $MODEL_PID; kill $RECOMMENDER_PID' SIGINT
+wait $MODEL_PID
+echo "Model finished"
+wait $RECOMMENDER_PID
+echo "Recommender finished"
