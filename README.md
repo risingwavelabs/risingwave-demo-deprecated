@@ -4,6 +4,7 @@ Here is a gallery of demos that present how to use RisingWave alongwith the ecos
 
 - `ad-click/`: [Build and Maintain Real-time Applications Faster and Easier with Redpanda and RisingWave](https://singularity-data.com/blog/build-with-Redpanda-and-RisingWave)
 - `ad-ctr`: [Perform real-time ad performance analysis](https://www.risingwave.dev/docs/latest/real-time-ad-performance-analysis/)
+- `cdn-metrics`: [Server performance anomaly detection](https://www.risingwave.dev/docs/latest/server-performance-anomaly-detection/)
 
 ## Workload Generator
 
