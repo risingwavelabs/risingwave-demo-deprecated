@@ -34,4 +34,4 @@ jobs:
           context: ./datagen
           push: true
           tags: |
-            ghcr.io/singularity-data/demo-datagen:${{github.ref_name}}
+            ghcr.io/risingwavelabs/demo-datagen:${{github.ref_name}}
