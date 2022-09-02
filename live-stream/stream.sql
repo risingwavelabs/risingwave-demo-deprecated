@@ -1,5 +1,4 @@
--- The mobile app will periodically upload the performance data to the server.
-CREATE TABLE live_stream_metrics (
+CREATE SOURCE live_stream_metrics (
     client_ip VARCHAR,
     user_agent VARCHAR,
     user_id VARCHAR,
@@ -7,9 +6,9 @@ CREATE TABLE live_stream_metrics (
     room_id VARCHAR,
     -- Sent bits per second.
     video_bps BIGINT,
-    -- Sent frames per second.
+    -- Sent frames per second. Typically 30 fps.
     video_fps BIGINT,
-    -- Round-trip time (in ms).
+    -- Round-trip time (in ms). 200ms is recommended.
     video_rtt BIGINT,
     -- Lost packets per second.
     video_lost_pps BIGINT,
@@ -19,7 +18,12 @@ CREATE TABLE live_stream_metrics (
     video_total_freeze_duration BIGINT,
     report_timestamp TIMESTAMP,
     country VARCHAR
-);
+) WITH (
+    connector = 'kafka',
+    kafka.topic = 'live_stream_metrics',
+    kafka.brokers = '127.0.0.1:55971',
+    kafka.scan.startup.mode = 'earliest'
+) ROW FORMAT JSON;
 
 CREATE MATERIALIZED VIEW live_video_qos_10min AS
 SELECT
@@ -38,6 +42,7 @@ GROUP BY
     window_start,
     room_id;
 
+-- Unsupported yet.
 CREATE MATERIALIZED VIEW blocked_user_ratio_10min AS
 SELECT
     window_start AS report_ts,
