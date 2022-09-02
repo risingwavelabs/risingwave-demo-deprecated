@@ -1,5 +1,5 @@
 CREATE SOURCE user_behaviors (
-    user_id BIGINT,
+    user_id VARCHAR,
     target_id VARCHAR,
     target_type VARCHAR,
     event_timestamp TIMESTAMP,
