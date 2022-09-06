@@ -113,7 +113,7 @@ func (p *KafkaSink) WriteRecord(ctx context.Context, record sink.SinkRecord) err
 	topic, data := record.ToKafka()
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
-	msg.Key = sarama.StringEncoder(topic)
+	msg.Key = nil
 	msg.Value = sarama.ByteEncoder(data)
 	select {
 	case <-ctx.Done():
