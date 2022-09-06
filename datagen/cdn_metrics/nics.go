@@ -35,9 +35,9 @@ values ('%s', '%s', '%s' '%s', '%s', '%f', '%f')`,
 		"nics_metrics", r.DeviceId, r.MetricName, r.Aggregation, r.NicName, r.ReportTime, r.Bandwidth, r.Value)
 }
 
-func (r *nicsMetric) ToKafka() (topic string, data []byte) {
+func (r *nicsMetric) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "nics_metrics", data
+	return "nics_metrics", r.DeviceId, data
 }
 
 // Each device has a nics monitor.

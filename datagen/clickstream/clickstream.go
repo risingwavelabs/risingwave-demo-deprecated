@@ -33,9 +33,9 @@ values ('%s', '%s', '%s', '%s', '%s', '%s', '%s')`,
 		"user_behaviors", r.UserId, r.TargetId, r.TargetType, r.EventTimestmap, r.BehaviorType, r.ParentTargetType, r.ParentTargetId)
 }
 
-func (r *userBehavior) ToKafka() (topic string, data []byte) {
+func (r *userBehavior) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "user_behaviors", data
+	return "user_behaviors", r.UserId, data
 }
 
 type targetType string

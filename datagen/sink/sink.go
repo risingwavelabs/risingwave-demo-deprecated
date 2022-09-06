@@ -10,7 +10,7 @@ type SinkRecord interface {
 
 	// Convert the event to a Kakfa message in JSON format.
 	// This interface will also be used for Pulsar.
-	ToKafka() (topic string, data []byte)
+	ToKafka() (topic string, key string, data []byte)
 }
 
 type Sink interface {

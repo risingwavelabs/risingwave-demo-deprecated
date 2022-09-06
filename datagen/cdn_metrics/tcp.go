@@ -24,9 +24,9 @@ func (r *tcpMetric) ToPostgresSql() string {
 		"tcp_metrics", r.DeviceId, r.ReportTime, r.MetricName, r.Value)
 }
 
-func (r *tcpMetric) ToKafka() (topic string, data []byte) {
+func (r *tcpMetric) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "tcp_metrics", data
+	return "tcp_metrics", r.DeviceId, data
 }
 
 // Each device has a TCP monitor.

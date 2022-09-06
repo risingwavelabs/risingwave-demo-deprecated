@@ -81,9 +81,9 @@ VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, '%s', '%s')
 		r.Ip, r.Agent, r.Id, r.RoomId, r.VideoBps, r.VideoFps, r.VideoRtt, r.VideoLostPps, r.VideoLongestFreezeDuration, r.VideoTotalFreezeDuration, r.ReportTimestamp, r.Country)
 }
 
-func (r *liveMetric) ToKafka() (topic string, data []byte) {
+func (r *liveMetric) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "live_stream_metrics", data
+	return "live_stream_metrics", fmt.Sprint(r.Id), data
 }
 
 type liveStreamMetricsGen struct {

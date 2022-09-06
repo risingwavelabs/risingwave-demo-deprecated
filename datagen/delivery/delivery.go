@@ -22,9 +22,9 @@ func (r *orderEvent) ToPostgresSql() string {
 		"delivery_orders_source", r.OrderId, r.RestaurantId, r.OrderState, r.OrderTimestamp)
 }
 
-func (r *orderEvent) ToKafka() (topic string, data []byte) {
+func (r *orderEvent) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "delivery_orders", data
+	return "delivery_orders", fmt.Sprint(r.OrderId), data
 }
 
 type orderEventGen struct {
