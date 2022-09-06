@@ -283,7 +283,7 @@ services:
     container_name: message_queue
     stop_grace_period: 2s
   datagen:
-    image: ghcr.io/risingwavelabs/demo-datagen:v1.0.4
+    image: ghcr.io/risingwavelabs/demo-datagen:v1.0.7
     depends_on: [message_queue]
     command:
       - /bin/sh
