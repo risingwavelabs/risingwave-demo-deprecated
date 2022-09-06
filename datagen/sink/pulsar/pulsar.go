@@ -41,7 +41,7 @@ func (p *PulsarSink) Close() error {
 
 func (p *PulsarSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
 	var err error
-	topic, data := record.ToKafka()
+	topic, key, data := record.ToKafka()
 	producer, ok := p.producers[topic]
 	if !ok {
 		producer, err = p.client.CreateProducer(pulsar.ProducerOptions{
@@ -53,7 +53,8 @@ func (p *PulsarSink) WriteRecord(ctx context.Context, record sink.SinkRecord) er
 		p.producers[topic] = producer
 	}
 	_, err = producer.Send(ctx, &pulsar.ProducerMessage{
-		Payload: data,
+		Value: data,
+		Key:   key,
 	})
 	return err
 }

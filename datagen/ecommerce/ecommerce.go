@@ -27,9 +27,9 @@ values ('%d', '%d', %f, '%s')`,
 		"order_events", r.OrderId, r.ItemId, r.ItemPrice, r.EventTimestmap)
 }
 
-func (r *orderEvent) ToKafka() (topic string, data []byte) {
+func (r *orderEvent) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "order_events", data
+	return "order_events", fmt.Sprint(r.OrderId), data
 }
 
 // Each order/trade will be composed of two events:
@@ -47,9 +47,9 @@ values ('%d', '%s', '%s')`,
 		"parcel_events", r.OrderId, r.EventTimestmap, r.EventType)
 }
 
-func (r *parcelEvent) ToKafka() (topic string, data []byte) {
+func (r *parcelEvent) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "parcel_events", data
+	return "parcel_events", fmt.Sprint(r.OrderId), data
 }
 
 type ecommerceGen struct {

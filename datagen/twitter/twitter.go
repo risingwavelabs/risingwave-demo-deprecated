@@ -45,9 +45,9 @@ func (r *tweetData) objectString() string {
 	return fmt.Sprintf("('%s'::TIMESTAMP, '%s', '%s', '%s')", r.CreatedAt, r.Id, r.Text, r.Lang)
 }
 
-func (r *twitterEvent) ToKafka() (topic string, data []byte) {
+func (r *twitterEvent) ToKafka() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "twitter", data
+	return "twitter", r.Data.Id, data
 }
 
 type twitterGen struct {

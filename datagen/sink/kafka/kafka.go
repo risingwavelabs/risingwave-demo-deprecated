@@ -110,10 +110,10 @@ func (p *KafkaSink) Close() error {
 }
 
 func (p *KafkaSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
-	topic, data := record.ToKafka()
+	topic, key, data := record.ToKafka()
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
-	msg.Key = sarama.StringEncoder(topic)
+	msg.Key = sarama.StringEncoder(key)
 	msg.Value = sarama.ByteEncoder(data)
 	select {
 	case <-ctx.Done():
