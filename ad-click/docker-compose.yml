@@ -9,8 +9,12 @@ services:
       - "0.0.0.0:6660"
       - "--prometheus-listener-addr"
       - "0.0.0.0:1260"
+      - "--client-address"
+      - "compactor-0:6660"
       - "--metrics-level"
       - "1"
+      - "--max-concurrent-task-number"
+      - "15"
       - "--state-store"
       - "hummock+minio://hummockadmin:hummockadmin@minio-0:9301/hummock001"
       - "--meta-address"
@@ -29,7 +33,6 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: compactor-0
-    hostname: compactor-0
     healthcheck:
       test:
         - CMD
@@ -66,10 +69,10 @@ services:
       - minio-0
     volumes:
       - "../risingwave.toml:/risingwave.toml"
+      - "compute-node-0:/filecache"
     environment:
       RUST_BACKTRACE: "1"
     container_name: compute-node-0
-    hostname: compute-node-0
     healthcheck:
       test:
         - CMD
@@ -113,7 +116,6 @@ services:
       - "etcd-0:/etcd-data"
     environment: {}
     container_name: etcd-0
-    hostname: etcd-0
     healthcheck:
       test:
         - CMD
@@ -129,19 +131,23 @@ services:
       - frontend-node
       - "--host"
       - "0.0.0.0:4566"
+      - "--client-address"
+      - "frontend-node-0:4566"
       - "--meta-addr"
       - "http://meta-node-0:5690"
+      - "--config-path"
+      - /risingwave.toml
     expose:
       - "4566"
     ports:
       - "4566:4566"
     depends_on:
       - meta-node-0
-    volumes: []
+    volumes:
+      - "../risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: frontend-node-0
-    hostname: frontend-node-0
     healthcheck:
       test:
         - CMD
@@ -167,7 +173,6 @@ services:
       - "../risingwave-dashboard.json:/risingwave-dashboard.json"
     environment: {}
     container_name: grafana-0
-    hostname: grafana-0
     healthcheck:
       test:
         - CMD
@@ -193,6 +198,12 @@ services:
       - etcd
       - "--etcd-endpoints"
       - "etcd-0:2388"
+      - "--vacuum-interval-sec"
+      - "30"
+      - "--collect-gc-watermark-spin-interval-sec"
+      - "5"
+      - "--min-sst-retention-time-sec"
+      - "604800"
       - "--config-path"
       - /risingwave.toml
     expose:
@@ -206,7 +217,6 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: meta-node-0
-    hostname: meta-node-0
     healthcheck:
       test:
         - CMD
@@ -242,7 +252,6 @@ services:
       MINIO_ROOT_PASSWORD: hummockadmin
       MINIO_ROOT_USER: hummockadmin
     container_name: minio-0
-    hostname: minio-0
     healthcheck:
       test:
         - CMD
@@ -271,7 +280,6 @@ services:
       - "../prometheus.yaml:/etc/prometheus/prometheus.yml"
     environment: {}
     container_name: prometheus-0
-    hostname: prometheus-0
     healthcheck:
       test:
         - CMD
@@ -289,7 +297,7 @@ services:
       - "--smp"
       - "4"
       - "--reserve-memory"
-      - 0M
+      - "0"
       - "--memory"
       - 4G
       - "--overprovisioned"
@@ -311,7 +319,6 @@ services:
       - "message_queue:/var/lib/redpanda/data"
     environment: {}
     container_name: message_queue
-    hostname: message_queue
     healthcheck:
       test:
         - CMD
@@ -332,6 +339,8 @@ services:
     container_name: datagen
     hostname: datagen
 volumes:
+  compute-node-0:
+    external: false
   etcd-0:
     external: false
   grafana-0:
