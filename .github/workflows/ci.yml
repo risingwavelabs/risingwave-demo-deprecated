@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  goreleaser:
+  run-demos:
     runs-on: ubuntu-latest
     steps:
       -
@@ -19,3 +19,7 @@ jobs:
         name: Run Demos
         working-directory: .github/scripts
         run: python3 run_demos.py 
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
