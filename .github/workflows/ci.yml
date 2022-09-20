@@ -1,0 +1,21 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      -
+        name: Run Demos
+        working-directory: .github/scripts
+        run: python3 run_demos.py 
