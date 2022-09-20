@@ -3,9 +3,6 @@ name: Pull Request CI
 on:
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   run-demos:
     runs-on: ubuntu-latest
@@ -19,7 +16,3 @@ jobs:
         name: Run Demos
         working-directory: .github/scripts
         run: python3 run_demos.py 
-        with:
-          context: .
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
