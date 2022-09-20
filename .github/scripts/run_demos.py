@@ -11,11 +11,10 @@ from time import sleep
 demos = [
     "ad-click",
     "ad-ctr",
-    # "cdn-metrics",
+    "cdn-metrics",
     # "clickstream",
     # "delivery",
     # "ecommerce",
-    # "gaming",
     # "live-stream",
     # "twitter",
     # "twitter-pulsar"
