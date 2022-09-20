@@ -41,7 +41,7 @@ def run_demo(demo: str):
 
     sql_file = os.path.join(demo_dir, "create_source.sql")
     run_sql_file(sql_file, demo_dir)
-    sleep(5)
+    sleep(10)
 
     sql_file = os.path.join(demo_dir, "create_mv.sql")
     run_sql_file(sql_file, demo_dir)
