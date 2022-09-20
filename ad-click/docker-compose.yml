@@ -337,7 +337,6 @@ services:
       - /datagen --mode ad-click --qps 2 kafka --brokers message_queue:29092
     restart: always
     container_name: datagen
-    hostname: datagen
 volumes:
   compute-node-0:
     external: false

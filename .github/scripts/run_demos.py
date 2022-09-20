@@ -10,7 +10,7 @@ from time import sleep
 
 demos = [
     "ad-click",
-    # "ad-ctr",
+    "ad-ctr",
     # "cdn-metrics",
     # "clickstream",
     # "delivery",
