@@ -4,7 +4,7 @@ SELECT
     tcp.window_end AS window_end,
     tcp.metric_name AS metric_name,
     tcp.metric_value AS metric_value,
-    nic.avg_util as tcp_avg_bandwidth_util
+    nic.avg_util AS tcp_avg_bandwidth_util
 FROM
     (
         SELECT
@@ -43,7 +43,7 @@ FROM
     ) AS nic ON tcp.device_id = nic.device_id
     AND tcp.window_end = nic.window_end
 WHERE
-    avg_util >= 40;
+    avg_util >= 50;
 
 CREATE MATERIALIZED VIEW retrans_incidents AS
 SELECT
@@ -56,7 +56,7 @@ WHERE
     metric_name = 'retrans_rate'
     AND metric_value > 0.15;
 
-CREATE MATERIALIZED VIEW rtt_incidents AS
+CREATE MATERIALIZED VIEW srtt_incidents AS
 SELECT
     device_id,
     window_end AS trigger_time,

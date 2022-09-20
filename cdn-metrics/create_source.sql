@@ -20,7 +20,7 @@ CREATE SOURCE tcp_metrics (
     metric_value DOUBLE PRECISION
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'nics_metrics',
+    kafka.topic = 'tcp_metrics',
     kafka.brokers = 'message_queue:29092',
     kafka.scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
