@@ -29,6 +29,7 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: compactor-0
+    hostname: compactor-0
     healthcheck:
       test:
         - CMD
@@ -68,6 +69,7 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: compute-node-0
+    hostname: compute-node-0
     healthcheck:
       test:
         - CMD
@@ -111,6 +113,7 @@ services:
       - "etcd-0:/etcd-data"
     environment: {}
     container_name: etcd-0
+    hostname: etcd-0
     healthcheck:
       test:
         - CMD
@@ -138,6 +141,7 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: frontend-node-0
+    hostname: frontend-node-0
     healthcheck:
       test:
         - CMD
@@ -163,6 +167,7 @@ services:
       - "../risingwave-dashboard.json:/risingwave-dashboard.json"
     environment: {}
     container_name: grafana-0
+    hostname: grafana-0
     healthcheck:
       test:
         - CMD
@@ -201,6 +206,7 @@ services:
     environment:
       RUST_BACKTRACE: "1"
     container_name: meta-node-0
+    hostname: meta-node-0
     healthcheck:
       test:
         - CMD
@@ -236,6 +242,7 @@ services:
       MINIO_ROOT_PASSWORD: hummockadmin
       MINIO_ROOT_USER: hummockadmin
     container_name: minio-0
+    hostname: minio-0
     healthcheck:
       test:
         - CMD
@@ -264,6 +271,7 @@ services:
       - "../prometheus.yaml:/etc/prometheus/prometheus.yml"
     environment: {}
     container_name: prometheus-0
+    hostname: prometheus-0
     healthcheck:
       test:
         - CMD
@@ -303,6 +311,7 @@ services:
       - "message_queue:/var/lib/redpanda/data"
     environment: {}
     container_name: message_queue
+    hostname: message_queue
     healthcheck:
       test:
         - CMD
@@ -321,6 +330,7 @@ services:
       - /datagen --mode ad-click --qps 2 kafka --brokers message_queue:29092
     restart: always
     container_name: datagen
+    hostname: datagen
 volumes:
   etcd-0:
     external: false
