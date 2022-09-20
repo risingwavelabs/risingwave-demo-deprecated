@@ -295,11 +295,11 @@ services:
       - redpanda
       - start
       - "--smp"
-      - "4"
+      - "2"
       - "--reserve-memory"
       - "0"
       - "--memory"
-      - 4G
+      - 1G
       - "--overprovisioned"
       - "--node-id"
       - "0"
