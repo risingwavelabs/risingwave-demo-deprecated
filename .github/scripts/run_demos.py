@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-
-from cProfile import run
 from os.path import (dirname, abspath)
 import os
 import subprocess
@@ -15,7 +13,7 @@ demos = [
     "clickstream",
     # "delivery",
     # "ecommerce",
-    # "live-stream",
+    "live-stream",
     "twitter",
     # "twitter-pulsar"
 ]
