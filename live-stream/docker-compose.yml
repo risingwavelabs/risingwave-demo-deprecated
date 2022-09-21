@@ -334,7 +334,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - /datagen --mode ad-click --qps 2 kafka --brokers message_queue:29092
+      - /datagen --mode livestream --qps 2 kafka --brokers message_queue:29092
     restart: always
     container_name: datagen
 volumes:
