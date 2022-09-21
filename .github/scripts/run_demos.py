@@ -24,7 +24,7 @@ def run_sql_file(f: str, dir: str):
     # ON_ERROR_STOP=1 will let psql return error code when the query fails.
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
     subprocess.run(["psql", "-h", "localhost", "-p", "4566",
-                    "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"], cwd=dir, check=True)
+                    "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"], cwd=dir, check=True, capture_output=True)
 
 
 def run_demo(demo: str):
