@@ -12,11 +12,11 @@ demos = [
     "ad-click",
     "ad-ctr",
     "cdn-metrics",
-    # "clickstream",
+    "clickstream",
     # "delivery",
     # "ecommerce",
     # "live-stream",
-    # "twitter",
+    "twitter",
     # "twitter-pulsar"
 ]
 
