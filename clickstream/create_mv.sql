@@ -19,7 +19,8 @@ CREATE MATERIALIZED VIEW thread_view_count AS WITH t AS (
 SELECT
     target_id,
     SUM(t.view_count) AS view_count,
-    window_start as window_time
+    window_start as window_time,
+    window_end
 FROM
     HOP(
         t,
@@ -29,4 +30,5 @@ FROM
     )
 GROUP BY
     target_id,
-    window_start;
+    window_start,
+    window_end;
