@@ -1,24 +1,3 @@
-CREATE SOURCE ad_impression (
-    bid_id BIGINT,
-    ad_id BIGINT,
-    impression_timestamp TIMESTAMP
-) WITH (
-    connector = 'kafka',
-    kafka.topic = 'ad_impression',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
-) ROW FORMAT JSON;
-
-CREATE SOURCE ad_click (
-    bid_id BIGINT,
-    click_timestamp TIMESTAMP
-) WITH (
-    connector = 'kafka',
-    kafka.topic = 'ad_click',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
-) ROW FORMAT JSON;
-
 CREATE MATERIALIZED VIEW ad_ctr AS
 SELECT
     ad_clicks.ad_id AS ad_id,
