@@ -1,11 +1,26 @@
-CREATE MATERIALIZED VIEW ad_ctr AS
+CREATE MATERIALIZED VIEW ad_ctr AS WITH ad_impression AS (
+    SELECT
+        *
+    FROM
+        ad_event
+    WHERE
+        event_type = 'impression'
+),
+ad_click AS (
+    SELECT
+        *
+    FROM
+        ad_event
+    WHERE
+        event_type = 'click'
+)
 SELECT
     ad_clicks.ad_id AS ad_id,
     ad_clicks.clicks_count :: NUMERIC / ad_impressions.impressions_count AS ctr
 FROM
     (
         SELECT
-            ad_impression.ad_id AS ad_id,
+            ad_id,
             COUNT(*) AS impressions_count
         FROM
             ad_impression
@@ -14,16 +29,30 @@ FROM
     ) AS ad_impressions
     JOIN (
         SELECT
-            ai.ad_id,
+            ad_id,
             COUNT(*) AS clicks_count
         FROM
-            ad_click AS ac
-            LEFT JOIN ad_impression AS ai ON ac.bid_id = ai.bid_id
+            ad_click
         GROUP BY
-            ai.ad_id
+            ad_id
     ) AS ad_clicks ON ad_impressions.ad_id = ad_clicks.ad_id;
 
-CREATE MATERIALIZED VIEW ad_ctr_5min AS
+CREATE MATERIALIZED VIEW ad_ctr_5min AS WITH ad_impression AS (
+    SELECT
+        *
+    FROM
+        ad_event
+    WHERE
+        event_type = 'impression'
+),
+ad_click AS (
+    SELECT
+        *
+    FROM
+        ad_event
+    WHERE
+        event_type = 'click'
+)
 SELECT
     ac.ad_id AS ad_id,
     ac.clicks_count :: NUMERIC / ai.impressions_count AS ctr,
@@ -37,7 +66,7 @@ FROM
         FROM
             TUMBLE(
                 ad_impression,
-                impression_timestamp,
+                event_timestamp,
                 INTERVAL '5' MINUTE
             )
         GROUP BY
@@ -46,19 +75,13 @@ FROM
     ) AS ai
     JOIN (
         SELECT
-            ai.ad_id,
+            ad_id,
             COUNT(*) AS clicks_count,
-            ai.window_end AS window_end
+            window_end
         FROM
-            TUMBLE(ad_click, click_timestamp, INTERVAL '5' MINUTE) AS ac
-            INNER JOIN TUMBLE(
-                ad_impression,
-                impression_timestamp,
-                INTERVAL '5' MINUTE
-            ) AS ai ON ai.bid_id = ac.bid_id
-            AND ai.window_end = ac.window_end
+            TUMBLE(ad_click, event_timestamp, INTERVAL '5' MINUTE)
         GROUP BY
-            ai.ad_id,
-            ai.window_end
+            ad_id,
+            window_end
     ) AS ac ON ai.ad_id = ac.ad_id
     AND ai.window_end = ac.window_end;

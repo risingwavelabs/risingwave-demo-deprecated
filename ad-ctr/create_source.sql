@@ -1,20 +1,11 @@
-CREATE SOURCE ad_impression (
+CREATE SOURCE ad_event (
+    event_type VARCHAR,
     bid_id BIGINT,
     ad_id BIGINT,
-    impression_timestamp TIMESTAMP
+    event_timestamp TIMESTAMP
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'ad_impression',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
-) ROW FORMAT JSON;
-
-CREATE SOURCE ad_click (
-    bid_id BIGINT,
-    click_timestamp TIMESTAMP
-) WITH (
-    connector = 'kafka',
-    kafka.topic = 'ad_click',
+    kafka.topic = 'ad_event',
     kafka.brokers = 'message_queue:29092',
     kafka.scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
