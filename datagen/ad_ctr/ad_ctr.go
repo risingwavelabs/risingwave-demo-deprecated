@@ -12,35 +12,34 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 )
 
+type adEvent struct {
+	EventType         int64              `json:"event_type"`
+	AdImpressionEvent *adImpressionEvent `json:"ad_impression_event"`
+	AdClickEvent      *adClickEvent      `json:"ad_click_event"`
+}
+
+func (r *adEvent) ToPostgresSql() string {
+	return ""
+}
+
+func (r *adEvent) ToKafka() (topic string, key string, data []byte) {
+	data, _ = json.Marshal(r)
+	if r.EventType == 1 {
+		return "ad", fmt.Sprint(r.AdImpressionEvent.BidId), data
+	} else {
+		return "ad", fmt.Sprint(r.AdClickEvent.BidId), data
+	}
+}
+
 type adImpressionEvent struct {
 	BidId               int64  `json:"bid_id"`
 	AdId                int64  `json:"ad_id"`
 	ImpressionTimestamp string `json:"impression_timestamp"`
 }
 
-func (r *adImpressionEvent) ToPostgresSql() string {
-	return fmt.Sprintf("INSERT INTO %s (bid_id, ad_id, impression_timestamp) values ('%d', '%d', '%s')",
-		"ad_impression", r.BidId, r.AdId, r.ImpressionTimestamp)
-}
-
-func (r *adImpressionEvent) ToKafka() (topic string, key string, data []byte) {
-	data, _ = json.Marshal(r)
-	return "ad_impression", fmt.Sprint(r.BidId), data
-}
-
 type adClickEvent struct {
 	BidId          int64  `json:"bid_id"`
 	ClickTimestamp string `json:"click_timestamp"`
-}
-
-func (r *adClickEvent) ToPostgresSql() string {
-	return fmt.Sprintf("INSERT INTO %s (bid_id, click_timestamp) values ('%d',  '%s')",
-		"ad_click", r.BidId, r.ClickTimestamp)
-}
-
-func (r *adClickEvent) ToKafka() (topic string, key string, data []byte) {
-	data, _ = json.Marshal(r)
-	return "ad_click", fmt.Sprint(r.BidId), data
 }
 
 type adCtrGen struct {
@@ -73,24 +72,32 @@ func (g *adCtrGen) generate() []sink.SinkRecord {
 	adId := int64(g.faker.IntRange(1, 10))
 
 	events := []sink.SinkRecord{
-		&adImpressionEvent{
-			BidId:               bidId,
-			AdId:                adId,
-			ImpressionTimestamp: time.Now().Format(gen.RwTimestampLayout),
+		&adEvent{
+			EventType: 1,
+			AdImpressionEvent: &adImpressionEvent{
+				BidId:               bidId,
+				AdId:                adId,
+				ImpressionTimestamp: time.Now().Format(gen.RwTimestampLayout),
+			},
+			AdClickEvent: nil,
 		},
 	}
 	if g.hasClick(adId) {
 		randomDelay := time.Duration(g.faker.IntRange(1, 10) * int(time.Second))
-		events = append(events, &adClickEvent{
-			BidId:          bidId,
-			ClickTimestamp: time.Now().Add(randomDelay).Format(gen.RwTimestampLayout),
+		events = append(events, &adEvent{
+			EventType:         2,
+			AdImpressionEvent: nil,
+			AdClickEvent: &adClickEvent{
+				BidId:          bidId,
+				ClickTimestamp: time.Now().Add(randomDelay).Format(gen.RwTimestampLayout),
+			},
 		})
 	}
 	return events
 }
 
 func (g *adCtrGen) KafkaTopics() []string {
-	return []string{"ad_impression", "ad_click"}
+	return []string{"ad"}
 }
 
 func (g *adCtrGen) Load(ctx context.Context, outCh chan<- sink.SinkRecord) {
