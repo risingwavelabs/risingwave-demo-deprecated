@@ -295,7 +295,7 @@ services:
       - redpanda
       - start
       - "--smp"
-      - "4"
+      - "${REDPANDA_SMP_NUM:-4}" # default to 4 threads
       - "--reserve-memory"
       - "0"
       - "--memory"
