@@ -295,7 +295,7 @@ services:
       - redpanda
       - start
       - "--smp"
-      - "2"
+      - "4"
       - "--reserve-memory"
       - "0"
       - "--memory"
