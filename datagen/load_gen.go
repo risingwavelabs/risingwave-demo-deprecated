@@ -17,10 +17,9 @@ import (
 	"datagen/sink/pulsar"
 	"datagen/twitter"
 	"fmt"
+	"go.uber.org/ratelimit"
 	"log"
 	"time"
-
-	"go.uber.org/ratelimit"
 )
 
 func createSink(ctx context.Context, cfg gen.GeneratorConfig) (sink.Sink, error) {
@@ -96,12 +95,14 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 	count := int64(0)
 	initTime := time.Now()
 	prevTime := time.Now()
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 	rl := ratelimit.New(cfg.Qps, ratelimit.WithoutSlack) // per second
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case <-time.NewTicker(time.Second).C:
+		case <-ticker.C:
 			if time.Since(prevTime) >= 10*time.Second {
 				log.Printf("Sent %d records in total (Elasped: %s)", count, time.Since(initTime).String())
 				prevTime = time.Now()
