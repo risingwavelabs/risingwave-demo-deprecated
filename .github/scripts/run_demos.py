@@ -18,13 +18,17 @@ demos = [
     # "twitter-pulsar"
 ]
 
+redpanda_smp = "REDPANDA_SMP_NUM={}".format(round(os.cpu_count()/2+1))
+print(redpanda_smp)
+
 
 def run_sql_file(f: str, dir: str):
     print("Running SQL file: {}".format(f))
     # ON_ERROR_STOP=1 will let psql return error code when the query fails.
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
     subprocess.run(["psql", "-h", "localhost", "-p", "4566",
-                    "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"], cwd=dir, check=True, capture_output=True)
+                    "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"],
+                   cwd=dir, check=True, capture_output=True)
 
 
 def run_demo(demo: str):
@@ -33,8 +37,13 @@ def run_demo(demo: str):
     demo_dir = os.path.join(project_dir, demo)
     print("Running demo: {}".format(demo))
 
-    subprocess.run(["docker", "compose", "up", "-d"], cwd=demo_dir, check=True)
-    sleep(30)
+    f = open("{}/{}".format(demo_dir, ".env"), "w")
+    f.write(redpanda_smp)
+    f.close()
+
+    subprocess.run(["docker", "compose", "up", "-d"],
+                   cwd=demo_dir, check=True)
+    sleep(40)
 
     sql_file = os.path.join(demo_dir, "create_source.sql")
     run_sql_file(sql_file, demo_dir)
