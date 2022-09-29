@@ -15,7 +15,7 @@ demos = [
     # "ecommerce",
     "live-stream",
     "twitter",
-    # "twitter-pulsar"
+    "twitter-pulsar"
 ]
 
 redpanda_smp = "REDPANDA_SMP_NUM={}".format(round(os.cpu_count()/2+1))

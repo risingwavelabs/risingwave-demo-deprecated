@@ -26,6 +26,8 @@ To use this tool, you can run the following command:
 ./datagen --mode clickstream --qps 10 kafka --brokers 127.0.0.1:57801
 ```
 
+or
+
 ```sh
 ./datagen --mode ecommerce --qps 10000000 postgres --port 6875 --user materialize --db materialize
 ```
