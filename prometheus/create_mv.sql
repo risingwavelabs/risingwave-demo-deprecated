@@ -11,4 +11,6 @@ from
     )
 group by
     name,
+    window_start
+order by
     window_start;

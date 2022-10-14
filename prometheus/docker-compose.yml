@@ -329,7 +329,7 @@ services:
       timeout: 5s
       retries: 5
   prometheus-kafka-adaptor:
-    image: "ghcr.io/risingwavelabs/risingwave/prometheus-kafka-adapter:1.0.0"
+    image: "telefonica/prometheus-kafka-adapter:1.8.0"
     expose:
       - "9501"
     ports:
