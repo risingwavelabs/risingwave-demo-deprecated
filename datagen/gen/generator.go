@@ -37,7 +37,7 @@ type LoadGenerator interface {
 	Load(ctx context.Context, outCh chan<- sink.SinkRecord)
 }
 
-const RwTimestampLayout = "2006-01-02 15:04:05.07"
+const RwTimestampLayout = "2006-01-02 15:04:05.07+01:00"
 
 type RandDist interface {
 	// Rand returns a random number ranging from [0, max].
