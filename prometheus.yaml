@@ -3,7 +3,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 60s
   external_labels:
-    rw_cluster: 20220927-225847
+    rw_cluster: 20221019-184606
 
 
 scrape_configs:
