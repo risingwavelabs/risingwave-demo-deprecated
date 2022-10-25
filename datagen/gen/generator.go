@@ -7,7 +7,6 @@ import (
 	"datagen/sink/kinesis"
 	"datagen/sink/postgres"
 	"datagen/sink/pulsar"
-	"fmt"
 
 	"gonum.org/v1/gonum/stat/distuv"
 )
