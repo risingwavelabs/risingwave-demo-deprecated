@@ -69,7 +69,6 @@ func (ud UniformDist) Rand(max float64) float64 {
 		}
 	}
 	gen_num := ud.u[max].Rand()
-	fmt.Printf("random uniform: %v, max %v\n", gen_num, max)
 	return gen_num
 }
 
@@ -89,6 +88,5 @@ func (pd PoissonDist) Rand(max float64) float64 {
 		}
 	}
 	gen_num := pd.ps[max].Rand()
-	fmt.Printf("random normal: %v, max %v\n", gen_num, max)
 	return gen_num
 }
