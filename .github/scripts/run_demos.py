@@ -11,6 +11,7 @@ demos = [
     "ad-ctr",
     "cdn-metrics",
     "clickstream",
+    "docker",
     # "delivery",
     # "ecommerce",
     "live-stream",
