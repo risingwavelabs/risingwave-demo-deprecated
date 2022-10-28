@@ -252,17 +252,7 @@ services:
     depends_on: []
     volumes:
       - "minio-0:/data"
-    entrypoint: "
-
-      /bin/sh -c '
-
-      set -e
-
-      mkdir -p \"/data/hummock001\"
-
-      /usr/bin/docker-entrypoint.sh \"$$0\" \"$$@\"
-
-      '"
+    entrypoint: "\n/bin/sh -c '\nset -e\nmkdir -p \"/data/hummock001\"\n/usr/bin/docker-entrypoint.sh \"$$0\" \"$$@\"\n'"
     environment:
       MINIO_CI_CD: "1"
       MINIO_PROMETHEUS_AUTH_TYPE: public
@@ -347,7 +337,7 @@ services:
       retries: 5
   datagen:
     image: ghcr.io/risingwavelabs/demo-datagen:v1.0.7
-    depends_on: [ message_queue ]
+    depends_on: [message_queue]
     command:
       - /bin/sh
       - -c
