@@ -52,22 +52,40 @@ func NewRandDist(cfg GeneratorConfig) RandDist {
 	}
 }
 
-type UniformDist struct{}
+type UniformDist struct {
+	u map[float64]distuv.Uniform
+}
 
-func (UniformDist) Rand(max float64) float64 {
-	d := distuv.Uniform{
-		Min: 0,
-		Max: max,
+func (ud UniformDist) Rand(max float64) float64 {
+	if ud.u == nil {
+		ud.u = make(map[float64]distuv.Uniform)
 	}
-	return d.Rand()
+	_, ok := ud.u[max]
+	if !ok {
+		ud.u[max] = distuv.Uniform{
+			Min: 0,
+			Max: max,
+		}
+	}
+	gen_num := ud.u[max].Rand()
+	return gen_num
 }
 
 // A more real-world distribution. The tail will have lower probability..
-type PoissonDist struct{}
+type PoissonDist struct {
+	ps map[float64]distuv.Poisson
+}
 
-func (PoissonDist) Rand(max float64) float64 {
-	d := distuv.Poisson{
-		Lambda: max / 2,
+func (pd PoissonDist) Rand(max float64) float64 {
+	if pd.ps == nil {
+		pd.ps = make(map[float64]distuv.Poisson)
 	}
-	return d.Rand()
+	_, ok := pd.ps[max]
+	if !ok {
+		pd.ps[max] = distuv.Poisson{
+			Lambda: max / 2,
+		}
+	}
+	gen_num := pd.ps[max].Rand()
+	return gen_num
 }

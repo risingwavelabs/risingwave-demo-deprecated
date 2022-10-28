@@ -53,10 +53,10 @@ func (m *deviceTcpMonitor) emulate(ctx context.Context, outCh chan<- sink.SinkRe
 			case outCh <- metric:
 			}
 		}
-		// Produce tcp metrics every 60s.
+		// Produce tcp metrics every 1s.
 		select {
 		case <-ctx.Done():
-		case <-time.NewTicker(10 * time.Second).C:
+		case <-time.NewTicker(1 * time.Second).C:
 		}
 	}
 }
