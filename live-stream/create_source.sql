@@ -16,7 +16,7 @@ CREATE SOURCE live_stream_metrics (
     video_longest_freeze_duration BIGINT,
     -- Total freeze duration.
     video_total_freeze_duration BIGINT,
-    report_timestamp TIMESTAMP,
+    report_timestamp TIMESTAMPTZ,
     country VARCHAR
 ) WITH (
     connector = 'kafka',

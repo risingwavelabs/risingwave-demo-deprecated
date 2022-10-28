@@ -14,7 +14,7 @@ Here is a gallery of demos that present how to use RisingWave alongwith the ecos
 The workloads presented in the demos are produced by a golang program in `/datagen`. You can get this tool in multiple ways:
 
 - Download pre-built binaries from [Releases](https://github.com/risingwavelabs/risingwave-demo/releases)
-- Pull the latest docker image via `docker pull ghcr.io/risingwavelabs/demo-datagen:v1.0.7`.
+- Pull the latest docker image via `docker pull ghcr.io/risingwavelabs/demo-datagen:v1.0.8`.
 - Build the binary from source:
   ```sh
   cd datagen && go build

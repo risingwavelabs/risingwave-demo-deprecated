@@ -3,7 +3,7 @@ CREATE SOURCE prometheus (
     instance VARCHAR,
     job VARCHAR >,
     name VARCHAR,
-    timestamp TIMESTAMP,
+    timestamp TIMESTAMPTZ,
     value VARCHAR
 ) WITH (
     connector = 'kafka',

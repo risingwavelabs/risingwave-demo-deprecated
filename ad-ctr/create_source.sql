@@ -1,7 +1,7 @@
 CREATE SOURCE ad_impression (
     bid_id BIGINT,
     ad_id BIGINT,
-    impression_timestamp TIMESTAMP
+    impression_timestamp TIMESTAMPTZ
 ) WITH (
     connector = 'kafka',
     kafka.topic = 'ad_impression',
@@ -11,7 +11,7 @@ CREATE SOURCE ad_impression (
 
 CREATE SOURCE ad_click (
     bid_id BIGINT,
-    click_timestamp TIMESTAMP
+    click_timestamp TIMESTAMPTZ
 ) WITH (
     connector = 'kafka',
     kafka.topic = 'ad_click',

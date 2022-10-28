@@ -6,7 +6,7 @@ select
 from
     tumble(
         prometheus,
-        timestamp :: TIMESTAMP,
+        timestamp,
         interval '30 s'
     )
 group by

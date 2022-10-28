@@ -3,8 +3,8 @@
 create source ad_source (
     user_id bigint,
     ad_id bigint,
-    click_timestamp timestamp,
-    impression_timestamp timestamp
+    click_timestamp timestamptz,
+    impression_timestamp timestamptz
 ) with (
     connector = 'kafka',
     kafka.topic = 'ad_clicks',

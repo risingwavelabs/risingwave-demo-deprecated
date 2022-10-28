@@ -2,11 +2,11 @@
 -- The Kafka source version
 --
 CREATE SOURCE twitter (
-    data STRUCT < created_at TIMESTAMP,
+    data STRUCT < created_at TIMESTAMPTZ,
     id VARCHAR,
     text VARCHAR,
     lang VARCHAR >,
-    author STRUCT < created_at TIMESTAMP,
+    author STRUCT < created_at TIMESTAMPTZ,
     id VARCHAR,
     name VARCHAR,
     username VARCHAR,
