@@ -321,7 +321,6 @@ services:
       - "9092"
     ports:
       - "9092:9092"
-      - "9644:9644"
     depends_on: []
     volumes:
       - "message_queue:/var/lib/redpanda/data"
