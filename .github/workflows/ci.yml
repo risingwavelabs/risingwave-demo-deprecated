@@ -16,6 +16,7 @@ jobs:
           - live-stream
           - twitter
           - twitter-pulsar
+          - prometheus
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
