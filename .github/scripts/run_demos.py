@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from cProfile import run
 from os.path import (dirname, abspath)
 import os
 import subprocess
