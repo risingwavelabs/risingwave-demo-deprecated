@@ -1,23 +1,12 @@
 #!/usr/bin/python3
 
+from cProfile import run
 from os.path import (dirname, abspath)
 import os
 import subprocess
 from time import sleep
+import sys
 
-
-demos = [
-    "ad-click",
-    "ad-ctr",
-    "cdn-metrics",
-    "clickstream",
-    "docker",
-    # "delivery",
-    # "ecommerce",
-    "live-stream",
-    "twitter",
-    "twitter-pulsar"
-]
 
 redpanda_smp = "REDPANDA_SMP_NUM={}".format(round(os.cpu_count()/2+1))
 print(redpanda_smp)
@@ -61,5 +50,4 @@ def run_demo(demo: str):
     subprocess.run(["docker", "compose", "down"], cwd=demo_dir, check=True)
 
 
-for demo in demos:
-    run_demo(demo)
+run_demo(sys.argv[1])

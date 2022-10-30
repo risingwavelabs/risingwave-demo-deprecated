@@ -5,14 +5,23 @@ on:
 
 jobs:
   run-demos:
+    strategy:
+      matrix:
+        testcase:
+          - ad-click
+          - ad-ctr
+          - cdn-metrics
+          - clickstream
+          - docker
+          - live-stream
+          - twitter
+          - twitter-pulsar
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      -
-        name: Run Demos
+      - name: Run Demos
         working-directory: .github/scripts
-        run: python3 run_demos.py 
+        run: python3 run_demos.py ${{ matrix.testcase }}
