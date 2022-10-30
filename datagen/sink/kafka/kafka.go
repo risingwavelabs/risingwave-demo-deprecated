@@ -13,12 +13,16 @@ import (
 
 type KafkaConfig struct {
 	Brokers string
+
+	// Do not recreate the Kafka topic when it exists. The default value is false.
+	// It can be enabled if datagen is not authorized to create topic.
+	NoRecreateIfExists bool
 }
 
 type KafkaSink struct {
-	admin   sarama.ClusterAdmin
-	brokers string
-	client  sarama.AsyncProducer
+	admin  sarama.ClusterAdmin
+	cfg    KafkaConfig
+	client sarama.AsyncProducer
 }
 
 func newKafkaConfig() *sarama.Config {
@@ -53,9 +57,9 @@ func OpenKafkaSink(ctx context.Context, cfg KafkaConfig) (*KafkaSink, error) {
 		return nil, fmt.Errorf("NewAsyncProducer failed: %v", err)
 	}
 	p := &KafkaSink{
-		admin:   admin,
-		brokers: cfg.Brokers,
-		client:  client,
+		admin:  admin,
+		cfg:    cfg,
+		client: client,
 	}
 	go func() {
 		p.consumeSuccesses(ctx)
@@ -73,21 +77,31 @@ func (p *KafkaSink) consumeSuccesses(ctx context.Context) {
 	}
 }
 
-func CreateRequiredTopics(admin sarama.ClusterAdmin, keys []string) error {
+func (p *KafkaSink) createRequiredTopics(admin sarama.ClusterAdmin, keys []string) error {
 	topics, err := admin.ListTopics()
 	if err != nil {
 		return err
 	}
 	for _, t := range keys {
-		if err := createTopic(admin, t, topics); err != nil {
+		if err := p.createTopic(admin, t, topics); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama.TopicDetail) error {
-	if _, exists := topics[key]; exists {
+func (p *KafkaSink) createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama.TopicDetail) error {
+	_, exists := topics[key]
+	if p.cfg.NoRecreateIfExists {
+		if exists {
+			// The topic already exists, and we don't want to recreate it.
+			return nil
+		} else {
+			return fmt.Errorf("topic \"%s\" does not exist", key)
+		}
+	}
+	if exists {
+		// Recreate the topic if it exists.
 		if err := admin.DeleteTopic(key); err != nil {
 			log.Printf("Deleted an existing topic: %s", key)
 			return err
@@ -101,7 +115,7 @@ func createTopic(admin sarama.ClusterAdmin, key string, topics map[string]sarama
 }
 
 func (p *KafkaSink) Prepare(topics []string) error {
-	return CreateRequiredTopics(p.admin, topics)
+	return p.createRequiredTopics(p.admin, topics)
 }
 
 func (p *KafkaSink) Close() error {

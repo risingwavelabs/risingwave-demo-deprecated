@@ -77,6 +77,12 @@ func main() {
 						Required:    true,
 						Destination: &cfg.Kafka.Brokers,
 					},
+					cli.BoolFlag{
+						Name:        "no-recreate",
+						Usage:       "Do not recreate the Kafka topic when it exists.",
+						Required:    false,
+						Destination: &cfg.Kafka.NoRecreateIfExists,
+					},
 				},
 				Action: func(c *cli.Context) error {
 					cfg.Sink = "kafka"
