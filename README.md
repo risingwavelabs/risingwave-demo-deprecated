@@ -8,6 +8,7 @@ Here is a gallery of demos that present how to use RisingWave alongwith the ecos
 - `clickstream`: [Clickstream analysis](https://www.risingwave.dev/docs/latest/clickstream-analysis/)
 - `twitter`: [Fast Twitter events processing](https://www.risingwave.dev/docs/latest/fast-twitter-events-processing/)
 - `twitter-pulsar`: [Tutorial: Pulsar + RisingWave for Fast Twitter Event Processing](https://www.risingwave.com/blog/tutorial-pulsar-risingwave-for-fast-twitter-events-processing/)
+- `live-stream`: [Live stream metrics analysis](https://www.risingwave.dev/docs/latest/live-stream-metrics-analysis/)
 
 ## Workload Generator
 
