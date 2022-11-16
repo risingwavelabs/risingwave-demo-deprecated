@@ -4,7 +4,7 @@ on:
   push:
     # run only against tags
     tags:
-      - '*'
+      - "*"
 
 permissions:
   contents: write
@@ -13,21 +13,17 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      -
-        name: Fetch all tags
+      - name: Fetch all tags
         run: git fetch --force --tags
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.18
-      -
-        name: Run GoReleaser
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
@@ -36,3 +32,40 @@ jobs:
           workdir: ./datagen
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload_images:
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+
+      - name: Download all necessary images
+        run: |
+          cd docker
+          docker compose pull
+          docker save $(docker images -q) -o $PACKAGE_NAME
+          zip $PACKAGE_NAME.zip $PACKAGE_NAME
+        env:
+          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}
+
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Upload release binary
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./docker/$PACKAGE_NAME
+          asset_name: $PACKAGE_NAME
+          asset_content_type: application/zip
