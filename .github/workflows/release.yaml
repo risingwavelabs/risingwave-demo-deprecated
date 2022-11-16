@@ -51,7 +51,7 @@ jobs:
           docker save $(docker images -q) -o $PACKAGE_NAME
           zip $PACKAGE_NAME.zip $PACKAGE_NAME
         env:
-          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}
+          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}-linux-amd64
 
       - name: Get release
         id: get_release
@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}
+          PACKAGE_NAME: risingwave-compose-nightly-${{ steps.date.outputs.date }}-linux-amd64
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: ./docker/$PACKAGE_NAME
