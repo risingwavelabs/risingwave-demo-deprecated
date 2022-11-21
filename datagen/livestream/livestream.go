@@ -3,6 +3,7 @@ package livestream
 import (
 	"context"
 	"datagen/gen"
+	"datagen/livestream/proto"
 	"datagen/sink"
 	"encoding/json"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	protobuf "google.golang.org/protobuf/proto"
 )
 
 type liveClient struct {
@@ -81,8 +83,30 @@ VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, '%s', '%s')
 		r.Ip, r.Agent, r.Id, r.RoomId, r.VideoBps, r.VideoFps, r.VideoRtt, r.VideoLostPps, r.VideoLongestFreezeDuration, r.VideoTotalFreezeDuration, r.ReportTimestamp, r.Country)
 }
 
-func (r *liveMetric) ToKafka() (topic string, key string, data []byte) {
+func (r *liveMetric) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
+	return "live_stream_metrics", fmt.Sprint(r.Id), data
+}
+
+func (r *liveMetric) ToProtobuf() (topic string, key string, data []byte) {
+	m := proto.LiveStreamMetrics{
+		ClientIp:                   r.Ip,
+		UserAgent:                  r.Agent,
+		UserId:                     r.Id,
+		RoomId:                     r.RoomId,
+		VideoBps:                   r.VideoBps,
+		VideoFps:                   r.VideoFps,
+		VideoRtt:                   r.VideoRtt,
+		VideoLostPps:               r.VideoLostPps,
+		VideoLongestFreezeDuration: r.VideoLongestFreezeDuration,
+		VideoTotalFreezeDuration:   r.VideoTotalFreezeDuration,
+		ReportTimestamp:            time.Now().Unix(),
+		Country:                    r.Country,
+	}
+	data, err := protobuf.Marshal(&m)
+	if err != nil {
+		panic(err)
+	}
 	return "live_stream_metrics", fmt.Sprint(r.Id), data
 }
 

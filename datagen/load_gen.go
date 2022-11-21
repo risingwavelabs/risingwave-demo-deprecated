@@ -17,9 +17,10 @@ import (
 	"datagen/sink/pulsar"
 	"datagen/twitter"
 	"fmt"
-	"go.uber.org/ratelimit"
 	"log"
 	"time"
+
+	"go.uber.org/ratelimit"
 )
 
 func createSink(ctx context.Context, cfg gen.GeneratorConfig) (sink.Sink, error) {
@@ -112,7 +113,7 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 				fmt.Println(record.ToPostgresSql())
 			}
 			// Consume records from the channel and send to sink.
-			if err := sinkImpl.WriteRecord(ctx, record); err != nil {
+			if err := sinkImpl.WriteRecord(ctx, cfg.Format, record); err != nil {
 				return err
 			}
 			_ = rl.Take()

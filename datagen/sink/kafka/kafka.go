@@ -123,8 +123,8 @@ func (p *KafkaSink) Close() error {
 	return nil
 }
 
-func (p *KafkaSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
-	topic, key, data := record.ToKafka()
+func (p *KafkaSink) WriteRecord(ctx context.Context, format string, record sink.SinkRecord) error {
+	topic, key, data := sink.RecordToKafka(record, format)
 	msg := &sarama.ProducerMessage{}
 	msg.Topic = topic
 	msg.Key = sarama.StringEncoder(key)

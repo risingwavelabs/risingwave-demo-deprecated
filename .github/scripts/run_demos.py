@@ -5,7 +5,7 @@ import os
 import subprocess
 from time import sleep
 import sys
-
+import argparse
 
 redpanda_smp = "REDPANDA_SMP_NUM={}".format(round(os.cpu_count()/2+1))
 print(redpanda_smp)
@@ -20,7 +20,7 @@ def run_sql_file(f: str, dir: str):
                    cwd=dir, check=True, capture_output=True)
 
 
-def run_demo(demo: str):
+def run_demo(demo: str, format: str):
     file_dir = dirname(abspath(__file__))
     project_dir = dirname(dirname(file_dir))
     demo_dir = os.path.join(project_dir, demo)
@@ -34,7 +34,13 @@ def run_demo(demo: str):
                    cwd=demo_dir, check=True)
     sleep(40)
 
-    sql_file = os.path.join(demo_dir, "create_source.sql")
+    if format == 'json':
+        source_file = 'create_source.sql'
+    elif format == 'protobuf':
+        source_file = 'create_source_pb.sql'
+    else:
+        raise Exception("Unknown format: {}".format(format))
+    sql_file = os.path.join(demo_dir, source_file)
     run_sql_file(sql_file, demo_dir)
     sleep(10)
 
@@ -49,4 +55,16 @@ def run_demo(demo: str):
     subprocess.run(["docker", "compose", "down"], cwd=demo_dir, check=True)
 
 
-run_demo(sys.argv[1])
+arg_parser = argparse.ArgumentParser(description='Run the demo')
+arg_parser.add_argument('--format',
+                        metavar='format',
+                        type=str,
+                        help='the format of output data',
+                        default='json')
+arg_parser.add_argument('--case',
+                        metavar='case',
+                        type=str,
+                        help='the test case')
+args = arg_parser.parse_args()
+
+run_demo(args.case, args.format)
