@@ -303,7 +303,7 @@ services:
       - redpanda
       - start
       - "--smp"
-      - "${REDPANDA_SMP_NUM:-4}" # default to 4 threads
+      - "2"
       - "--reserve-memory"
       - "0"
       - "--memory"
