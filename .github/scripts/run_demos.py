@@ -2,6 +2,7 @@
 
 from os.path import (dirname, abspath)
 import os
+import sys
 import subprocess
 from time import sleep
 import argparse
@@ -11,9 +12,11 @@ def run_sql_file(f: str, dir: str):
     print("Running SQL file: {}".format(f))
     # ON_ERROR_STOP=1 will let psql return error code when the query fails.
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
-    subprocess.run(["psql", "-h", "localhost", "-p", "4566",
-                    "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"],
-                   cwd=dir)
+    proc = subprocess.run(["psql", "-h", "localhost", "-p", "4566",
+                           "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"],
+                          cwd=dir)
+    if proc.returncode != 0:
+        sys.exit(1)
 
 
 def run_demo(demo: str, format: str):

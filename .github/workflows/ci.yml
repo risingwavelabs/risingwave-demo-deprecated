@@ -71,5 +71,10 @@ jobs:
           python3 gen_docker_compose.py --case ${{ matrix.testcase }} --format ${{ matrix.format }}
           python3 run_demos.py --case ${{ matrix.testcase }} --format ${{ matrix.format }}
 
+      - name: Step to run on failure
+        if: ${{ failure() }}
+        run: |
+          docker compose logs
+
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
