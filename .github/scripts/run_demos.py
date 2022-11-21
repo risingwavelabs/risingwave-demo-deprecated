@@ -4,11 +4,7 @@ from os.path import (dirname, abspath)
 import os
 import subprocess
 from time import sleep
-import sys
 import argparse
-
-redpanda_smp = "REDPANDA_SMP_NUM={}".format(round(os.cpu_count()/2+1))
-print(redpanda_smp)
 
 
 def run_sql_file(f: str, dir: str):
@@ -17,7 +13,7 @@ def run_sql_file(f: str, dir: str):
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
     subprocess.run(["psql", "-h", "localhost", "-p", "4566",
                     "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"],
-                   cwd=dir, check=True, capture_output=True)
+                   cwd=dir)
 
 
 def run_demo(demo: str, format: str):
@@ -25,10 +21,6 @@ def run_demo(demo: str, format: str):
     project_dir = dirname(dirname(file_dir))
     demo_dir = os.path.join(project_dir, demo)
     print("Running demo: {}".format(demo))
-
-    f = open("{}/{}".format(demo_dir, ".env"), "w")
-    f.write(redpanda_smp)
-    f.close()
 
     subprocess.run(["docker", "compose", "up", "-d"],
                    cwd=demo_dir, check=True)
