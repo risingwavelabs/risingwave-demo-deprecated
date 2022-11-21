@@ -32,9 +32,8 @@ jobs:
           - cdn-metrics
           - clickstream
           - docker
-          - live-stream
+          - livestream
           - twitter
-          - twitter-pulsar
           - prometheus
         format: ["json", "protobuf"]
         exclude:
@@ -49,8 +48,6 @@ jobs:
           - testcase: docker
             format: protobuf
           - testcase: twitter
-            format: protobuf
-          - testcase: twitter-pulsar
             format: protobuf
           - testcase: prometheus
             format: protobuf
