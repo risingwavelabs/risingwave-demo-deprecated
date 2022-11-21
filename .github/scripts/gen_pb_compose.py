@@ -39,4 +39,4 @@ project_dir = dirname(dirname(file_dir))
 demo_dir = os.path.join(project_dir, demo)
 demo_compose = os.path.join(demo_dir, 'docker-compose.yml')
 
-gen_docker_compose(demo)
+gen_docker_compose(demo_compose)
