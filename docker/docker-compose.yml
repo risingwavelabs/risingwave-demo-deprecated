@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221031"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - compactor-node
       - "--host"
@@ -43,7 +43,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221031"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - compute-node
       - "--host"
@@ -126,7 +126,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221031"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - frontend-node
       - "--host"
@@ -187,7 +187,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221031"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - meta-node
       - "--listen-addr"
