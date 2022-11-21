@@ -53,7 +53,7 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return ecommerce.NewEcommerceGen(), nil
 	} else if cfg.Mode == "delivery" {
 		return delivery.NewOrderEventGen(cfg), nil
-	} else if cfg.Mode == "livestream" {
+	} else if cfg.Mode == "livestream" || cfg.Mode == "superset" {
 		return livestream.NewLiveStreamMetricsGen(cfg), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)

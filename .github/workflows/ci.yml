@@ -65,10 +65,14 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
 
+      - name: Rewrite docker compose for protobuf 
+        if: ${{ matrix.format == 'protobuf' }}
+        run: |
+          python3 gen_pb_compose.py ${{ matrix.testcase }}      
+
       - name: Run Demos
         working-directory: .github/scripts
         run: |
-          python3 gen_docker_compose.py --case ${{ matrix.testcase }} --format ${{ matrix.format }}
           python3 run_demos.py --case ${{ matrix.testcase }} --format ${{ matrix.format }}
 
       - name: Step to run on failure

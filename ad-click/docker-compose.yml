@@ -338,6 +338,4 @@ volumes:
     external: false
   prometheus-0:
     external: false
-  message_queue:
-    external: false
 name: risingwave-compose
