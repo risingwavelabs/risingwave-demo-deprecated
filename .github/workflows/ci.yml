@@ -37,25 +37,23 @@ jobs:
           - twitter-pulsar
           - prometheus
         format: ["json", "protobuf"]
-        include:
+        exclude:
           - testcase: ad-click
-            format: json
+            format: protobuf
           - testcase: ad-ctr
-            format: json
+            format: protobuf
           - testcase: cdn-metrics
-            format: json
+            format: protobuf
           - testcase: clickstream
-            format: json
+            format: protobuf
           - testcase: docker
-            format: json
-          - testcase: live-stream
-            format: json
+            format: protobuf
           - testcase: twitter
-            format: json
+            format: protobuf
           - testcase: twitter-pulsar
-            format: json
+            format: protobuf
           - testcase: prometheus
-            format: json
+            format: protobuf
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
