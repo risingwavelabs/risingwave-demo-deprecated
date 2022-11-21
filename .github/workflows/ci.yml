@@ -16,7 +16,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           working-directory: datagen
-          args: --timeout=30s
+          args: --timeout=90s
       - name: Go build
         run: |
           go mod tidy
@@ -26,25 +26,35 @@ jobs:
   run-demos:
     strategy:
       matrix:
+        testcase:
+          - ad-click
+          - ad-ctr
+          - cdn-metrics
+          - clickstream
+          - docker
+          - live-stream
+          - twitter
+          - twitter-pulsar
+          - prometheus
         format: ["json", "protobuf"]
         include:
-          - testcase: "ad-click"
+          - testcase: ad-click
             format: json
-          - testcase: "ad-ctr"
+          - testcase: ad-ctr
             format: json
-          - testcase: "cdn-metrics"
+          - testcase: cdn-metrics
             format: json
-          - testcase: "clickstream"
+          - testcase: clickstream
             format: json
-          - testcase: "docker"
+          - testcase: docker
             format: json
-          - testcase: "live-stream"
+          - testcase: live-stream
             format: json
-          - testcase: "twitter"
+          - testcase: twitter
             format: json
-          - testcase: "twitter-pulsar"
+          - testcase: twitter-pulsar
             format: json
-          - testcase: "prometheus"
+          - testcase: prometheus
             format: json
     runs-on: ubuntu-latest
     steps:
