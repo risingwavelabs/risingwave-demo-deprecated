@@ -16,7 +16,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           working-directory: datagen
-          args: --timeout=90s
+          args: --timeout=120s
       - name: Go build
         run: |
           go mod tidy
@@ -73,6 +73,7 @@ jobs:
 
       - name: Step to run on failure
         if: ${{ failure() }}
+        working-directory: ./${{ matrix.testcase }}
         run: |
           docker compose logs
 
