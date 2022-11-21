@@ -17,7 +17,7 @@ SELECT
     video_lost_pps,
     video_longest_freeze_duration,
     video_total_freeze_duration,
-    to_timestamp(report_timestamp),
+    to_timestamp(report_timestamp) as report_timestamp,
     country
 FROM
     live_stream_metrics_pb;
