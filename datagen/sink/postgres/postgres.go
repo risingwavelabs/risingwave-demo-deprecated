@@ -35,7 +35,7 @@ func (p *PostgresSink) Close() error {
 	return p.db.Close()
 }
 
-func (p *PostgresSink) WriteRecord(ctx context.Context, record sink.SinkRecord) error {
+func (p *PostgresSink) WriteRecord(ctx context.Context, format string, record sink.SinkRecord) error {
 	query := record.ToPostgresSql()
 	_, err := p.db.ExecContext(ctx, query)
 	if err != nil {

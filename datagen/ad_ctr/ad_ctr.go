@@ -23,9 +23,13 @@ func (r *adImpressionEvent) ToPostgresSql() string {
 		"ad_impression", r.BidId, r.AdId, r.ImpressionTimestamp)
 }
 
-func (r *adImpressionEvent) ToKafka() (topic string, key string, data []byte) {
+func (r *adImpressionEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "ad_impression", fmt.Sprint(r.BidId), data
+}
+
+func (r *adImpressionEvent) ToProtobuf() (topic string, key string, data []byte) {
+	return "ad_impression", fmt.Sprint(r.BidId), []byte{}
 }
 
 type adClickEvent struct {
@@ -38,9 +42,13 @@ func (r *adClickEvent) ToPostgresSql() string {
 		"ad_click", r.BidId, r.ClickTimestamp)
 }
 
-func (r *adClickEvent) ToKafka() (topic string, key string, data []byte) {
+func (r *adClickEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "ad_click", fmt.Sprint(r.BidId), data
+}
+
+func (r *adClickEvent) ToProtobuf() (topic string, key string, data []byte) {
+	return "ad_click", fmt.Sprint(r.BidId), []byte{}
 }
 
 type adCtrGen struct {

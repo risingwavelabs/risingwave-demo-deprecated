@@ -17,9 +17,10 @@ import (
 	"datagen/sink/pulsar"
 	"datagen/twitter"
 	"fmt"
-	"go.uber.org/ratelimit"
 	"log"
 	"time"
+
+	"go.uber.org/ratelimit"
 )
 
 func createSink(ctx context.Context, cfg gen.GeneratorConfig) (sink.Sink, error) {
@@ -52,7 +53,7 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return ecommerce.NewEcommerceGen(), nil
 	} else if cfg.Mode == "delivery" {
 		return delivery.NewOrderEventGen(cfg), nil
-	} else if cfg.Mode == "livestream" {
+	} else if cfg.Mode == "livestream" || cfg.Mode == "superset" {
 		return livestream.NewLiveStreamMetricsGen(cfg), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)
@@ -112,7 +113,7 @@ func generateLoad(ctx context.Context, cfg gen.GeneratorConfig) error {
 				fmt.Println(record.ToPostgresSql())
 			}
 			// Consume records from the channel and send to sink.
-			if err := sinkImpl.WriteRecord(ctx, record); err != nil {
+			if err := sinkImpl.WriteRecord(ctx, cfg.Format, record); err != nil {
 				return err
 			}
 			_ = rl.Take()

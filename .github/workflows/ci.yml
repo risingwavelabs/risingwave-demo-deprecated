@@ -4,6 +4,25 @@ on:
   pull_request:
 
 jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: datagen
+          args: --timeout=120s
+      - name: Go build
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+          go build .
+        working-directory: datagen
   run-demos:
     strategy:
       matrix:
@@ -13,10 +32,25 @@ jobs:
           - cdn-metrics
           - clickstream
           - docker
-          - live-stream
+          - livestream
           - twitter
-          - twitter-pulsar
           - prometheus
+        format: ["json", "protobuf"]
+        exclude:
+          - testcase: ad-click
+            format: protobuf
+          - testcase: ad-ctr
+            format: protobuf
+          - testcase: cdn-metrics
+            format: protobuf
+          - testcase: clickstream
+            format: protobuf
+          - testcase: docker
+            format: protobuf
+          - testcase: twitter
+            format: protobuf
+          - testcase: prometheus
+            format: protobuf
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,9 +65,22 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
 
+      - name: Rewrite docker compose for protobuf 
+        working-directory: .github/scripts
+        if: ${{ matrix.format == 'protobuf' }}
+        run: |
+          python3 gen_pb_compose.py ${{ matrix.testcase }}      
+
       - name: Run Demos
         working-directory: .github/scripts
-        run: python3 run_demos.py ${{ matrix.testcase }}
+        run: |
+          python3 run_demos.py --case ${{ matrix.testcase }} --format ${{ matrix.format }}
+
+      - name: Step to run on failure
+        if: ${{ failure() }}
+        working-directory: ./${{ matrix.testcase }}
+        run: |
+          docker compose logs
 
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true

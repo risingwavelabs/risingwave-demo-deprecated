@@ -29,6 +29,9 @@ type GeneratorConfig struct {
 	// Whether the tail probability is high.
 	// If true, We will use uniform distribution for randomizing values.
 	HeavyTail bool
+
+	// The record format, used when the sink is a message queue.
+	Format string
 }
 
 type LoadGenerator interface {

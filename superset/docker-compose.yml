@@ -12,7 +12,7 @@ x-superset-volumes:
 version: "3.7"
 services:
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221020"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - compactor-node
       - "--host"
@@ -53,7 +53,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221020"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - compute-node
       - "--host"
@@ -136,7 +136,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221020"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - frontend-node
       - "--host"
@@ -197,7 +197,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221020"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
     command:
       - meta-node
       - "--listen-addr"
@@ -308,33 +308,16 @@ services:
       timeout: 5s
       retries: 5
   message_queue:
-    image: "docker.vectorized.io/vectorized/redpanda:latest"
+    image: docker.redpanda.com/vectorized/redpanda:latest
     command:
-      - redpanda
-      - start
-      - "--smp"
-      - "${REDPANDA_SMP_NUM:-4}" # default to 4 threads
-      - "--reserve-memory"
-      - "0"
-      - "--memory"
-      - 1G
-      - "--overprovisioned"
-      - "--node-id"
-      - "0"
-      - "--check=false"
-      - "--kafka-addr"
-      - "PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092"
-      - "--advertise-kafka-addr"
-      - "PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092"
-    expose:
-      - "29092"
-      - "9092"
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092
     ports:
-      - "9092:9092"
-    depends_on: []
-    volumes:
-      - "message_queue:/var/lib/redpanda/data"
-    environment: {}
+      - 29092:29092
     container_name: message_queue
     healthcheck:
       test:
@@ -429,7 +412,5 @@ volumes:
   minio-0:
     external: false
   prometheus-0:
-    external: false
-  message_queue:
     external: false
 name: risingwave-compose

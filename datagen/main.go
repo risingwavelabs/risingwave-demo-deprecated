@@ -149,6 +149,13 @@ func main() {
 				Required:    true,
 				Destination: &cfg.Mode,
 			},
+			cli.StringFlag{
+				Name:        "format",
+				Usage:       "The output record format: json | protobuf. Used when the sink is a message queue.",
+				Value:       "json",
+				Required:    false,
+				Destination: &cfg.Format,
+			},
 			cli.BoolFlag{
 				Name:        "heavytail",
 				Usage:       "Whether the tail probability is high. If true We will use uniform distribution for randomizing values.",

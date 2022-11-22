@@ -22,9 +22,13 @@ func (r *clickEvent) ToPostgresSql() string {
 		"ad_source", r.UserId, r.AdId, r.ClickTimestamp, r.ImpressionTimestamp)
 }
 
-func (r *clickEvent) ToKafka() (topic string, key string, data []byte) {
+func (r *clickEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "ad_clicks", fmt.Sprint(r.UserId), data
+}
+
+func (r *clickEvent) ToProtobuf() (topic string, key string, data []byte) {
+	return "ad_clicks", fmt.Sprint(r.UserId), []byte{}
 }
 
 type adClickGen struct {

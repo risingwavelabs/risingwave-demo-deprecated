@@ -11,6 +11,7 @@ require (
 	github.com/urfave/cli v1.22.10
 	go.uber.org/ratelimit v0.2.0
 	gonum.org/v1/gonum v0.12.0
+	google.golang.org/protobuf v1.28.1
 )
 
 require (
@@ -72,6 +73,5 @@ require (
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
