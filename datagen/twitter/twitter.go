@@ -4,12 +4,14 @@ import (
 	"context"
 	"datagen/gen"
 	"datagen/sink"
+	"datagen/twitter/proto"
 	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	protobuf "google.golang.org/protobuf/proto"
 )
 
 type tweetData struct {
@@ -51,7 +53,26 @@ func (r *twitterEvent) ToJson() (topic string, key string, data []byte) {
 }
 
 func (r *twitterEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "twitter", r.Data.Id, []byte{}
+	m := proto.Event{
+		Data: &proto.TweetData{
+			CreatedAt: r.Data.CreatedAt,
+			Id:        r.Data.Id,
+			Text:      r.Data.Text,
+			Lang:      r.Data.Lang,
+		},
+		Author: &proto.User{
+			CreatedAt: r.Author.CreatedAt,
+			Id:        r.Author.Id,
+			Name:      r.Author.Name,
+			UserName:  r.Author.UserName,
+			Followers: int64(r.Author.Followers),
+		},
+	}
+	data, err := protobuf.Marshal(&m)
+	if err != nil {
+		panic(err)
+	}
+	return "twitter", r.Data.Id, data
 }
 
 type twitterGen struct {
