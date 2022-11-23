@@ -29,23 +29,19 @@ def run_demo(demo: str, format: str):
                    cwd=demo_dir, check=True)
     sleep(40)
 
-    if format == 'json':
-        source_file = 'create_source.sql'
-    elif format == 'protobuf':
-        source_file = 'create_source_pb.sql'
-    else:
-        raise Exception("Unknown format: {}".format(format))
-    sql_file = os.path.join(demo_dir, source_file)
-    run_sql_file(sql_file, demo_dir)
-    sleep(10)
-
-    sql_file = os.path.join(demo_dir, "create_mv.sql")
-    run_sql_file(sql_file, demo_dir)
-    sleep(10)
-
-    sql_file = os.path.join(demo_dir, "query.sql")
-    run_sql_file(sql_file, demo_dir)
-    sleep(10)
+    sql_files = ['create_source.sql', 'create_mv.sql', 'query.sql']
+    for fname in sql_files:
+        if format == 'protobuf':
+            sql_file = os.path.join(demo_dir, "pb", fname)
+            if os.path.isfile(sql_file):
+                # Try to run the protobuf version first.
+                run_sql_file(sql_file, demo_dir)
+                sleep(10)
+                continue
+            # Fallback to default version when the protobuf version doesn't exist.
+        sql_file = os.path.join(demo_dir,  fname)
+        run_sql_file(sql_file, demo_dir)
+        sleep(10)
 
     subprocess.run(["docker", "compose", "down"], cwd=demo_dir, check=True)
 

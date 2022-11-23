@@ -47,8 +47,6 @@ jobs:
             format: protobuf
           - testcase: docker
             format: protobuf
-          - testcase: twitter
-            format: protobuf
           - testcase: prometheus
             format: protobuf
     runs-on: ubuntu-latest
