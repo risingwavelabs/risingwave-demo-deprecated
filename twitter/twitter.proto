@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package twitter.schema;
+package schema;
 option go_package = "twitter/proto";
 
 message Event {
