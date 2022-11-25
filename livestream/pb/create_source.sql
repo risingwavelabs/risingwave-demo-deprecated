@@ -3,7 +3,7 @@ CREATE SOURCE live_stream_metrics_pb WITH (
     kafka.topic = 'live_stream_metrics',
     kafka.brokers = 'message_queue:29092',
     kafka.scan.startup.mode = 'earliest'
-) ROW FORMAT PROTOBUF MESSAGE 'schema.LiveStreamMetrics' ROW SCHEMA LOCATION 'http://file_server:8080/schema';
+) ROW FORMAT PROTOBUF MESSAGE 'livestream.schema.LiveStreamMetrics' ROW SCHEMA LOCATION 'http://file_server:8080/schema';
 
 CREATE MATERIALIZED VIEW live_stream_metrics AS
 SELECT

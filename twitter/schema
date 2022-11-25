@@ -1,9 +1,9 @@
 
-ð
-schema.protoschema"T
-Event%
-data (2.schema.TweetDataRdata$
-author (2.schema.UserRauthor"b
+‰
+twitter.prototwitter.schema"d
+Event-
+data (2.twitter.schema.TweetDataRdata,
+author (2.twitter.schema.UserRauthor"b
 	TweetData
 id (	Rid
 text (	Rtext

@@ -1,6 +1,6 @@
 
-æ
-schema.protoschema"Å
+‰
+livestream.protolivestream.schema"Å
 LiveStreamMetrics
 	client_ip (	RclientIp
 
@@ -15,4 +15,4 @@ user_agent (	R	userAgent
 video_total_freeze_duration
  (RvideoTotalFreezeDuration)
 report_timestamp (RreportTimestamp
-country (	Rcountrybproto3
+country (	RcountryBZlivestream/protobproto3
