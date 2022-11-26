@@ -43,7 +43,6 @@ data_check = os.path.join(demo_dir, 'data_check')
 with open(data_check) as f:
     relations = f.read().split(",")
     for rel in relations:
-        print("Checking relation: {}".format(rel))
         create_mv(rel)
     time.sleep(10)
     for rel in relations:
