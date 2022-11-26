@@ -43,8 +43,6 @@ def run_demo(demo: str, format: str):
         run_sql_file(sql_file, demo_dir)
         sleep(10)
 
-    subprocess.run(["docker", "compose", "down"], cwd=demo_dir, check=True)
-
 
 arg_parser = argparse.ArgumentParser(description='Run the demo')
 arg_parser.add_argument('--format',

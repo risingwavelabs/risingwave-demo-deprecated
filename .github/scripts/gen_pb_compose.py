@@ -21,8 +21,8 @@ def gen_docker_compose(demo_compose: str):
     content = ""
     with open(demo_compose) as file:
         for line in file:
-            # if line.startswith("      - /datagen"):
-            #     line = line + " --format protobuf"
+            line = line.replace("      - /datagen",
+                                "      - /datagen --format protobuf")
             if line == 'volumes:\n':
                 content += file_server
             content += line
