@@ -124,7 +124,7 @@ func (t *twitterGen) generate() twitterEvent {
 	return twitterEvent{
 		Data: tweetData{
 			Id:        id,
-			CreatedAt: time.Now().Format("2006-01-02 15:04:05.07"),
+			CreatedAt: time.Now().Format(gen.RwTimestampLayout),
 			Text:      sentence,
 			Lang:      gofakeit.Language(),
 		},
