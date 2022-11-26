@@ -21,17 +21,15 @@ def create_mv(rel: str):
 
 def check_mv(rel: str):
     rows = run_sql("SELECT COUNT(*) FROM {}_mv".format(rel))
+    rows = int(rows.decode('utf8').strip())
     print("{} rows in {}".format(rows, rel))
-    assert int(str(rows).strip()) >= 1
+    assert rows >= 1
 
 
 def run_sql(sql):
     print("Running SQL: {}".format(sql))
-    proc = subprocess.run(["psql", "-h", "localhost", "-p", "4566",
-                           "-d", "dev", "-U", "root", "--tuples-only", "-c", sql])
-    if proc.returncode != 0:
-        sys.exit(1)
-    return proc.stdout
+    return subprocess.check_output(["psql", "-h", "localhost", "-p", "4566",
+                                    "-d", "dev", "-U", "root", "--tuples-only", "-c", sql])
 
 
 demo = sys.argv[1]
