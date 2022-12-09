@@ -228,7 +228,8 @@ services:
       - "5690"
       - "1250"
       - "5691"
-    ports: []
+    ports:
+      - "5691:5691"
     depends_on: []
     volumes:
       - "../risingwave.toml:/risingwave.toml"
