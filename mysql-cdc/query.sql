@@ -1,6 +1,6 @@
 SELECT
     *
 FROM
-    mysql_table
+    orders
 LIMIT
     10;

@@ -60,6 +60,8 @@ services:
       - "http://meta-node-0:5690"
       - "--config-path"
       - /risingwave.toml
+      - "--connector-rpc-endpoint"
+      - "connector-node:50051"
     expose:
       - "5688"
       - "1222"
@@ -313,6 +315,11 @@ services:
       timeout: 5s
       retries: 5
     container_name: mysql
+  connector-node:
+    image: connector-node:latest
+    ports:
+      - "50051:50051"
+    container_name: connector-node
 volumes:
   compute-node-0:
     external: false
