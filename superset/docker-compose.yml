@@ -12,7 +12,7 @@ x-superset-volumes:
 version: "3.7"
 services:
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - compactor-node
       - "--host"
@@ -53,7 +53,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - compute-node
       - "--host"
@@ -136,7 +136,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - frontend-node
       - "--host"
@@ -197,7 +197,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221120"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - meta-node
       - "--listen-addr"
@@ -212,16 +212,6 @@ services:
       - etcd
       - "--etcd-endpoints"
       - "etcd-0:2388"
-      - "--vacuum-interval-sec"
-      - "30"
-      - "--max-heartbeat-interval-secs"
-      - "600"
-      - "--collect-gc-watermark-spin-interval-sec"
-      - "5"
-      - "--min-sst-retention-time-sec"
-      - "604800"
-      - "--periodic-compaction-interval-sec"
-      - "60"
       - "--config-path"
       - /risingwave.toml
     expose:
