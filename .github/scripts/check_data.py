@@ -44,6 +44,6 @@ with open(data_check) as f:
     relations = f.read().split(",")
     for rel in relations:
         create_mv(rel)
-    time.sleep(10)
+    time.sleep(20)
     for rel in relations:
         check_mv(rel)
