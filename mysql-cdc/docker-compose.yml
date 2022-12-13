@@ -63,6 +63,7 @@ services:
     depends_on:
       - meta-node-0
       - minio-0
+    volumes:
       - "compute-node-0:/filecache"
     environment:
       RUST_BACKTRACE: "1"
