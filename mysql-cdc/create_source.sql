@@ -7,11 +7,12 @@ create materialized source orders (
     order_status smallint,
     PRIMARY KEY (order_id)
 ) with (
-    connector = 'cdc',
-    database.hostname = 'mysql',
-    database.port = '3306',
-    database.user = 'root',
-    database.password = '123456',
+    connector = 'mysql-cdc',
+    hostname = 'mysql',
+    port = '3306',
+    username = 'root',
+    password = '123456',
     database.name = 'mydb',
-    table.name = 'orders'
-) row format debezium_json;
+    table.name = 'orders',
+    server.id = '1'
+);

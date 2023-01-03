@@ -1,4 +1,4 @@
--- `mysql -p123456 -h 127.0.0.1 mydb < mysql_prepare.sql`
+-- mysql -p123456 -uroot -h 127.0.0.1 mydb < mysql_prepare.sql
 --
 -- Mysql
 create table orders (
