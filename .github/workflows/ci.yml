@@ -35,6 +35,7 @@ jobs:
           - livestream
           - twitter
           - prometheus
+          - schema-registry
         format: ["json", "protobuf"]
         exclude:
           - testcase: ad-click
@@ -48,6 +49,9 @@ jobs:
           - testcase: docker
             format: protobuf
           - testcase: prometheus
+            format: protobuf
+          # This demo is showcasing avro + schema registry. So there's no file server for the schema file.
+          - testcase: schema-registry
             format: protobuf
     runs-on: ubuntu-latest
     steps:

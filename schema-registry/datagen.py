@@ -68,7 +68,7 @@ schema_v2 = r'''
       "default": 0
     },
     {
-      "name": "qq",
+      "name": "facebook_id",
       "type": "string",
       "default": ""
     },
@@ -100,7 +100,7 @@ def get_value_and_serializer(id, version, schema_registry_client):
     value = get_basic_value(id)
     value['schema_version'] = version
     if version == 'v2':
-        value['qq'] = "12345678"
+        value['facebook_id'] = "12345678"
     return value, AvroSerializer(schema_registry_client=schema_registry_client, schema_str=schemas[version])
 
 
