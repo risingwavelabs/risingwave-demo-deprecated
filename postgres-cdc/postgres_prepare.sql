@@ -1,6 +1,6 @@
 -- # import data to postgres
--- createdb -h db -U postgres cdc_test
--- psql -h db -U postgres -d cdc_test < postgres_prepare.sql
+-- createdb -U postgres cdc_test
+-- psql -U postgres -d cdc_test < postgres_prepare.sql
 
 create table orders (
   order_id int,
