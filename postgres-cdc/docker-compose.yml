@@ -314,10 +314,11 @@ services:
     command:
       - /bin/sh
       - -c
-      - "psql postgresql://postgres:postgres@postgres/cdc_test < postgres_prepare.sql"
+      - "psql postgresql://postgres:postgres@postgres:5432/cdc_test < postgres_prepare.sql"
     volumes:
       - "./postgres_prepare.sql:/postgres_prepare.sql"      
     container_name: datagen
+    restart: always
 volumes:
   compute-node-0:
     external: false
