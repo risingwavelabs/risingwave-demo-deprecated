@@ -307,6 +307,18 @@ services:
     ports:
       - "50051:50051"
     container_name: connector-node
+  datagen:
+    image: mysql:8.0
+    depends_on: 
+      - mysql
+    command:
+      - /bin/sh
+      - -c
+      - "mysql -p123456 -h mysql mydb < mysql_prepare.sql"
+    volumes:
+      - "./mysql_prepare.sql:/mysql_prepare.sql"      
+    container_name: datagen
+    restart: always
 volumes:
   compute-node-0:
     external: false

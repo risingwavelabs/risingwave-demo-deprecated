@@ -1,5 +1,4 @@
 -- # import data to postgres
--- createdb -U postgres cdc_test
 -- psql -U postgres -d cdc_test < postgres_prepare.sql
 
 create table orders (
@@ -12,7 +11,6 @@ create table orders (
   PRIMARY KEY (order_id)
 );
 
-ALTER SEQUENCE public.orders_order_id_seq RESTART WITH 1001;
 ALTER TABLE public.orders REPLICA IDENTITY FULL;
 
 insert into

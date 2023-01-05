@@ -293,6 +293,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+      - POSTGRES_DB=cdc_test
     ports:
       - 5432
     healthcheck:
@@ -306,6 +307,17 @@ services:
     ports:
       - "50051:50051"
     container_name: connector-node
+  datagen:
+    image: postgres
+    depends_on: 
+      - postgres
+    command:
+      - /bin/sh
+      - -c
+      - "psql postgresql://postgres:postgres@postgres/cdc_test < postgres_prepare.sql"
+    volumes:
+      - "./postgres_prepare.sql:/postgres_prepare.sql"      
+    container_name: datagen
 volumes:
   compute-node-0:
     external: false
