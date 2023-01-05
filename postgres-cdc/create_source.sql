@@ -7,12 +7,13 @@ create materialized source orders (
     order_status smallint,
     PRIMARY KEY (order_id)
 ) with (
-    connector = 'mysql-cdc',
-    hostname = 'mysql',
-    port = '3306',
-    username = 'root',
-    password = '123456',
-    database.name = 'mydb',
+    connector = 'postgres-cdc',
+    hostname = 'postgres',
+    port = '5432',
+    username = 'postgres',
+    password = 'postgres',
+    database.name = 'cdc_test',
+    schema.name = 'public',
     table.name = 'orders',
-    server.id = '1'
+    slot.name = 'orders'
 );

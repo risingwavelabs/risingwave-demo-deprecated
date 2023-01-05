@@ -1,7 +1,5 @@
--- mysql -p123456 -uroot -h 127.0.0.1 mydb < mysql_prepare.sql
---
--- Mysql
-USE mydb;
+-- # import data to postgres
+-- psql -U postgres -d cdc_test < postgres_prepare.sql
 
 create table orders (
   order_id int,
@@ -12,6 +10,8 @@ create table orders (
   order_status smallint,
   PRIMARY KEY (order_id)
 );
+
+ALTER TABLE public.orders REPLICA IDENTITY FULL;
 
 insert into
   orders

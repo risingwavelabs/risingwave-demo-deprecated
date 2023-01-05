@@ -36,6 +36,8 @@ jobs:
           - twitter
           - prometheus
           - schema-registry
+          - mysql-cdc
+          - postgres-cdc
         format: ["json", "protobuf"]
         exclude:
           - testcase: ad-click
@@ -52,6 +54,10 @@ jobs:
             format: protobuf
           # This demo is showcasing avro + schema registry. So there's no file server for the schema file.
           - testcase: schema-registry
+            format: protobuf
+          - testcase: mysql-cdc
+            format: protobuf
+          - testcase: postgres-cdc
             format: protobuf
     runs-on: ubuntu-latest
     steps:
