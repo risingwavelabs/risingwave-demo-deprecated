@@ -10,9 +10,9 @@ create materialized source orders (
     connector = 'postgres-cdc',
     hostname = 'postgres',
     port = '5432',
-    username = 'postgres',
-    password = 'postgres',
-    database.name = 'cdc_test',
+    username = 'myuser',
+    password = '123456',
+    database.name = 'mydb',
     schema.name = 'public',
     table.name = 'orders',
     slot.name = 'orders'
