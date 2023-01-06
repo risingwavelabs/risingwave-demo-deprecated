@@ -38,6 +38,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   compute-node-0:
     image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
     command:
@@ -75,6 +76,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   etcd-0:
     image: "quay.io/coreos/etcd:latest"
     command:
@@ -118,6 +120,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   frontend-node-0:
     image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
     command:
@@ -150,6 +153,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   grafana-0:
     image: "grafana/grafana-oss:latest"
     command: []
@@ -175,6 +179,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   meta-node-0:
     image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
     command:
@@ -210,6 +215,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   minio-0:
     image: "quay.io/minio/minio:latest"
     command:
@@ -245,6 +251,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
   prometheus-0:
     image: "prom/prometheus:latest"
     command:
@@ -273,6 +280,7 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+    restart: always
 volumes:
   compute-node-0:
     external: false
