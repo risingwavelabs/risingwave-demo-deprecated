@@ -308,7 +308,7 @@ services:
   connector-node:
     image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.0.5
     ports:
-      - "50051:50051"
+      - 50051
     container_name: connector-node
   datagen:
     image: postgres
@@ -321,7 +321,7 @@ services:
     volumes:
       - "./postgres_prepare.sql:/postgres_prepare.sql"      
     container_name: datagen
-    restart: always
+    restart: on-failure
 volumes:
   compute-node-0:
     external: false
