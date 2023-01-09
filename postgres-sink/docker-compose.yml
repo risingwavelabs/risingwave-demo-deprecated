@@ -334,7 +334,7 @@ services:
     restart: always
     container_name: postgres
   connector-node:
-    image: connector-node:latest
+    image: "ghcr.io/risingwavelabs/connector-node:latest"
     ports:
       - "50051:50051"
     container_name: connector-node
