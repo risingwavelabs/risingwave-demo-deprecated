@@ -281,6 +281,11 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+  connector-node:
+    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.0.5
+    ports:
+      - 50051
+    container_name: connector-node
 volumes:
   compute-node-0:
     external: false
