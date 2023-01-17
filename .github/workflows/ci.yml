@@ -38,6 +38,7 @@ jobs:
           - schema-registry
           - mysql-cdc
           - postgres-cdc
+          - iceberg-sink
         format: ["json", "protobuf"]
         exclude:
           - testcase: ad-click
@@ -58,6 +59,8 @@ jobs:
           - testcase: mysql-cdc
             format: protobuf
           - testcase: postgres-cdc
+            format: protobuf
+          - testcase: iceberg-sink
             format: protobuf
     runs-on: ubuntu-latest
     steps:
