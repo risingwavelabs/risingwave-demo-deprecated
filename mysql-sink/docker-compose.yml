@@ -322,7 +322,7 @@ services:
       retries: 5
     container_name: mysql
   connector-node:
-    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.0.5
+    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.0.6
     ports:
       - 50051
     container_name: connector-node
@@ -337,14 +337,14 @@ services:
     container_name: datagen
   prepare_mysql:
     image: mysql:8.0
-    depends_on: 
+    depends_on:
       - mysql
     command:
       - /bin/sh
       - -c
       - "mysql -p123456 -h mysql mydb < mysql_prepare.sql"
     volumes:
-      - "./mysql_prepare.sql:/mysql_prepare.sql"      
+      - "./mysql_prepare.sql:/mysql_prepare.sql"
     container_name: prepare_mysql
     restart: on-failure
 volumes:
