@@ -1,6 +1,6 @@
 SELECT
     *
 FROM
-    orders
+    target_count
 LIMIT
     10;
