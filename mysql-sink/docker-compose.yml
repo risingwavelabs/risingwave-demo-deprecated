@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - compactor-node
       - "--host"
@@ -39,7 +39,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - compute-node
       - "--host"
@@ -121,7 +121,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - frontend-node
       - "--host"
@@ -178,7 +178,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230102"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
     command:
       - meta-node
       - "--listen-addr"
@@ -193,8 +193,6 @@ services:
       - etcd
       - "--etcd-endpoints"
       - "etcd-0:2388"
-      - "--connector-rpc-endpoint"
-      - "connector-node:50051"
     expose:
       - "5690"
       - "1250"
@@ -287,6 +285,27 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+  message_queue:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092
+    ports:
+      - 29092:29092
+    container_name: message_queue
+    healthcheck:
+      test:
+        - CMD
+        - printf
+        - ""
+        - /dev/tcp/127.0.0.1/9092
+      interval: 1s
+      timeout: 5s
+      retries: 5
   mysql:
     image: mysql:8.0
     ports:
@@ -308,16 +327,25 @@ services:
       - 50051
     container_name: connector-node
   datagen:
+    image: ghcr.io/risingwavelabs/demo-datagen:v1.0.9
+    depends_on: [message_queue]
+    command:
+      - /bin/sh
+      - -c
+      - /datagen --mode clickstream --qps 2 kafka --brokers message_queue:29092
+    restart: always
+    container_name: datagen
+  prepare_mysql:
     image: mysql:8.0
-    depends_on: 
+    depends_on:
       - mysql
     command:
       - /bin/sh
       - -c
       - "mysql -p123456 -h mysql mydb < mysql_prepare.sql"
     volumes:
-      - "./mysql_prepare.sql:/mysql_prepare.sql"      
-    container_name: datagen
+      - "./mysql_prepare.sql:/mysql_prepare.sql"
+    container_name: prepare_mysql
     restart: on-failure
 volumes:
   compute-node-0:
