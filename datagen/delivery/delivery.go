@@ -11,6 +11,8 @@ import (
 )
 
 type orderEvent struct {
+	sink.BaseSinkRecord
+
 	OrderId        int64  `json:"order_id"`
 	RestaurantId   int64  `json:"restaurant_id"`
 	OrderState     string `json:"order_state"`
@@ -25,10 +27,6 @@ func (r *orderEvent) ToPostgresSql() string {
 func (r *orderEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "delivery_orders", fmt.Sprint(r.OrderId), data
-}
-
-func (r *orderEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "delivery_orders", fmt.Sprint(r.OrderId), []byte{}
 }
 
 type orderEventGen struct {

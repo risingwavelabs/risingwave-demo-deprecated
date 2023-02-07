@@ -22,6 +22,8 @@ type tweetData struct {
 }
 
 type twitterEvent struct {
+	sink.BaseSinkRecord
+
 	Data   tweetData   `json:"data"`
 	Author twitterUser `json:"author"`
 }
@@ -73,6 +75,29 @@ func (r *twitterEvent) ToProtobuf() (topic string, key string, data []byte) {
 		panic(err)
 	}
 	return "twitter", r.Data.Id, data
+}
+
+func (r *twitterEvent) ToAvro() (topic string, key string, data []byte) {
+	obj := map[string]interface{}{
+		"data": map[string]interface{}{
+			"created_at": r.Data.CreatedAt,
+			"id":         r.Data.Id,
+			"text":       r.Data.Text,
+			"lang":       r.Data.Lang,
+		},
+		"author": map[string]interface{}{
+			"created_at": r.Author.CreatedAt,
+			"id":         r.Author.Id,
+			"name":       r.Author.Name,
+			"username":   r.Author.UserName,
+			"followers":  r.Author.Followers,
+		},
+	}
+	binary, err := AvroCodec.BinaryFromNative(nil, obj)
+	if err != nil {
+		panic(err)
+	}
+	return "twitter", r.Data.Id, binary
 }
 
 type twitterGen struct {

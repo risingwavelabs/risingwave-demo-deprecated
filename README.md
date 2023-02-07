@@ -10,6 +10,14 @@ Here is a gallery of demos that present how to use RisingWave alongwith the ecos
 - `twitter-pulsar`: [Tutorial: Pulsar + RisingWave for Fast Twitter Event Processing](https://www.risingwave.com/blog/tutorial-pulsar-risingwave-for-fast-twitter-events-processing/)
 - `live-stream`: [Live stream metrics analysis](https://www.risingwave.dev/docs/latest/live-stream-metrics-analysis/)
 
+## Demo Runnability Testing
+
+The demos listed above will all run through a series of tests when each PR is merged, including:
+
+- Run the queries mentioned in the demos.
+- Ingest the data in various formats, including Protobuf, Avro, and JSON. Each format will be tested individually.
+- For each demo test, we check if the sources and MVs have successfully ingested data, meaning that they should have >0 records.
+
 ## Workload Generator
 
 The workloads presented in the demos are produced by a golang program in `/datagen`. You can get this tool in multiple ways:

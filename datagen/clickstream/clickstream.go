@@ -12,6 +12,8 @@ import (
 )
 
 type userBehavior struct {
+	sink.BaseSinkRecord
+
 	UserId         string `json:"user_id"`
 	TargetId       string `json:"target_id"`
 	TargetType     string `json:"target_type"`
@@ -36,10 +38,6 @@ values ('%s', '%s', '%s', '%s', '%s', '%s', '%s')`,
 func (r *userBehavior) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "user_behaviors", r.UserId, data
-}
-
-func (r *userBehavior) ToProtobuf() (topic string, key string, data []byte) {
-	return "user_behaviors", r.UserId, []byte{}
 }
 
 type targetType string

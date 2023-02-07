@@ -11,6 +11,8 @@ import (
 )
 
 type clickEvent struct {
+	sink.BaseSinkRecord
+
 	UserId              int64  `json:"user_id"`
 	AdId                int64  `json:"ad_id"`
 	ClickTimestamp      string `json:"click_timestamp"`
@@ -25,10 +27,6 @@ func (r *clickEvent) ToPostgresSql() string {
 func (r *clickEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "ad_clicks", fmt.Sprint(r.UserId), data
-}
-
-func (r *clickEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "ad_clicks", fmt.Sprint(r.UserId), []byte{}
 }
 
 type adClickGen struct {
