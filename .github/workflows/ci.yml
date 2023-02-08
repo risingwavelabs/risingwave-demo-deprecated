@@ -32,8 +32,6 @@ jobs:
           - cdn-metrics
           - clickstream
           - docker
-          - livestream
-          - twitter
           - prometheus
           - schema-registry
           - mysql-cdc
