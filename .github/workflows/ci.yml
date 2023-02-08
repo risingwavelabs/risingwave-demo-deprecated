@@ -44,11 +44,15 @@ jobs:
           # JSON is the default value when the format is not required.
           - format: json
           - testcase: livestream
+            format: json
+          - testcase: livestream
+            format: protobuf
+          - testcase: twitter
+            format: json
+          - testcase: twitter
             format: protobuf
           - testcase: twitter
             format: avro
-          - testcase: twitter
-            format: protobuf
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,7 +69,7 @@ jobs:
 
       - name: Rewrite docker compose for protobuf
         working-directory: .github/scripts
-        if: ${{ matrix.format == 'protobuf' }}
+        if: ${{ matrix.format == 'protobuf' || matrix.format == 'avro' }}
         run: |
           python3 gen_pb_compose.py ${{ matrix.testcase }} ${{ matrix.format }}
 
