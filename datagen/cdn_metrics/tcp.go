@@ -13,6 +13,8 @@ import (
 )
 
 type tcpMetric struct {
+	sink.BaseSinkRecord
+
 	DeviceId   string  `json:"device_id"`
 	ReportTime string  `json:"report_time"`
 	MetricName string  `json:"metric_name"`
@@ -27,10 +29,6 @@ func (r *tcpMetric) ToPostgresSql() string {
 func (r *tcpMetric) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "tcp_metrics", r.DeviceId, data
-}
-
-func (r *tcpMetric) ToProtobuf() (topic string, key string, data []byte) {
-	return "tcp_metrics", r.DeviceId, []byte{}
 }
 
 // Each device has a TCP monitor.

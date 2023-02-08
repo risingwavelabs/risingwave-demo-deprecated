@@ -13,6 +13,8 @@ import (
 )
 
 type adImpressionEvent struct {
+	sink.BaseSinkRecord
+
 	BidId               int64  `json:"bid_id"`
 	AdId                int64  `json:"ad_id"`
 	ImpressionTimestamp string `json:"impression_timestamp"`
@@ -28,11 +30,9 @@ func (r *adImpressionEvent) ToJson() (topic string, key string, data []byte) {
 	return "ad_impression", fmt.Sprint(r.BidId), data
 }
 
-func (r *adImpressionEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "ad_impression", fmt.Sprint(r.BidId), []byte{}
-}
-
 type adClickEvent struct {
+	sink.BaseSinkRecord
+
 	BidId          int64  `json:"bid_id"`
 	ClickTimestamp string `json:"click_timestamp"`
 }
@@ -45,10 +45,6 @@ func (r *adClickEvent) ToPostgresSql() string {
 func (r *adClickEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "ad_click", fmt.Sprint(r.BidId), data
-}
-
-func (r *adClickEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "ad_click", fmt.Sprint(r.BidId), []byte{}
 }
 
 type adCtrGen struct {

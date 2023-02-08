@@ -15,6 +15,29 @@ type SinkRecord interface {
 	// Convert the event to a Kakfa message in Protobuf format.
 	// This interface will also be used for Pulsar and Kinesis.
 	ToProtobuf() (topic string, key string, data []byte)
+
+	// Convert the event to a Kakfa message in Avro format.
+	// This interface will also be used for Pulsar and Kinesis.
+	ToAvro() (topic string, key string, data []byte)
+}
+
+type BaseSinkRecord struct {
+}
+
+func (r BaseSinkRecord) ToPostgresSql() string {
+	panic("not implemented")
+}
+
+func (r BaseSinkRecord) ToJson() (topic string, key string, data []byte) {
+	panic("not implemented")
+}
+
+func (r BaseSinkRecord) ToProtobuf() (topic string, key string, data []byte) {
+	panic("not implemented")
+}
+
+func (r BaseSinkRecord) ToAvro() (topic string, key string, data []byte) {
+	panic("not implemented")
 }
 
 // Convert the event to a Kakfa message in the given format.
@@ -24,6 +47,8 @@ func RecordToKafka(r SinkRecord, format string) (topic string, key string, data 
 		return r.ToJson()
 	} else if format == "protobuf" {
 		return r.ToProtobuf()
+	} else if format == "avro" {
+		return r.ToAvro()
 	} else {
 		panic("unsupported format")
 	}

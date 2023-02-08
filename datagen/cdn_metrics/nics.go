@@ -18,6 +18,8 @@ const (
 )
 
 type nicsMetric struct {
+	sink.BaseSinkRecord
+
 	DeviceId    string  `json:"device_id"`
 	MetricName  string  `json:"metric_name"`
 	Aggregation string  `json:"aggregation"`
@@ -38,10 +40,6 @@ values ('%s', '%s', '%s' '%s', '%s', '%f', '%f')`,
 func (r *nicsMetric) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "nics_metrics", r.DeviceId, data
-}
-
-func (r *nicsMetric) ToProtobuf() (topic string, key string, data []byte) {
-	return "nics_metrics", r.DeviceId, []byte{}
 }
 
 // Each device has a nics monitor.
