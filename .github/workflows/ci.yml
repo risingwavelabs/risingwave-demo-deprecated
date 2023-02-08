@@ -41,32 +41,36 @@ jobs:
           - mysql-sink
           - postgres-sink
         format: ["json", "protobuf", "avro"]
-        exclude:
+        include:
           - testcase: ad-click
-            format: [protobuf, avro]
+            format: json
           - testcase: ad-ctr
-            format: [protobuf, avro]
+            format: json
           - testcase: cdn-metrics
-            format: [protobuf, avro]
+            format: json
           - testcase: clickstream
-            format: [protobuf, avro]
+            format: json
           - testcase: docker
-            format: [protobuf, avro]
+            format: json
           - testcase: prometheus
-            format: [protobuf, avro]
+            format: json
           # This demo is showcasing avro + schema registry. So there's no file server for the schema file.
           - testcase: schema-registry
-            format: [protobuf, avro]
+            format: json
+          # JSON is the default value when the format is not required.
           - testcase: mysql-cdc
-            format: [protobuf, avro]
+            format: json
           - testcase: postgres-cdc
-            format: [protobuf, avro]
+            format: json
           - testcase: mysql-sink
-            format: [protobuf, avro]
+            format: json
           - testcase: postgres-sink
-            format: [protobuf, avro]
+            format: json
           - testcase: livestream
-            format: [avro]
+            format: json
+          - testcase: livestream
+            format: protobuf
+          - testcase: twitter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
