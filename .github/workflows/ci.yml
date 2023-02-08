@@ -83,7 +83,7 @@ jobs:
         working-directory: .github/scripts
         if: ${{ matrix.format == 'protobuf' }}
         run: |
-          python3 gen_pb_compose.py ${{ matrix.testcase }}
+          python3 gen_pb_compose.py ${{ matrix.testcase }} ${{ matrix.format }}
 
       - name: Run Demos
         working-directory: .github/scripts
