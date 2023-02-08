@@ -305,7 +305,7 @@ services:
       timeout: 5s
       retries: 5
   datagen:
-    image: ghcr.io/risingwavelabs/demo-datagen:v1.0.9
+    image: ghcr.io/risingwavelabs/demo-datagen:v1.0.10
     depends_on: [message_queue]
     command:
       - /bin/sh
