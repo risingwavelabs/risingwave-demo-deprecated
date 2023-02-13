@@ -5,9 +5,9 @@ CREATE SOURCE delivery_orders_source (
     order_timestamp TIMESTAMP
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'delivery_orders',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'delivery_orders',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 
