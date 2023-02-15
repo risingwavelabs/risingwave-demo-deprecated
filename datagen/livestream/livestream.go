@@ -59,6 +59,8 @@ func (c *liveClient) reportMetric(ctx context.Context, outCh chan<- sink.SinkRec
 }
 
 type liveMetric struct {
+	sink.BaseSinkRecord
+
 	Ip                         string `json:"client_ip"`
 	Agent                      string `json:"user_agent"`
 	Id                         string `json:"user_id"`

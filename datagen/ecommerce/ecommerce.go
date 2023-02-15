@@ -14,6 +14,8 @@ import (
 
 // The order details.
 type orderEvent struct {
+	sink.BaseSinkRecord
+
 	OrderId        int64   `json:"order_id"`
 	ItemId         int64   `json:"item_id"`
 	ItemPrice      float64 `json:"item_price"`
@@ -32,13 +34,11 @@ func (r *orderEvent) ToJson() (topic string, key string, data []byte) {
 	return "order_events", fmt.Sprint(r.OrderId), data
 }
 
-func (r *orderEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "order_events", fmt.Sprint(r.OrderId), []byte{}
-}
-
 // Each order/trade will be composed of two events:
 // An 'order_created' event and a 'parcel_shipped' event.
 type parcelEvent struct {
+	sink.BaseSinkRecord
+
 	OrderId        int64  `json:"order_id"`
 	EventTimestmap string `json:"event_timestamp"`
 	EventType      string `json:"event_type"`
@@ -54,10 +54,6 @@ values ('%d', '%s', '%s')`,
 func (r *parcelEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
 	return "parcel_events", fmt.Sprint(r.OrderId), data
-}
-
-func (r *parcelEvent) ToProtobuf() (topic string, key string, data []byte) {
-	return "parcel_events", fmt.Sprint(r.OrderId), []byte{}
 }
 
 type ecommerceGen struct {

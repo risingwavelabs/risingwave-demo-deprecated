@@ -27,20 +27,21 @@ jobs:
     strategy:
       matrix:
         testcase:
-          # - ad-click
-          # - ad-ctr
-          # - cdn-metrics
-          # - clickstream
-          # - docker
-          # - livestream
-          # - twitter
-          # - prometheus
-          # - schema-registry
-          # - mysql-cdc
-          # - postgres-cdc
+          - ad-click
+          - ad-ctr
+          - cdn-metrics
+          - clickstream
+          - docker
+          - livestream
+          - twitter
+          - prometheus
+          - schema-registry
+          - mysql-cdc
+          - postgres-cdc
+          - mysql-sink
+          - postgres-sink
           - iceberg-sink
-        # format: ["json", "protobuf"]
-        format: ["json"]
+        format: ["json", "protobuf"]
         exclude:
           - testcase: ad-click
             format: protobuf
@@ -61,8 +62,6 @@ jobs:
             format: protobuf
           - testcase: postgres-cdc
             format: protobuf
-          - testcase: iceberg-sink
-            format: protobuf
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -81,7 +80,7 @@ jobs:
         working-directory: .github/scripts
         if: ${{ matrix.format == 'protobuf' }}
         run: |
-          python3 gen_pb_compose.py ${{ matrix.testcase }}
+          python3 gen_pb_compose.py ${{ matrix.testcase }} ${{ matrix.format }}
 
       - name: Run Demos
         working-directory: .github/scripts

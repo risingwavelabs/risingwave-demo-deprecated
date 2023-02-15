@@ -9,20 +9,20 @@ from os.path import (dirname, abspath)
 file_server = """  file_server:
     image: halverneus/static-file-server:latest
     volumes:
-      - "./schema:/schema"
+      - "./:/demo"
     restart: always
     environment:
-      FOLDER: /
+      FOLDER: /demo
     container_name: file_server
 """
 
 
-def gen_docker_compose(demo_compose: str):
+def gen_docker_compose(demo_compose: str, format: str):
     content = ""
     with open(demo_compose) as file:
         for line in file:
             line = line.replace("      - /datagen",
-                                "      - /datagen --format protobuf")
+                                "      - /datagen --format {}".format(format))
             if line == 'volumes:\n':
                 content += file_server
             content += line
@@ -34,9 +34,15 @@ demo = sys.argv[1]
 if demo == 'docker':
     print('Will not generate docker-compose file for `docker`')
     sys.exit(0)
+
+format = sys.argv[2]
+if format not in ["json", "protobuf", "avro"]:
+    print('Invalid format: {}'.format(format))
+    sys.exit(1)
+
 file_dir = dirname(abspath(__file__))
 project_dir = dirname(dirname(file_dir))
 demo_dir = os.path.join(project_dir, demo)
 demo_compose = os.path.join(demo_dir, 'docker-compose.yml')
 
-gen_docker_compose(demo_compose)
+gen_docker_compose(demo_compose, format)
