@@ -1,8 +1,16 @@
 ---
 version: "3"
 services:
+  spark:
+    image: apache/spark:3.3.1
+    command: tail -f /dev/null
+    depends_on:
+      - minio-0
+    volumes:
+      - "./spark-script:/spark-script"
+    container_name: spark
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230214"
     command:
       - compactor-node
       - "--host"
@@ -39,7 +47,7 @@ services:
       timeout: 5s
       retries: 5
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230214"
     command:
       - compute-node
       - "--host"
@@ -77,6 +85,12 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+  connector-node:
+    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.1.16
+    platform: linux/x86_64
+    ports:
+      - "50051:50051"
+    container_name: connector-node
   etcd-0:
     image: "quay.io/coreos/etcd:latest"
     command:
@@ -121,7 +135,7 @@ services:
       timeout: 5s
       retries: 5
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230214"
     command:
       - frontend-node
       - "--host"
@@ -178,7 +192,7 @@ services:
       timeout: 5s
       retries: 5
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:nightly-20221210"
+    image: "ghcr.io/risingwavelabs/risingwave:nightly-20230214"
     command:
       - meta-node
       - "--listen-addr"
@@ -231,10 +245,15 @@ services:
     volumes:
       - "minio-0:/data"
     entrypoint: "
+
       /bin/sh -c '
+
       set -e
+
       mkdir -p \"/data/hummock001\"
+
       /usr/bin/docker-entrypoint.sh \"$$0\" \"$$@\"
+
       '"
     environment:
       MINIO_CI_CD: "1"
@@ -301,16 +320,6 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
-  presto:
-    image: ahanaio/prestodb-sandbox
-    ports:
-      - "8080:8080" # TODO: Reset to a less uncommon port.
-    container_name: presto
-  connector-node:
-    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.0.6
-    ports:
-      - 50051
-    container_name: connector-node
   datagen:
     image: ghcr.io/risingwavelabs/demo-datagen:v1.0.9
     depends_on: [message_queue]

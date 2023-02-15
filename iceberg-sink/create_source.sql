@@ -1,14 +1,15 @@
-CREATE SOURCE user_behaviors (
+CREATE TABLE user_behaviors (
     user_id VARCHAR,
     target_id VARCHAR,
     target_type VARCHAR,
-    event_timestamp TIMESTAMPTZ,
+    event_timestamp VARCHAR,
     behavior_type VARCHAR,
     parent_target_type VARCHAR,
-    parent_target_id VARCHAR
+    parent_target_id VARCHAR,
+    PRIMARY KEY(user_id, target_id, event_timestamp)
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'user_behaviors',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'user_behaviors',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;

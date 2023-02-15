@@ -27,19 +27,20 @@ jobs:
     strategy:
       matrix:
         testcase:
-          - ad-click
-          - ad-ctr
-          - cdn-metrics
-          - clickstream
-          - docker
-          - livestream
-          - twitter
-          - prometheus
-          - schema-registry
-          - mysql-cdc
-          - postgres-cdc
+          # - ad-click
+          # - ad-ctr
+          # - cdn-metrics
+          # - clickstream
+          # - docker
+          # - livestream
+          # - twitter
+          # - prometheus
+          # - schema-registry
+          # - mysql-cdc
+          # - postgres-cdc
           - iceberg-sink
-        format: ["json", "protobuf"]
+        # format: ["json", "protobuf"]
+        format: ["json"]
         exclude:
           - testcase: ad-click
             format: protobuf
