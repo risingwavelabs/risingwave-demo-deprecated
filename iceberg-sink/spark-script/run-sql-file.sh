@@ -9,5 +9,6 @@ set -ex
     --conf spark.sql.catalog.demo.hadoop.fs.s3a.path.style.access=true \
     --conf spark.sql.catalog.demo.hadoop.fs.s3a.access.key=hummockadmin \
     --conf spark.sql.catalog.demo.hadoop.fs.s3a.secret.key=hummockadmin \
+    --conf spark.driver.extraJavaOptions="-Divy.cache.dir=/spark-script/.ivy -Divy.home=/spark-script/.ivy" \
     --conf spark.sql.defaultCatalog=demo \
     -f /spark-script/$1.sql
