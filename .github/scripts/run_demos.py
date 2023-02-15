@@ -13,7 +13,7 @@ def run_sql_file(f: str, dir: str):
     # ON_ERROR_STOP=1 will let psql return error code when the query fails.
     # https://stackoverflow.com/questions/37072245/check-return-status-of-psql-command-in-unix-shell-scripting
     proc = subprocess.run(["psql", "-h", "localhost", "-p", "4566",
-                           "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"],
+                           "-d", "dev", "-U", "root", "-f", f, "-v", "ON_ERROR_STOP=1"], check=True,
                           cwd=dir)
     if proc.returncode != 0:
         sys.exit(1)
@@ -65,6 +65,8 @@ def run_iceberg_demo():
         run_sql_file(sql_file, demo_dir)
         sleep(10)
 
+    print("sink created. Wait for 2 min time for ingestion")
+
     # wait for two minutes ingestion
     sleep(120)
 
@@ -87,6 +89,9 @@ arg_parser.add_argument('--case',
 args = arg_parser.parse_args()
 
 if args.case == "iceberg-sink":
-    run_iceberg_demo()
+    if args.format == "protobuf":
+        print("skip protobuf test for iceberg-sink")
+    else:
+        run_iceberg_demo()
 else:
     run_demo(args.case, args.format)
