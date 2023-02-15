@@ -50,23 +50,23 @@ def run_iceberg_demo():
     demo_dir = os.path.join(project_dir, demo)
     print("Running demo: iceberg-sink")
 
-    # subprocess.run(["docker", "compose", "up", "-d"],
-    #                cwd=demo_dir, check=True)
-    # sleep(40)
+    subprocess.run(["docker", "compose", "up", "-d"],
+                   cwd=demo_dir, check=True)
+    sleep(40)
 
-    # subprocess.run(["docker", "compose", "exec", "-it", "spark", "bash", "/spark-script/run-sql-file.sh", "create-table"],
-    #                cwd=demo_dir, check=True)
-    # sleep(20)
+    subprocess.run(["docker", "compose", "exec", "-it", "spark", "bash", "/spark-script/run-sql-file.sh", "create-table"],
+                   cwd=demo_dir, check=True)
+    sleep(20)
 
-    # sql_files = ['create_source.sql', 'create_mv.sql', 'create_sink.sql']
-    # for fname in sql_files:
-    #     sql_file = os.path.join(demo_dir,  fname)
-    #     print("executing sql: ", open(sql_file).read())
-    #     run_sql_file(sql_file, demo_dir)
-    #     sleep(10)
+    sql_files = ['create_source.sql', 'create_mv.sql', 'create_sink.sql']
+    for fname in sql_files:
+        sql_file = os.path.join(demo_dir,  fname)
+        print("executing sql: ", open(sql_file).read())
+        run_sql_file(sql_file, demo_dir)
+        sleep(10)
 
-    # # wait for two minutes ingestion
-    # sleep(120)
+    # wait for two minutes ingestion
+    sleep(120)
 
     subprocess.run(["docker", "compose", "exec", "-it", "spark", "bash", "/spark-script/run-sql-file.sh", "query-table"],
                    cwd=demo_dir, check=True)
