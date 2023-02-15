@@ -40,6 +40,7 @@ jobs:
           - postgres-cdc
           - mysql-sink
           - postgres-sink
+          - iceberg-sink
         format: ["json", "protobuf"]
         exclude:
           - testcase: ad-click
@@ -64,6 +65,8 @@ jobs:
           - testcase: mysql-sink
             format: protobuf
           - testcase: postgres-sink
+            format: protobuf
+          - testcase: iceberg-sink
             format: protobuf
     runs-on: ubuntu-latest
     steps:
