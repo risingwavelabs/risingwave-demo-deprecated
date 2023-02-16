@@ -54,9 +54,8 @@ def run_iceberg_demo():
                    cwd=demo_dir, check=True)
     sleep(40)
 
-    subprocess.run(["docker", "compose", "exec", "-it", "spark", "bash", "/spark-script/run-sql-file.sh", "create-table"],
+    subprocess.run(["docker", "compose", "exec", "spark", "bash", "/spark-script/run-sql-file.sh", "create-table"],
                    cwd=demo_dir, check=True)
-    sleep(20)
 
     sql_files = ['create_source.sql', 'create_mv.sql', 'create_sink.sql']
     for fname in sql_files:
@@ -70,8 +69,23 @@ def run_iceberg_demo():
     # wait for two minutes ingestion
     sleep(120)
 
-    subprocess.run(["docker", "compose", "exec", "-it", "spark", "bash", "/spark-script/run-sql-file.sh", "query-table"],
-                   cwd=demo_dir, check=True)
+    query_sql = open(os.path.join(demo_dir, "iceberg-query.sql")).read()
+
+    print("querying iceberg with presto sql: %s"%query_sql)
+
+    query_output_file_name = "query_outout.txt"
+
+    query_output_file = open(query_output_file_name, "wb")
+
+    subprocess.run(["docker", "compose", "exec", "presto", "presto-cli", "--server", "localhost:8080", "--execute", query_sql],
+                   cwd=demo_dir, check=True, stdout=query_output_file)
+    query_output_file.close()
+
+    output_content = open(query_output_file_name).read()
+
+    print(output_content)
+
+    assert len(output_content.strip()) > 0
 
 
 

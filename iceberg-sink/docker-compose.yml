@@ -9,6 +9,9 @@ services:
     volumes:
       - "./spark-script:/spark-script"
     container_name: spark
+  presto:
+    build: ./presto-with-iceberg
+    container_name: presto
   compactor-0:
     image: "ghcr.io/risingwavelabs/risingwave:nightly-20230214"
     command:
@@ -91,6 +94,15 @@ services:
     ports:
       - "50051:50051"
     container_name: connector-node
+    healthcheck:
+      test:
+        - CMD
+        - printf
+        - ""
+        - /dev/tcp/127.0.0.1/50051
+      interval: 1s
+      timeout: 5s
+      retries: 5
   etcd-0:
     image: "quay.io/coreos/etcd:latest"
     command:
