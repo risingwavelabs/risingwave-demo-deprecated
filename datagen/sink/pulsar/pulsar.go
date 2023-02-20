@@ -9,7 +9,8 @@ import (
 )
 
 type PulsarConfig struct {
-	Brokers string
+	Brokers   string
+	AuthToken string
 }
 
 type PulsarSink struct {
@@ -18,8 +19,10 @@ type PulsarSink struct {
 }
 
 func OpenPulsarSink(ctx context.Context, cfg PulsarConfig) (*PulsarSink, error) {
+	auth_token := pulsar.NewAuthenticationToken(cfg.AuthToken)
 	client, err := pulsar.NewClient(pulsar.ClientOptions{
-		URL: fmt.Sprintf("pulsar://%s", cfg.Brokers),
+		URL:            cfg.Brokers,
+		Authentication: auth_token,
 	})
 	if err != nil {
 		return nil, err
@@ -42,6 +45,7 @@ func (p *PulsarSink) Close() error {
 func (p *PulsarSink) WriteRecord(ctx context.Context, format string, record sink.SinkRecord) error {
 	var err error
 	topic, key, data := sink.RecordToKafka(record, format)
+	fmt.Printf("key: %+v, value: %s\n", key, data)
 	producer, ok := p.producers[topic]
 	if !ok {
 		producer, err = p.client.CreateProducer(pulsar.ProducerOptions{
@@ -54,7 +58,8 @@ func (p *PulsarSink) WriteRecord(ctx context.Context, format string, record sink
 	}
 	_, err = producer.Send(ctx, &pulsar.ProducerMessage{
 		Value: data,
-		Key:   key,
+		// Key:   key,
 	})
+
 	return err
 }

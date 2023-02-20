@@ -99,6 +99,12 @@ func main() {
 						Required:    true,
 						Destination: &cfg.Pulsar.Brokers,
 					},
+					cli.StringFlag{
+						Name:        "auth-token",
+						Usage:       "Pulsar auth token",
+						Required:    false,
+						Destination: &cfg.Pulsar.AuthToken,
+					},
 				},
 				Action: func(c *cli.Context) error {
 					cfg.Sink = "pulsar"

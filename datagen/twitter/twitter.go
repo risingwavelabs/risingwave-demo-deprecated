@@ -51,7 +51,7 @@ func (r *tweetData) objectString() string {
 
 func (r *twitterEvent) ToJson() (topic string, key string, data []byte) {
 	data, _ = json.Marshal(r)
-	return "twitter", r.Data.Id, data
+	return "persistent://meetup/default/twitter", r.Data.Id, data
 }
 
 func (r *twitterEvent) ToProtobuf() (topic string, key string, data []byte) {
