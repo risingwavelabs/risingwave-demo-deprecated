@@ -33,8 +33,8 @@ def run_sql(sql):
 
 
 demo = sys.argv[1]
-if demo == 'docker':
-    print('Skip for running test for `docker`')
+if demo in ['docker', 'iceberg-sink'] :
+    print('Skip for running test for `%s`'%demo)
     sys.exit(0)
 file_dir = dirname(abspath(__file__))
 project_dir = dirname(dirname(file_dir))
