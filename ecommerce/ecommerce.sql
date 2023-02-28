@@ -5,9 +5,9 @@ CREATE SOURCE order_events (
     event_timestamp TIMESTAMP
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'nics_metrics',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'nics_metrics',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 CREATE TABLE order_events (

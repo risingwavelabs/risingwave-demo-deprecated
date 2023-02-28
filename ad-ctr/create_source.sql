@@ -4,9 +4,9 @@ CREATE SOURCE ad_impression (
     impression_timestamp TIMESTAMPTZ
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'ad_impression',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'ad_impression',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 CREATE SOURCE ad_click (
@@ -14,7 +14,7 @@ CREATE SOURCE ad_click (
     click_timestamp TIMESTAMPTZ
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'ad_click',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'ad_click',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;

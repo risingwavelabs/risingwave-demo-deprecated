@@ -1,4 +1,4 @@
-create materialized source orders (
+create table orders (
     order_id int,
     order_date bigint,
     customer_name varchar,

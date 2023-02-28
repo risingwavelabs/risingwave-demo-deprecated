@@ -8,9 +8,9 @@ CREATE SOURCE nics_metrics (
     metric_value DOUBLE PRECISION
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'nics_metrics',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'nics_metrics',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;
 
 CREATE SOURCE tcp_metrics (
@@ -20,7 +20,7 @@ CREATE SOURCE tcp_metrics (
     metric_value DOUBLE PRECISION
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'tcp_metrics',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'tcp_metrics',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;

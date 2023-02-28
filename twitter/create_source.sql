@@ -13,7 +13,7 @@ CREATE SOURCE twitter (
     followers INT >
 ) WITH (
     connector = 'kafka',
-    kafka.topic = 'twitter',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'twitter',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) ROW FORMAT JSON;

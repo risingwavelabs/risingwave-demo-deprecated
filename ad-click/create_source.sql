@@ -7,7 +7,7 @@ create source ad_source (
     impression_timestamp timestamptz
 ) with (
     connector = 'kafka',
-    kafka.topic = 'ad_clicks',
-    kafka.brokers = 'message_queue:29092',
-    kafka.scan.startup.mode = 'earliest'
+    topic = 'ad_clicks',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
 ) row format json;
