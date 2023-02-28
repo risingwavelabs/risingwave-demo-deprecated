@@ -27,3 +27,20 @@ FROM
     )
 GROUP BY
     window_start;
+
+CREATE MATERIALIZED VIEW live_video_qos_10min AS
+SELECT
+    window_start AS report_ts,
+    room_id,
+    SUM(video_total_freeze_duration) AS video_total_freeze_duration,
+    AVG(video_lost_pps) as video_lost_pps,
+    AVG(video_rtt) as video_rtt
+FROM
+    TUMBLE(
+        live_stream_metrics,
+        report_timestamp,
+        INTERVAL '10' MINUTE
+    )
+GROUP BY
+    window_start,
+    room_id;
