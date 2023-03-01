@@ -10,6 +10,7 @@ import (
 	"datagen/ecommerce"
 	"datagen/gen"
 	"datagen/livestream"
+	"datagen/nexmark"
 	"datagen/sink"
 	"datagen/sink/kafka"
 	"datagen/sink/kinesis"
@@ -55,6 +56,8 @@ func newGen(cfg gen.GeneratorConfig) (gen.LoadGenerator, error) {
 		return delivery.NewOrderEventGen(cfg), nil
 	} else if cfg.Mode == "livestream" || cfg.Mode == "superset" {
 		return livestream.NewLiveStreamMetricsGen(cfg), nil
+	} else if cfg.Mode == "nexmark" {
+		return nexmark.NewNexmarkGen(cfg), nil
 	} else {
 		return nil, fmt.Errorf("invalid mode: %s", cfg.Mode)
 	}
