@@ -368,7 +368,8 @@ services:
     depends_on:
       - minio-0
     volumes:
-      - ./trino:/etc/trino
+      - ./trino/catalog/iceberg.properties:/etc/trino/catalog/iceberg.properties
+      - ./trino/log.properties:/etc/trino/log.properties
 
 volumes:
   minio-0:
