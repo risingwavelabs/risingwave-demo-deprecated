@@ -11,7 +11,7 @@ CREATE MATERIALIZED VIEW nexmark_q8 AS
 SELECT
     P.id,
     P.name,
-    S.starttime
+    A.starttime
 FROM
     person as P
     JOIN (
