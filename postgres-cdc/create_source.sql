@@ -13,6 +13,6 @@ create table person (
     password = '123456',
     database.name = 'mydb',
     schema.name = 'public',
-    table.name = 'orders',
-    slot.name = 'orders'
+    table.name = 'person',
+    slot.name = 'person'
 );
