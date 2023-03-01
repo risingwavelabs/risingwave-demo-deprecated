@@ -1,8 +1,8 @@
-CREATE MATERIALIZED VIEW product_count AS
+CREATE MATERIALIZED VIEW city_population AS
 SELECT
-    product_id,
-    COUNT(*) as product_count
+    city,
+    COUNT(*) as population
 FROM
-    orders
+    person
 GROUP BY
-    product_id;
+    city;
