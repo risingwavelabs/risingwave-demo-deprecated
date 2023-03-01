@@ -4,6 +4,7 @@ create table person (
     "email_address" varchar,
     "credit_card" varchar,
     "city" varchar,
+    "date_time" bigint,
     PRIMARY KEY ("id")
 ) with (
     connector = 'postgres-cdc',
