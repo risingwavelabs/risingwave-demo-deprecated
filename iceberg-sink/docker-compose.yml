@@ -367,6 +367,8 @@ services:
     container_name: trino
     depends_on:
       - minio-0
+    volumes:
+      - ./trino:/etc/trino
 
 volumes:
   minio-0:
