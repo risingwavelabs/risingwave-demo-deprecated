@@ -1,9 +1,10 @@
-create table person (
+create table t_person (
     "id" int,
     "name" varchar,
     "email_address" varchar,
     "credit_card" varchar,
     "city" varchar,
+    "date_time" bigint,
     PRIMARY KEY ("id")
 ) with (
     connector = 'postgres-cdc',
@@ -16,3 +17,37 @@ create table person (
     table.name = 'person',
     slot.name = 'person'
 );
+
+CREATE SOURCE t_auction (
+    id BIGINT,
+    item_name VARCHAR,
+    date_time BIGINT,
+    seller INT,
+    category INT
+) WITH (
+    connector = 'kafka',
+    topic = 'auction',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
+) ROW FORMAT JSON;
+
+CREATE VIEW person as
+SELECT
+    id,
+    name,
+    email_address,
+    credit_card,
+    city,
+    to_timestamp(date_time) as date_time
+FROM
+    t_person;
+
+CREATE VIEW auction as
+SELECT
+    id,
+    item_name,
+    to_timestamp(date_time) as date_time,
+    seller,
+    category
+FROM
+    t_auction;

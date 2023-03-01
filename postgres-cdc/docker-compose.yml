@@ -322,6 +322,36 @@ services:
       - "./postgres_prepare.sql:/postgres_prepare.sql"      
     container_name: postgres_prepare
     restart: on-failure
+  datagen:
+    image: ghcr.io/risingwavelabs/demo-datagen:v1.1.0
+    depends_on: [message_queue]
+    command:
+      - /bin/sh
+      - -c
+      - /datagen --mode nexmark --qps 2 kafka --brokers message_queue:29092
+    restart: always
+    container_name: datagen
+  message_queue:
+    image: docker.redpanda.com/vectorized/redpanda:latest
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092
+    ports:
+      - 29092:29092
+    container_name: message_queue
+    healthcheck:
+      test:
+        - CMD
+        - printf
+        - ""
+        - /dev/tcp/127.0.0.1/9092
+      interval: 1s
+      timeout: 5s
+      retries: 5
 volumes:
   compute-node-0:
     external: false
