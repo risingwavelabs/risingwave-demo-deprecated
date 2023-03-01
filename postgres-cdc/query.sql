@@ -1,6 +1,6 @@
 SELECT
     *
 FROM
-    orders
+    city_population
 LIMIT
     10;

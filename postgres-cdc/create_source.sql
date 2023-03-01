@@ -1,11 +1,10 @@
-create table orders (
-    order_id int,
-    order_date bigint,
-    customer_name varchar,
-    price decimal,
-    product_id int,
-    order_status smallint,
-    PRIMARY KEY (order_id)
+create table person (
+    "id" int,
+    "name" varchar,
+    "email_address" varchar,
+    "credit_card" varchar,
+    "city" varchar,
+    PRIMARY KEY ("id")
 ) with (
     connector = 'postgres-cdc',
     hostname = 'postgres',
@@ -14,6 +13,6 @@ create table orders (
     password = '123456',
     database.name = 'mydb',
     schema.name = 'public',
-    table.name = 'orders',
-    slot.name = 'orders'
+    table.name = 'person',
+    slot.name = 'person'
 );
