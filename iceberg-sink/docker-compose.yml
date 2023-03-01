@@ -349,7 +349,7 @@ services:
 
   iceberg-create:
     # Iceberg Catalog
-    image: iceberg-create:latest
+    image: ghcr.io/risingwavelabs/pyiceberg:latest
     container_name: iceberg-create
     depends_on:
       - rest
