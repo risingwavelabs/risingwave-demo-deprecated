@@ -17,7 +17,14 @@ properties = {
     "uri": "http://rest:8181"
 }
 catalog = load_catalog("demo", **properties)
-catalog.create_namespace("demo_db")
+
+has_ns = False
+for ns in catalog.list_namespaces():
+    if ns[0] == "demo_db":
+        has_ns = True
+if not has_ns:
+    catalog.create_namespace("demo_db")
+
 catalog.create_table(
     identifier="demo_db.demo_table",
     location="s3a://hummock001/iceberg-data",

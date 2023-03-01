@@ -351,9 +351,14 @@ services:
     # Iceberg Catalog
     image: ghcr.io/risingwavelabs/pyiceberg:latest
     container_name: iceberg-create
+    command:
+      - python3
+      - /iceberg.py
     depends_on:
       - rest
     restart: on-failure:5
+    volumes:
+      - ./iceberg-create/iceberg.py:/iceberg.py
 
   trino:
     image: trinodb/trino
