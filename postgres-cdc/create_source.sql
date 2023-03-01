@@ -16,3 +16,16 @@ create table person (
     table.name = 'person',
     slot.name = 'person'
 );
+
+CREATE SOURCE auction (
+    id BIGINT,
+    item_name VARCHAR,
+    date_time BIGINT,
+    seller INT,
+    category INT
+) WITH (
+    connector = 'kafka',
+    topic = 'auction',
+    properties.bootstrap.server = 'message_queue:29092',
+    scan.startup.mode = 'earliest'
+) ROW FORMAT JSON;
