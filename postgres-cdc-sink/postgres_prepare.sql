@@ -10,6 +10,14 @@ create table person (
 ALTER TABLE
   public.person REPLICA IDENTITY FULL;
 
+CREATE TABLE seller_auctions (
+  id INT,
+  name VARCHAR(64),
+  starttime TIMESTAMP,
+  auctions_count INT,
+  PRIMARY KEY (id)
+);
+
 INSERT INTO person VALUES (1000, 'vicky noris', 'yplkvgz@qbxfg.com', '7878 5821 1864 2539', 'cheyenne');
 INSERT INTO person VALUES (1001, 'peter white', 'myckhsp@xpmpe.com', '1781 2313 8157 6974', 'boise');
 INSERT INTO person VALUES (1002, 'sarah spencer', 'wipvdbm@dkaap.com', '3453 4987 9481 6270', 'los angeles');

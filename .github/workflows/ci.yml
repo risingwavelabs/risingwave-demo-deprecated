@@ -37,9 +37,8 @@ jobs:
           - prometheus
           - schema-registry
           - mysql-cdc
-          - postgres-cdc
+          - postgres-cdc-sink
           #- mysql-sink
-          - postgres-sink
           - iceberg-sink
         format: ["json", "protobuf"]
         exclude:
@@ -60,11 +59,9 @@ jobs:
             format: protobuf
           - testcase: mysql-cdc
             format: protobuf
-          - testcase: postgres-cdc
+          - testcase: postgres-cdc-sink
             format: protobuf
           - testcase: mysql-sink
-            format: protobuf
-          - testcase: postgres-sink
             format: protobuf
           - testcase: iceberg-sink
             format: protobuf
