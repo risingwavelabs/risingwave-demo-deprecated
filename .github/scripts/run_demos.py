@@ -43,41 +43,23 @@ def run_demo(demo: str, format: str):
         run_sql_file(sql_file, demo_dir)
         sleep(10)
 
-def run_iceberg_demo():
-    demo = "iceberg-sink"
-    file_dir = dirname(abspath(__file__))
-    project_dir = dirname(dirname(file_dir))
-    demo_dir = os.path.join(project_dir, demo)
-    print("Running demo: iceberg-sink")
+    if demo == "iceberg-sink":
+        check_iceberg_demo(demo_dir)
 
-    subprocess.run(["docker", "compose", "up", "-d"],
-                   cwd=demo_dir, check=True)
-    sleep(40)
 
-    subprocess.run(["docker", "compose", "exec", "spark", "bash", "/spark-script/run-sql-file.sh", "create-table"],
-                   cwd=demo_dir, check=True)
-
-    sql_files = ['create_source.sql', 'create_mv.sql', 'create_sink.sql']
-    for fname in sql_files:
-        sql_file = os.path.join(demo_dir,  fname)
-        print("executing sql: ", open(sql_file).read())
-        run_sql_file(sql_file, demo_dir)
-        sleep(10)
-
-    print("sink created. Wait for 2 min time for ingestion")
-
+def check_iceberg_demo(demo_dir: str):
     # wait for two minutes ingestion
     sleep(120)
 
     query_sql = open(os.path.join(demo_dir, "iceberg-query.sql")).read()
 
-    print("querying iceberg with presto sql: %s"%query_sql)
+    print("querying iceberg with presto sql: %s" % query_sql)
 
     query_output_file_name = "query_outout.txt"
 
     query_output_file = open(query_output_file_name, "wb")
 
-    subprocess.run(["docker", "compose", "exec", "presto", "presto-cli", "--server", "localhost:8080", "--execute", query_sql],
+    subprocess.run(["docker", "compose", "exec", "trino", "trino", "--execute", query_sql],
                    cwd=demo_dir, check=True, stdout=query_output_file)
     query_output_file.close()
 
@@ -86,8 +68,6 @@ def run_iceberg_demo():
     print(output_content)
 
     assert len(output_content.strip()) > 0
-
-
 
 
 arg_parser = argparse.ArgumentParser(description='Run the demo')
@@ -102,10 +82,4 @@ arg_parser.add_argument('--case',
                         help='the test case')
 args = arg_parser.parse_args()
 
-if args.case == "iceberg-sink":
-    if args.format == "protobuf":
-        print("skip protobuf test for iceberg-sink")
-    else:
-        run_iceberg_demo()
-else:
-    run_demo(args.case, args.format)
+run_demo(args.case, args.format)
