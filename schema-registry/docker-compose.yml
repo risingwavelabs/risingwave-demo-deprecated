@@ -295,7 +295,7 @@ services:
       - --advertise-kafka-addr PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092
     ports:
       - 29092:29092
-      - 8081:8081
+      - 8081:8081 # For schema registry.
     container_name: message_queue
     healthcheck:
       test:
