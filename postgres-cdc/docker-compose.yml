@@ -307,6 +307,7 @@ services:
     container_name: postgres
   connector-node:
     image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.1.17
+    platform: linux/x86_64
     ports:
       - 50051
     container_name: connector-node
