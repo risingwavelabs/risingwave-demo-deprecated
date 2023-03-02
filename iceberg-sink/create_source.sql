@@ -7,9 +7,13 @@ CREATE TABLE user_behaviors (
     parent_target_type VARCHAR,
     parent_target_id VARCHAR,
     PRIMARY KEY(user_id, target_id, event_timestamp)
-) WITH (
-    connector = 'kafka',
-    topic = 'user_behaviors',
-    properties.bootstrap.server = 'message_queue:29092',
-    scan.startup.mode = 'earliest'
-) ROW FORMAT JSON;
+) with (
+    connector = 'mysql-cdc',
+    hostname = 'mysql',
+    port = '3306',
+    username = 'root',
+    password = '123456',
+    database.name = 'mydb',
+    table.name = 'user_behaviors',
+    server.id = '1'
+);
