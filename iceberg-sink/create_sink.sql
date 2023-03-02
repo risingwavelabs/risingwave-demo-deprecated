@@ -6,5 +6,5 @@ FROM
         location.type = 'minio',
         warehouse.path = 'minio://hummockadmin:hummockadmin@minio-0:9301/hummock001/iceberg-data',
         database.name = 'demo_db',
-        table.name = 'demo_table'
+        table.name = 'seller_auctions'
     );
