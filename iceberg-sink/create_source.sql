@@ -17,12 +17,13 @@ create table t_person (
     server.id = '1'
 );
 
-CREATE SOURCE t_auction (
+CREATE TABLE t_auction (
     id BIGINT,
     item_name VARCHAR,
     date_time BIGINT,
     seller INT,
-    category INT
+    category INT,
+    PRIMARY KEY (id)
 ) WITH (
     connector = 'kafka',
     topic = 'auction',
