@@ -5,6 +5,7 @@ import (
 	"datagen/sink"
 	"datagen/sink/kafka"
 	"datagen/sink/kinesis"
+	"datagen/sink/mysql"
 	"datagen/sink/postgres"
 	"datagen/sink/pulsar"
 
@@ -13,6 +14,7 @@ import (
 
 type GeneratorConfig struct {
 	Postgres postgres.PostgresConfig
+	Mysql    mysql.MysqlConfig
 	Kafka    kafka.KafkaConfig
 	Pulsar   pulsar.PulsarConfig
 	Kinesis  kinesis.KinesisConfig

@@ -7,6 +7,7 @@ require (
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/aws/aws-sdk-go v1.44.126
 	github.com/brianvoe/gofakeit/v6 v6.16.0
+	github.com/go-sql-driver/mysql v1.7.0
 	github.com/lib/pq v1.10.7
 	github.com/linkedin/goavro/v2 v2.9.8
 	github.com/urfave/cli v1.22.10
