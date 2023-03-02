@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"datagen/sink"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 type PostgresConfig struct {

@@ -14,6 +14,7 @@ import (
 	"datagen/sink"
 	"datagen/sink/kafka"
 	"datagen/sink/kinesis"
+	"datagen/sink/mysql"
 	"datagen/sink/postgres"
 	"datagen/sink/pulsar"
 	"datagen/twitter"
@@ -27,6 +28,8 @@ import (
 func createSink(ctx context.Context, cfg gen.GeneratorConfig) (sink.Sink, error) {
 	if cfg.Sink == "postgres" {
 		return postgres.OpenPostgresSink(cfg.Postgres)
+	} else if cfg.Sink == "mysql" {
+		return mysql.OpenMysqlSink(cfg.Mysql)
 	} else if cfg.Sink == "kafka" {
 		return kafka.OpenKafkaSink(ctx, cfg.Kafka)
 	} else if cfg.Sink == "pulsar" {

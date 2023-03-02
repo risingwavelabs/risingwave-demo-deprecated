@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	_ "github.com/lib/pq"
 	"github.com/urfave/cli"
 )
 
@@ -65,6 +64,50 @@ func main() {
 				},
 				Action: func(c *cli.Context) error {
 					cfg.Sink = "postgres"
+					return runCommand()
+				},
+			},
+			{
+				Name: "mysql",
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:        "host",
+						Usage:       "The host address of the MySQL server",
+						Required:    false,
+						Value:       "localhost",
+						Destination: &cfg.Mysql.DbHost,
+					},
+					cli.StringFlag{
+						Name:        "db",
+						Usage:       "The database where the target table is located",
+						Required:    false,
+						Value:       "mydb",
+						Destination: &cfg.Mysql.Database,
+					},
+					cli.IntFlag{
+						Name:        "port",
+						Usage:       "The port of the MySQL server",
+						Required:    false,
+						Value:       3306,
+						Destination: &cfg.Mysql.DbPort,
+					},
+					cli.StringFlag{
+						Name:        "user",
+						Usage:       "The user to MySQL",
+						Required:    false,
+						Value:       "mysqluser",
+						Destination: &cfg.Mysql.DbUser,
+					},
+					cli.StringFlag{
+						Name:        "password",
+						Usage:       "The password to MySQL",
+						Required:    false,
+						Value:       "mysqlpw",
+						Destination: &cfg.Mysql.DbPassword,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					cfg.Sink = "mysql"
 					return runCommand()
 				},
 			},
