@@ -23,6 +23,7 @@ docker compose exec spark bash /spark-script/run-sql-file.sh create-table
 
 - create_source.sql
 - create_mv.sql
+- create_sink.sql
 
 4. Connect to the Presto that is pre-installed in the docker compose and execute a simple query:
 
