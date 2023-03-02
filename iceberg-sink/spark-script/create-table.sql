@@ -1,11 +1,10 @@
-drop table if exists demo.demo_db.demo_table;
+drop table if exists demo.demo_db.seller_auctions;
 
-CREATE TABLE demo.demo_db.demo_table
-(
-  user_id string,
-  target_id string,
-  event_timestamp string
-) TBLPROPERTIES ('format-version'='2');
-
-
-
+CREATE TABLE demo.demo_db.seller_auctions (
+  seller_id string,
+  seller_name string,
+  auction_time timestamp,
+  auction_item_name string,
+  auction_category int,
+  auction_id int
+) TBLPROPERTIES ('format-version' = '2');

@@ -347,7 +347,7 @@ services:
       - -c
       - /datagen --mode nexmark --qps 2 kafka --brokers message_queue:29092
     restart: always
-    container_name: datagen
+    container_name: datagen-2
   message_queue:
     image: docker.redpanda.com/vectorized/redpanda:latest
     command:

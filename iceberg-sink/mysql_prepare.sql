@@ -4,12 +4,12 @@
 USE mydb;
 
 create table person (
-  "id" int,
-  "name" varchar(64),
-  "email_address" varchar(200),
-  "credit_card" varchar(200),
-  "city" varchar(200),
-  PRIMARY KEY ("id")
+  id int,
+  name varchar(64),
+  email_address varchar(200),
+  credit_card varchar(200),
+  city varchar(200),
+  PRIMARY KEY (id)
 );
 
 INSERT INTO person VALUES (1000, 'vicky noris', 'yplkvgz@qbxfg.com', '7878 5821 1864 2539', 'cheyenne');
