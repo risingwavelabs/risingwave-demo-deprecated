@@ -1,7 +1,8 @@
-CREATE MATERIALIZED VIEW bhv_mv AS
+CREATE MATERIALIZED VIEW seller_auctions AS
 SELECT
-    user_id,
-    target_id,
-    event_timestamp
+    P.id,
+    P.name,
+    A.date_time,
 FROM
-    user_behaviors;
+    person as P
+    JOIN auction as A A ON P.id = A.seller;
