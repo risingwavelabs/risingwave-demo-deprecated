@@ -13,16 +13,3 @@ CREATE TABLE user_behaviors (
   parent_target_id VARCHAR(60),
   PRIMARY KEY(user_id, target_id, event_timestamp)
 );
-
-insert into
-  user_behaviors
-values
-  (
-    "1001",
-    "1551",
-    'A',
-    "2023-03-02 14:20:47",
-    "",
-    ""
-  ),
-;
