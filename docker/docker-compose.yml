@@ -7,6 +7,8 @@ services:
       - compactor-node
       - "--listen-addr"
       - "0.0.0.0:6660"
+      - "--advertise-addr"
+      - "compactor-0:6660"
       - "--prometheus-listener-addr"
       - "0.0.0.0:1260"
       - "--metrics-level"
@@ -41,10 +43,10 @@ services:
       - compute-node
       - "--listen-addr"
       - "0.0.0.0:5688"
-      - "--prometheus-listener-addr"
-      - "0.0.0.0:1222"
       - "--advertise-addr"
       - "compute-node-0:5688"
+      - "--prometheus-listener-addr"
+      - "0.0.0.0:1222"
       - "--metrics-level"
       - "1"
       - "--state-store"
@@ -60,8 +62,6 @@ services:
     depends_on:
       - meta-node-0
       - minio-0
-    volumes:
-      - "./risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: compute-node-0
@@ -127,6 +127,12 @@ services:
       - "0.0.0.0:4566"
       - "--meta-addr"
       - "http://meta-node-0:5690"
+      - "--advertise-addr"
+      - "frontend-node-0:4566"
+      - "--prometheus-listener-addr"
+      - "0.0.0.0:2222"
+      - "--metrics-level"
+      - "1"
     expose:
       - "4566"
     ports:

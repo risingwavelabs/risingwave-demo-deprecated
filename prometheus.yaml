@@ -38,4 +38,4 @@ scrape_configs:
 
   - job_name: redpanda
     static_configs:
-      - targets: ["redpanda:9644"]
+      - targets: ["message_queue:9644"]
