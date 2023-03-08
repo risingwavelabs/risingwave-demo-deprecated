@@ -5,16 +5,12 @@ services:
     image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
     command:
       - compactor-node
-      - "--host"
+      - "--listen-addr"
       - "0.0.0.0:6660"
       - "--prometheus-listener-addr"
       - "0.0.0.0:1260"
-      - "--client-address"
-      - "compactor-0:6660"
       - "--metrics-level"
       - "1"
-      - "--max-concurrent-task-number"
-      - "15"
       - "--state-store"
       - "hummock+minio://hummockadmin:hummockadmin@minio-0:9301/hummock001"
       - "--meta-address"
@@ -43,11 +39,11 @@ services:
     image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
     command:
       - compute-node
-      - "--host"
+      - "--listen-addr"
       - "0.0.0.0:5688"
       - "--prometheus-listener-addr"
       - "0.0.0.0:1222"
-      - "--client-address"
+      - "--advertise-addr"
       - "compute-node-0:5688"
       - "--metrics-level"
       - "1"
@@ -65,7 +61,7 @@ services:
       - meta-node-0
       - minio-0
     volumes:
-      - "compute-node-0:/filecache"
+      - "./risingwave.toml:/risingwave.toml"
     environment:
       RUST_BACKTRACE: "1"
     container_name: compute-node-0
@@ -127,14 +123,8 @@ services:
     image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
     command:
       - frontend-node
-      - "--host"
+      - "--listen-addr"
       - "0.0.0.0:4566"
-      - "--client-address"
-      - "frontend-node-0:4566"
-      - "--prometheus-listener-addr"
-      - "0.0.0.0:2222"
-      - "--metrics-level"
-      - "1"
       - "--meta-addr"
       - "http://meta-node-0:5690"
     expose:
@@ -188,8 +178,8 @@ services:
       - meta-node
       - "--listen-addr"
       - "0.0.0.0:5690"
-      - "--host"
-      - meta-node-0
+      - "--advertise-addr"
+      - "meta-node-0:5690"
       - "--dashboard-host"
       - "0.0.0.0:5691"
       - "--prometheus-host"
@@ -205,8 +195,10 @@ services:
       - "1250"
       - "5691"
     ports:
+      - "5690:5690"
       - "5691:5691"
-    depends_on: []
+    depends_on:
+      - "etcd-0"
     environment:
       RUST_BACKTRACE: "1"
     container_name: meta-node-0
@@ -291,6 +283,44 @@ services:
     ports:
       - 50051
     container_name: connector-node
+  message_queue:
+    image: "docker.vectorized.io/vectorized/redpanda:latest"
+    command:
+      - redpanda
+      - start
+      - "--smp"
+      - "1"
+      - "--reserve-memory"
+      - 0M
+      - "--memory"
+      - 4G
+      - "--overprovisioned"
+      - "--node-id"
+      - "0"
+      - "--check=false"
+      - "--kafka-addr"
+      - "PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092"
+      - "--advertise-kafka-addr"
+      - "PLAINTEXT://message_queue:29092,OUTSIDE://localhost:9092"
+    expose:
+      - "29092"
+      - "9092"
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+      - "9644:9644"
+    depends_on: []
+    environment: {}
+    container_name: message_queue
+    healthcheck:
+      test:
+        - CMD
+        - printf
+        - ""
+        - /dev/tcp/127.0.0.1/9092
+      interval: 1s
+      timeout: 5s
+      retries: 5
 volumes:
   compute-node-0:
     external: false
