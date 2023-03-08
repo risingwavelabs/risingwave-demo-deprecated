@@ -51,6 +51,8 @@ services:
       - "hummock+minio://hummockadmin:hummockadmin@minio-0:9301/hummock001"
       - "--meta-address"
       - "http://meta-node-0:5690"
+      - "--connector-rpc-endpoint"
+      - "connector-node:50051"
     expose:
       - "5688"
       - "1222"
