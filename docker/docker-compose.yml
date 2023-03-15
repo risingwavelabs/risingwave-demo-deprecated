@@ -2,7 +2,7 @@
 version: "3"
 services:
   compactor-0:
-    image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
+    image: "risingwave:fix"
     command:
       - compactor-node
       - "--listen-addr"
@@ -38,7 +38,7 @@ services:
       retries: 5
     restart: always
   compute-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
+    image: "risingwave:fix"
     command:
       - compute-node
       - "--listen-addr"
@@ -120,7 +120,7 @@ services:
       retries: 5
     restart: always
   frontend-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
+    image: "risingwave:fix"
     command:
       - frontend-node
       - "--listen-addr"
@@ -179,7 +179,7 @@ services:
       retries: 5
     restart: always
   meta-node-0:
-    image: "ghcr.io/risingwavelabs/risingwave:v0.1.17"
+    image: "risingwave:fix"
     command:
       - meta-node
       - "--listen-addr"
@@ -284,10 +284,11 @@ services:
       retries: 5
     restart: always
   connector-node:
-    image: ghcr.io/risingwavelabs/risingwave-connector-node:v0.1.17
+    image: "risingwave:fix"
     platform: linux/x86_64
     ports:
       - 50051
+    entrypoint: /risingwave/bin/connector-node/start-service.sh
     container_name: connector-node
   message_queue:
     image: "docker.vectorized.io/vectorized/redpanda:latest"
