@@ -1,4 +1,9 @@
-# RisingWave Demos
+# RisingWave Demos (Deprecated)
+
+> **Note**
+> 
+> This repository has been deprecated and the sources have been migrated to the [`integration_tests/` folder under the RisingWave code base](https://github.com/risingwavelabs/risingwave/tree/main/integration_tests).
+
 
 Here is a gallery of demos that present how to use RisingWave alongwith the ecosystem tools.
 
