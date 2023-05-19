@@ -7,22 +7,22 @@ FROM
 GROUP BY
     city;
 
-CREATE MATERIALIZED VIEW nexmark_q8 AS
+CREATE MATERIALIZED VIEW seller_auctions AS
 SELECT
     P.id,
     P.name,
-    A.starttime
+    A.starttime,
+    A.auctions_count
 FROM
     person as P
     JOIN (
         SELECT
             seller,
-            window_start AS starttime,
-            window_end AS endtime
+            COUNT(*) as auctions_count,
+            window_start AS starttime
         FROM
             TUMBLE(auction, date_time, INTERVAL '10' SECOND)
         GROUP BY
             seller,
-            window_start,
-            window_end
+            window_start
     ) A ON P.id = A.seller;
