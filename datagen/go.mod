@@ -4,12 +4,12 @@ go 1.18
 
 require (
 	github.com/Shopify/sarama v1.37.2
+	github.com/actgardner/gogen-avro/v10 v10.2.1
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/aws/aws-sdk-go v1.44.126
 	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/lib/pq v1.10.7
-	github.com/linkedin/goavro/v2 v2.9.8
 	github.com/urfave/cli v1.22.10
 	go.uber.org/ratelimit v0.2.0
 	gonum.org/v1/gonum v0.12.0
@@ -49,6 +49,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/linkedin/goavro/v2 v2.11.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect

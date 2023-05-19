@@ -1,9 +1,11 @@
 package twitter
 
 import (
+	"bytes"
 	"context"
 	"datagen/gen"
 	"datagen/sink"
+	"datagen/twitter/avro"
 	"datagen/twitter/proto"
 	"encoding/json"
 	"fmt"
@@ -78,26 +80,27 @@ func (r *twitterEvent) ToProtobuf() (topic string, key string, data []byte) {
 }
 
 func (r *twitterEvent) ToAvro() (topic string, key string, data []byte) {
-	obj := map[string]interface{}{
-		"data": map[string]interface{}{
-			"created_at": r.Data.CreatedAt,
-			"id":         r.Data.Id,
-			"text":       r.Data.Text,
-			"lang":       r.Data.Lang,
+	obj := avro.Event{
+		Data: avro.TweetData{
+			Created_at: r.Data.CreatedAt,
+			Id:         r.Data.Id,
+			Text:       r.Data.Text,
+			Lang:       r.Data.Lang,
 		},
-		"author": map[string]interface{}{
-			"created_at": r.Author.CreatedAt,
-			"id":         r.Author.Id,
-			"name":       r.Author.Name,
-			"username":   r.Author.UserName,
-			"followers":  r.Author.Followers,
+		Author: avro.User{
+			Created_at: r.Author.CreatedAt,
+			Id:         r.Author.Id,
+			Name:       r.Author.Name,
+			Username:   r.Author.UserName,
+			Followers:  int64(r.Author.Followers),
 		},
 	}
-	binary, err := AvroCodec.BinaryFromNative(nil, obj)
+	var buf bytes.Buffer
+	err := obj.Serialize(&buf)
 	if err != nil {
 		panic(err)
 	}
-	return "twitter", r.Data.Id, binary
+	return "twitter", r.Data.Id, buf.Bytes()
 }
 
 type twitterGen struct {
